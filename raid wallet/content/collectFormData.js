@@ -18,22 +18,29 @@ let txtNode;
 let lastEventVal = "event value";
 let responseDiv;
 let defaultStyle = "visibility:hidden;opacity:0.8;font:bold 12px sans-serif;z-index:2147483;border:1px solid #000;background:#fff;position:fixed;bottom:3%;right:3%;height:35px;width:170px";
-browser.runtime.onConnect.addListener((port,msg) => {
-	port.onMessage.addListener((msg) => {port.postMessage({eventType:"ok"});awaitingResponse = null;console.log(msg.msg);responseWindow(msg.eventType,msg.msg);});
-});
-// the order has to be from most popular to least popular
-let filter = ["4chan.","4channel."/*,"twitter.com"*/,"ylilauta.","komica.","kohlchan.","diochan.","ptchan.","hispachan.","2ch.hk","indiachan.","2chan."/*,"github.com","bitcointalk.org",
-"ethereum-magicians.org","forum.openzeppelin.com"*/,"wrongthink.net","endchan.net","krautchan."];
+// the order has to be from most popular to least popular2ch.hk, 2ch.pm, 2ch.re, 2ch.tf, 2ch.wf, 2ch.yt, 2-ch.so
+let filter = ["4chan.","4channel."/*,"twitter.com"*/,"ylilauta.","komica.","kohlchan.","diochan.","ptchan.","hispachan.","2ch.", "2-ch.","indiachan.","2chan."/*,"github.com","bitcointalk.org",
+"ethereum-magicians.org","forum.openzeppelin.com"*/,"wrongthink.","endchan.","krautchan."];
 //----------------------------------------------------------------------------
 // EventQueue handling methods
 //----------------------------------------------------------------------------
 
-function responseWindow(type,msg) {
+browser.storage.onChanged.addListener((changes, area) => {
+	let changedItems = Object.keys(changes); for (let item of changedItems) {
+		if (item == "messageFromBackground" && changes[item].newValue != "") {
+			responseWindow(changes[item].newValue);
+			browser.storage.local.set({messageFromBackground: ""});
+		}
+	}
+});
+
+
+function responseWindow(msg) {
 	if(responseDiv) {
 		responseDiv.innerHTML = msg;
-		let color ="green"; let opacity = 0.8; if(type == true){setTimeout(()=>{responseDiv.setAttribute("style",defaultStyle);},5000);} else {
+		let color ="green"; let opacity = 0.8; if(msg.indexOf("XMLHttpRequest status 200") != -1){setTimeout(()=>{responseDiv.setAttribute("style",defaultStyle);},5000);} else {
 			color = "red";
-			setTimeout(()=>{responseDiv.setAttribute("style",defaultStyle);},15000);
+			setTimeout(()=>{responseDiv.setAttribute("style",defaultStyle);},30000);
 		}
 		responseDiv.setAttribute("style","color:#000;visibility:visible;opacity:"+opacity+";font:bold 12px sans-serif;z-index:2147483;border:1px solid #000;background:"+color+";position:fixed;bottom:3%;right:3%;height:35px;width:170px");
 	}
@@ -58,7 +65,6 @@ function _processContentEvent(event) {
 		event.node.listenerAdded = false;
 		let entry = event.value+";;;"+event.url;
 		browser.storage.local.set({eventValue: entry});
-	//	browser.runtime.sendMessage(event);
 	}
 }
 
@@ -287,40 +293,13 @@ function findFields(elem) {
 				if(t=="com"){butt=document.querySelector('td>input[value="Post"]');}
 				if(document.querySelector("#file-n-submit > input[value='Submit']")) {butt = document.querySelector("#file-n-submit > input[value='Submit']");}
 			}
-			if (window.location.href.indexOf("2ch.hk") != -1){
-			//	elemId = 'letButton'+ elem.type + elem.name;
-			//	if (document.getElementById(elemId)) {document.getElementById(elemId).remove();}
-			//	butt = _createLetButton(elemId, elem, true);
-			//	elem.parentNode.parentNode.insertBefore(div,elem.parentNode);
+			if (window.location.href.indexOf("2ch.") != -1){
 				if(elem.id=="qr-shampoo"){console.log("dis button");butt=document.querySelector('#qr-submit');} 
 				if(elem.id=="shampoo"){butt=document.querySelector('#submit');}
 			}
-			/*if (window.location.href.indexOf("4chan") != -1 ||window.location.href.indexOf("ylilauta") != -1 || window.location.href.indexOf("komica") != -1|| window.location.href.indexOf("krautchan.") != -1
-			|| window.location.href.indexOf("kohlchan") != -1 || window.location.href.indexOf("diochan") != -1 || window.location.href.indexOf("endchan.net") != -1
-			|| window.location.href.indexOf("ptchan") != -1 || window.location.href.indexOf("hispachan") != -1 || window.location.href.indexOf("wrongthink.net") != -1) {elem.parentNode.parentNode.appendChild(div);} 
-			else if (window.location.href.indexOf("2ch.hk") != -1 || window.location.href.indexOf("adnmb2") != -1
-			|| window.location.href.indexOf("indiachan") != -1){}
-			else if (window.location.href.indexOf("2chan") != -1){
-				let but = document.querySelector('input[value="返信する"]') || document.querySelector('input[value="スレッドを立てる"]');
-				but.parentNode.insertBefore(div,but);
-				div.style.display = "inline";
-				div.style.zIndex = "5000";
-			}
-			else {document.body.appendChild(div);}*/
 		}
 		return butt;
 	}
-/*	document.querySelectorAll("html,div,iframe,body").forEach( (elem) => {
-		if (_isNotIrrelevantInfo(elem)) {
-			if (_isContentEditable(elem) && _isDisplayed(elem)) {
-				elemId = 'letButton';
-				if (document.getElementById(elemId)) {document.getElementById(elemId).remove();div = _createLetButton(elemId, elem, false);document.body.appendChild(div);}
-				else {div = _createLetButton(elemId, elem, false);document.body.appendChild(div);}
-			}
-		}
-	});*/
-	//return div;
-	//return butt;
 }
 function createResponseWindow() {
 	if(responseDiv == undefined || responseDiv == null){
@@ -337,24 +316,3 @@ function createResponseWindow() {
 		responseDiv.appendChild(close);
 	}
 }
-/*
-function _createLetButton(id, sourceElem, includeForm){
-	let fldName = _getClassOrNameOrId(sourceElem);
-	if (fldName === '') {fldName = '\u00a0';} //&nbsp;
-	let style = 'display:block;padding:0 4px;color:#000;opacity:0.9;font:bold 11px sans-serif;text-decoration:none;text-align:center;z-index:2147483647;cursor:default;border:1px solid #000;';
-	let compstyle = document.defaultView.getComputedStyle(sourceElem, null);
-	let width = 0;
-	if ('BODY' !== sourceElem.nodeName && 'HTML' !== sourceElem.nodeName) {width = parseInt(compstyle.getPropertyValue("width").replace('px', ''));} // do need place info about body or html next to (and outside) the element
-	let padding = parseInt(compstyle.getPropertyValue("padding-right").replace('px', ''));
-	let border = parseInt(compstyle.getPropertyValue("border-right-width").replace('px', ''));
-	let left = 0, top = 0, elem = sourceElem;
-	let div = document.createElement('div');
-	div.setAttribute('id', id);
-	div.setAttribute('style', style);
-	div.addEventListener("mouseenter", function(){this.style.opacity=1;this.style.zIndex=1002;}, false);
-	div.addEventListener("mouseleave", function(){this.style.opacity=0.9;this.style.zIndex=1001;}, false);
-	if (elem.offsetParent) {do {left += elem.offsetLeft;top += elem.offsetTop;} while ((elem = elem.offsetParent));}
-	style += 'position:absolute; top:' + top + 'px; ';
-	style += 'left:' + (left + width + padding + border + 4) + 'px; ';
-	return div;
-}*/
