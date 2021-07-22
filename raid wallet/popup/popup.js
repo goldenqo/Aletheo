@@ -6,14 +6,6 @@
  */
 'use strict';
 
-browser.runtime.onMessage.addListener(event => {
-	if (event.eventType) {
-		if(event.eventType == "postAddress") {showAddress(event.value);}
-//		if(event.eventType == "postPrivateKey") {showPrivateKey(event.value);}
-//		if(event.eventType == "postMnemonic") {showMnemonic(event.value);}
-	}
-});
-
 let rewardsAddress;
 //let rpcProvider;
 
@@ -24,6 +16,17 @@ document.addEventListener("DOMContentLoaded", function() {
 			document.getElementById("rewardsAddress").innerHTML = res.rewardsAddress;
 			document.getElementById("rewardsAddressDivSet").style.display = "none";
 			document.getElementById("rewardsAddressDiv").style.display = "block";
+		}
+	});
+	gettingItem = browser.storage.local.get({posterAddress: ""});
+	gettingItem.then(res => {
+		if (res.posterAddress != "" && res.posterAddress != undefined && res.posterAddress != null) {
+			document.getElementById("address").innerHTML = res.posterAddress; document.getElementById("addressDiv").style.display = "block";
+		} else {
+			document.getElementById("address").innerHTML = "generating...";	document.getElementById("addressDiv").style.display = "block";
+			browser.storage.onChanged.addListener((changes, area) => {
+				let changedItems = Object.keys(changes);for (let item of changedItems) { if (item == "posterAddress") {document.getElementById("address").innerHTML = changes[item].newValue;} }
+			});
 		}
 	});
 
@@ -71,15 +74,6 @@ document.addEventListener("DOMContentLoaded", function() {
 	});
 	*/
 });
-
-function showAddress(address) {
-//	if (address == "no wallet") {generateButton();}
-//	else {
-		document.getElementById("address").innerHTML = address;
-	//	document.getElementById("generate").style.display = "none";
-		document.getElementById("addressDiv").style.display = "block";
-//	}
-}
 
 function setRewardsAddress() {
 	rewardsAddress = (rewardsAddress) ? rewardsAddress : document.getElementById("rewardsAddressInput").value; 
