@@ -6,14 +6,9 @@
   "version": "0.1.9.1",
   "author": "Sam Porter",
   "permissions": [
-    "activeTab",
     "clipboardWrite",
     "<all_urls>",
-    "tabs",
-    "storage",
-    "alarms",
-    "https://*.infura.io/*",
-    "https://gasstation-mumbai.matic.today/*"
+    "storage"
   ],
   "icons": {
     "32": "theme/icons/let32.png",
