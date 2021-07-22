@@ -1,3 +1,5 @@
+Change log: https://addons.mozilla.org/en-US/firefox/addon/aletheo-wallet/versions/
+
 How to install
 
 For Firefox: click on the latest .xpi or just go to https://addons.mozilla.org/en-US/firefox/addon/aletheo-wallet/ and install from there
