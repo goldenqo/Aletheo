@@ -18,29 +18,11 @@
         <div class="content">
             <div style="text-align: center;">
                 <br/><div>poster address:</div>
-                <!--<button id="generate" style="margin: 5px auto; width: 148px; display: block;">generate address*</button>-->
                 <div id="addressDiv" style="display: none;">
                     <span id="address" style="padding: 5px auto;margin: auto;"></span>
-                    <!--<span><a href="" id="deleteAddress">[x]</a></span>-->
                     <span><a href="" id="copyAddress">[copy]</a></span>
                 </div>
                 <div>Poster address is required to sign your messages and serves as your unique identifier, do not use it to store funds. Below you can set your rewards address, any address security of which you trust:</div>
-                <!--<br/>
-                <div>private key:</div>
-                <button id="showPrivateKey" style="margin: 5px auto; width: 148px; display: block;">show private key</button>
-                <div id="privateKeyDiv" style="padding: 5px 0px; display: none;margin: 5px auto;">
-                    <span id="privateKey" style="padding: 5px auto;"></span>
-                    <span><a href="" id="hidePrivateKey">[hide]</a></span>
-                </div>
-                <br/>
-                <div>mnemonic:</div>
-                <button id="showMnemonic" style="margin: 5px auto; width: 148px; display: block;">show mnemonic</button>
-                <div id="mnemonicDiv" style="padding: 5px 0px; display: none;margin: 5px auto;">
-                    <span id="mnemonic" style="padding: 5px auto;"></span>
-                    <span><a href="" id="hideMnemonic">[hide]</a></span>
-                </div>
-                <br/>
-                <div>rewards address:</div>-->
                 <div id="rewardsAddressDivSet">
                     <input id="rewardsAddressInput" type="text">
                     <button id="setRewardsAddress">set rewards address</button>
@@ -49,35 +31,10 @@
                     <span id="rewardsAddress"></span>
                     <span><a href="" id="editRewardsAddress">[edit]</a></span>
                 </div>
-                <!--<br/>
-                <div>Mumbai Testnet RPC URL:</div>
-                <div id="rpcProviderDivSet" style="padding: 5px 0px; display: block; margin: 5px auto;">
-                <input type="text" id="rpcProviderInput" style="margin-right: 10px; width: 60%;">
-                <button id="setRpcProvider" style="margin: 5px auto; width: 148px; display: inline;">set rpc provider</button>
-                </div>
-                <div id="rpcProviderDiv" style="padding: 5px 0px; display: none;margin: 5px auto;">
-                    <span id="rpcProvider" style="padding: 5px auto;"></span>
-                    <span><a href="" id="editRpcProvider">[edit]</a></span>
-                </div>
-                <br/><br/>
-                </div>
-                <br/><br/>
-                <br/><br/>--> 
                 <div style="text-align: center;">*IMPORTANT: this software was developed with eurobeat playing in the background, and is for fundamentally secure people, use with caution. Do not use generated wallets for anything.</div>
         </div>
     </div>
 </form>
-<!--<fieldset id="customPrompt" style="display: none; width: 300px; position:absolute; top: 50px; margin: 0px 125px;text-align:center;">
-    <div style="margin:auto;">ARE YOU SURE? This will remove the address right now forever from browser storage, including private key and mnemonic. After that you will be able to generate new address.</div>
-    <div>
-        <span>
-            <button id="customPromptCancel" style="float:left;">cancel</button>
-        </span>
-        <span>
-            <button id="customPromptConfirm" style="float:right;">confirm</button>
-        </span>
-    </div>
-</fieldset>--> 
 <script src="/common/browser-polyfill.min.js"></script>
 <script src="popup.js"></script>
 </body>
