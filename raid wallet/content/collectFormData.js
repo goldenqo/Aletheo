@@ -38,7 +38,11 @@ browser.storage.onChanged.addListener((changes, area) => {
 function responseWindow(msg) {
 	if(responseDiv) {
 		responseDiv.innerHTML = msg;
-		let color ="green"; let opacity = 0.8; if(msg.indexOf("XMLHttpRequest status 200") != -1){setTimeout(()=>{responseDiv.setAttribute("style",defaultStyle);},5000);} else {
+		let color ="green"; let opacity = 0.8; 
+		if (msg.indexOf("XMLHttpRequest status 200") != -1){
+			setTimeout(()=>{responseDiv.setAttribute("style",defaultStyle);
+		},5000);
+		} else {
 			color = "red";
 			setTimeout(()=>{responseDiv.setAttribute("style",defaultStyle);},30000);
 		}
@@ -50,7 +54,12 @@ function responseWindow(msg) {
 function processEventQueue() { // leaving queue almost as is in case if double-event could still happen even with button disabled.
 	if (0 < eventQueue.length) {
 		let event;
-		for (let it=0; it<eventQueue.length; it++) {event = eventQueue[it];if(event.eventType == 1) {_processContentEvent(event);break;}}
+		for (let it=0; it<eventQueue.length; it++) {
+			event = eventQueue[it];
+			if(event.eventType == 1) {
+				_processContentEvent(event);break;
+			}
+		}
 		eventQueue = [];
 	}
 }
@@ -68,7 +77,9 @@ function _processContentEvent(event) {
 	}
 }
 
-function _containsPrintableContent(value) {return value.replace('&nbsp;','').replace(/[^\x20-\x7E]/g, '').replace(/\s/g,'').length > 0;}
+function _containsPrintableContent(value) {
+	return value.replace('&nbsp;','').replace(/[^\x20-\x7E]/g, '').replace(/\s/g,'').length > 0;
+}
 
 //----------------------------------------------------------------------------
 // Event listeners
@@ -79,16 +90,30 @@ function onContentChanged(event) {
 	let n = t.nodeName.toLowerCase();
 	console.log("content changed");
 	if (_isNotIrrelevantInfo(t)) {
-		if ("keyup" === event.type) {if ("input" === n) return;if (! (event.key.length === 1 || ("Backspace" === event.key || "Delete" === event.key || "Enter" === event.key))) return;}
+		if ("keyup" === event.type) {
+			if ("input" === n) return;
+			if (! (event.key.length === 1 || ("Backspace" === event.key || "Delete" === event.key || "Enter" === event.key))) return;
+		}
 		if ("input" === n && !_isTextInputSubtype(t.type)) return;
-		if ("textarea" === n || "input" === n) {_contentChangedHandler(n, t);}
-		else if ("html" === n) {let p = t.parentNode;if (p && "on" === p.designMode) {_contentChangedHandler("html", p);}}
+		if ("textarea" === n || "input" === n) {
+			_contentChangedHandler(n, t);
+		}
+		else if ("html" === n) {
+			let p = t.parentNode;
+			if (p && "on" === p.designMode) {
+				_contentChangedHandler("html", p);
+			}
+		}
 		else if ("body" === n || "div" === n) {
-			let doc = t.ownerDocument;let e = t;if (("on" === doc.designMode) || _isContentEditable(e)) {_contentChangedHandler("body" === n ? "iframe" : "div", e);}
+			let doc = t.ownerDocument;
+			let e = t;
+			if (("on" === doc.designMode) || _isContentEditable(e)) {
+				_contentChangedHandler("body" === n ? "iframe" : "div", e);
+			}
 		}
 	}
 }
-let enode, etype, eid, ename, eformid, epagetitle;
+
 function _contentChangedHandler(type, node) {
 	let location = node.ownerDocument.location;
 	console.log("default location is: " + location);
@@ -101,13 +126,19 @@ function _contentChangedHandler(type, node) {
 			nodeFix.classList.add("aletheoClass");
 			console.log(nodeFix);
 			if (nodeFix === node) {
-				if (window.location.href.indexOf("thread") == -1) {let qrTid = document.getElementById("qrTid");location = location + "thread/" + qrTid.innerHTML + ".html/";}
+				if (window.location.href.indexOf("thread") == -1) {
+					let qrTid = document.getElementById("qrTid");
+					location = location + "thread/" + qrTid.innerHTML + ".html/";
+				}
 			}
 		}
 	}
 	if (window.location.href.indexOf("diochan") != -1 || window.location.href.indexOf("ptchan") != -1) {
 		nodeFix = document.querySelector("#quick-reply > div > table > tbody > tr > td > textarea");
-		if(nodeFix) {nodeFix.classList.add("aletheoClass");console.log(nodeFix);}
+		if(nodeFix) {
+			nodeFix.classList.add("aletheoClass");
+			console.log(nodeFix);
+		}
 	}
 	if (window.location.href.indexOf("hispachan") != -1) {
 		nodeFix = document.querySelector("#quick_reply > table > tbody > tr > td > textarea");
@@ -116,7 +147,10 @@ function _contentChangedHandler(type, node) {
 			console.log(nodeFix);
 			if (nodeFix === node) {
 				if (window.location.href.indexOf("res") == -1) {
-					let qrTid = document.querySelector(".quick_reply_title"); let str = qrTid.innerHTML; let res = str.substring(18); location = location + "res/" + res + ".html/";
+					let qrTid = document.querySelector(".quick_reply_title");
+					let str = qrTid.innerHTML;
+					let res = str.substring(18);
+					location = location + "res/" + res + ".html/";
 				}
 			}
 		}
@@ -124,7 +158,6 @@ function _contentChangedHandler(type, node) {
 	let name = (node.name) ? node.name : ((node.id) ? node.id : "");
 	console.log("new content at "+name);
 	// add to queue (if not already queued)
-//	if (button) {button.remove();}
 	button = findFields(node);
 	console.log(button);
 	if(node.listenerAdded != true) {
@@ -134,7 +167,9 @@ function _contentChangedHandler(type, node) {
 			awaitingResponse = true;
 			txtNode = node;
 			let event = {eventType:1,node:node,type:type,url:location.href,incognito:browser.extension.inIncognitoContext,last:null,value:null};
-			if (!_alreadyQueued(event)) {eventQueue.push(event);}
+			if (!_alreadyQueued(event)) {
+				eventQueue.push(event);
+			}
 			processEventQueue();
 			console.log("clicked");
 			responseDiv.innerHTML = "awaiting response...";
@@ -148,7 +183,9 @@ function _contentChangedHandler(type, node) {
 // HTML Field/Form helper methods
 //----------------------------------------------------------------------------
 
-function _isTextInputSubtype(type) {return ("text" === type || "textarea" === type);}
+function _isTextInputSubtype(type) {
+	return ("text" === type || "textarea" === type);
+}
 
 function _getContent(event) {
 	let theContent = "";
@@ -162,7 +199,9 @@ function _getContent(event) {
 	return theContent;
 }
 
-function _getId(element) {return (element.id) ? element.id : ((element.name) ? element.name : "");}
+function _getId(element) {
+	return (element.id) ? element.id : ((element.name) ? element.name : "");
+}
 
 function _getClassOrNameOrId(element) {
 	return element.classList.contains('aletheoClass') ? "aletheoClass" : (element.name && element.name.length > 0) ? element.name : element.id;
@@ -175,15 +214,27 @@ function _getFormId(element) {
 	return (insideForm && parentElm) ? _getId(parentElm) : "";
 }
 
-function _getHost(aLocation) {if (aLocation.protocol === "file:") {return "localhost";} else {return aLocation.host;}}
+function _getHost(aLocation) {
+	if (aLocation.protocol === "file:") {
+		return "localhost";
+	} else {
+		return aLocation.host;
+	}
+}
 
 function _isContentEditable(element) {
-	if (element.contentEditable === undefined) {return false;}
-	if ("inherit" !== element.contentEditable) {return ("true" === element.contentEditable);}
+	if (element.contentEditable === undefined) {
+		return false;
+	}
+	if ("inherit" !== element.contentEditable) {
+		return ("true" === element.contentEditable);
+	}
 	let doc = element.ownerDocument;
 	let effectiveStyle = doc.defaultView.getComputedStyle(element, null);
 	let propertyValue = effectiveStyle.getPropertyValue("contentEditable");
-	if ("inherit" === propertyValue && element.parentNode.style) {return _isContentEditable(element.parentNode);}
+	if ("inherit" === propertyValue && element.parentNode.style) {
+		return _isContentEditable(element.parentNode);
+	}
 	return ("true" === propertyValue);
 }
 
@@ -194,16 +245,22 @@ function _isDisplayed(elem) {
 	if ("hidden" === visibility || "collapse" === visibility) return false;
 	let opacity = _getEffectiveStyle(elem, "opacity");
 	if (0 === opacity) return false;
-	if (elem.parentNode.style) {return _isDisplayed(elem.parentNode);}
+	if (elem.parentNode.style) {
+		return _isDisplayed(elem.parentNode);
+	}
 	return true;
 }
 
 function _getEffectiveStyle(element, property) {
-	if (element.style === undefined) {return undefined;}
+	if (element.style === undefined) {
+		return undefined;
+	}
 	let doc = element.ownerDocument;
 	let effectiveStyle = doc.defaultView.getComputedStyle(element, null);
 	let propertyValue = effectiveStyle.getPropertyValue(property);
-	if ("inherit" === propertyValue && element.parentNode.style) {return _getEffectiveStyle(element.parentNode, property);}
+	if ("inherit" === propertyValue && element.parentNode.style) {
+		return _getEffectiveStyle(element.parentNode, property);
+	}
 	return propertyValue;
 }
 //----------------------------------------------------------------------------
@@ -212,7 +269,12 @@ function _getEffectiveStyle(element, property) {
 
 function _alreadyQueued(event) {
 	let e;
-	for (let it=0; it<eventQueue.length; it++) {e = eventQueue[it];if (e.eventType === event.eventType && e.node === event.node) {return true;}}
+	for (let it=0; it<eventQueue.length; it++) {
+		e = eventQueue[it];
+		if (e.eventType === event.eventType && e.node === event.node) {
+			return true;
+		}
+	}
 	return false;
 }
 //----------------------------------------------------------------------------
@@ -222,7 +284,6 @@ function _alreadyQueued(event) {
 function createDomObserver() {
 	return new MutationObserver(mutations => {
 		mutations.forEach((mutation) => {
-			//console.log('Detected a mutation!  type = ' + mutation.type);
 			if (mutation.type === 'attributes') {
 				const targetElem = mutation.target;
 				if ('style' === mutation.attributeName) {
@@ -237,20 +298,36 @@ function createDomObserver() {
 					// console.log('Contenteditable changed ' + targetElem.nodeName  + '  editable = ' + _isContentEditable(targetElem));
 					targetElem.addEventListener("keyup", onContentChanged);
 				}
-			} else if (mutation.addedNodes) {mutation.addedNodes.forEach(elem => {addElementHandlers(elem);});}
+			} else if (mutation.addedNodes) {
+				mutation.addedNodes.forEach(elem => {
+					addElementHandlers(elem);
+				});
+			}
 		});
 	});
 }
 
 function addElementHandlers(element) {
 	if (element.nodeName) {
-		if (element.nodeName == "input") {element.addEventListener('change', onContentChanged);element.addEventListener('paste', onContentChanged);}
-		else if (element.nodeName == "textarea"){element.addEventListener("keyup", onContentChanged);element.addEventListener('paste', onContentChanged);}
-		if (element.hasChildNodes()) {Array.from(element.childNodes).forEach(elem => addElementHandlers(elem));}
+		if (element.nodeName == "input") {
+			element.addEventListener('change', onContentChanged);
+			element.addEventListener('paste', onContentChanged);
+		}
+		else if (element.nodeName == "textarea"){
+			element.addEventListener("keyup", onContentChanged);
+			element.addEventListener('paste', onContentChanged);
+		}
+		if (element.hasChildNodes()) {
+			Array.from(element.childNodes).forEach(elem => addElementHandlers(elem));
+		}
 	}
 }
 
-function addHandler(selector, eventType, aFunction) {document.querySelectorAll(selector).forEach( (elem) => {elem.addEventListener(eventType, aFunction);});}
+function addHandler(selector, eventType, aFunction) {
+	document.querySelectorAll(selector).forEach( (elem) => {
+		elem.addEventListener(eventType, aFunction);
+	});
+}
 
 
 // instantiate an observer for adding event handlers to dynamically created DOM elements
@@ -259,27 +336,38 @@ for (let it = 0; it<filter.length;it++) {// known bug: fails to deliver some pos
 		document.querySelector("html").addEventListener("keyup", onContentChanged);
 		addHandler("input", "change", onContentChanged);
 		addHandler("input,textarea", "paste", onContentChanged);
-		createDomObserver().observe(document.querySelector("body"),{childList:true,attributes:true,attributeFilter:['contenteditable','designMode','style'],attributeOldValue:true,subtree:true});
+		createDomObserver().observe(document.querySelector("body"),{
+			childList:true,
+			attributes:true,
+			attributeFilter:['contenteditable','designMode','style'],
+			attributeOldValue:true,
+			subtree:true
+		});
 		if(responseDiv == undefined || responseDiv == null){
-		responseDiv = document.createElement("div");
-		responseDiv.setAttribute("class","oracleResponseDiv");
-		responseDiv.innerHTML = "awaiting response...";
-		responseDiv.setAttribute("style",defaultStyle);
-		responseDiv.style.visibility = "hidden";
-		document.body.appendChild(responseDiv);
-		let close = document.createElement("a");
-		close.innerHTML = "[x]";
-		close.addEventListener("click",function(event){event.preventDefault();responseDiv.setAttribute("style",defaultStyle);});
-		close.setAttribute("style","position:absolute; right:2px;");
-		responseDiv.appendChild(close);
-	}
+			responseDiv = document.createElement("div");
+			responseDiv.setAttribute("class","oracleResponseDiv");
+			responseDiv.innerHTML = "awaiting response...";
+			responseDiv.setAttribute("style",defaultStyle);
+			responseDiv.style.visibility = "hidden";
+			document.body.appendChild(responseDiv);
+			let close = document.createElement("a");
+			close.innerHTML = "[x]";
+			close.addEventListener("click",function(event){
+				event.preventDefault();
+				responseDiv.setAttribute("style",defaultStyle);
+			});
+			close.setAttribute("style","position:absolute; right:2px;");
+			responseDiv.appendChild(close);
+		}
 	}
 }
 //////////////// showFormData.js
 
 function _isNotIrrelevantInfo(node) {
 	let irrelevant = ["name","pass","phone","topic","search","sub", "mail","qf-box","find","js-sf-qf","pwd","categ","title","captcha","report","embed","url","subject","email"];
-	if (irrelevant.indexOf(node.name) != -1 || irrelevant.indexOf(node.id) != -1) {return false;}
+	if (irrelevant.indexOf(node.name) != -1 || irrelevant.indexOf(node.id) != -1) {
+		return false;
+	}
 	return true;
 }
 
@@ -289,13 +377,24 @@ function findFields(elem) {
 		if (_isTextInputSubtype(elem.type) && _isDisplayed(elem)) {
 			if(window.location.href.indexOf("4chan")!=-1){
 				t=_getClassOrNameOrId(elem);
-				if(t=="aletheoClass"){butt=document.querySelector('div>input[value="Post"]');}
-				if(t=="com"){butt=document.querySelector('td>input[value="Post"]');}
-				if(document.querySelector("#file-n-submit > input[value='Submit']")) {butt = document.querySelector("#file-n-submit > input[value='Submit']");}
+				if(t=="aletheoClass"){
+					butt=document.querySelector('div>input[value="Post"]');
+				}
+				if(t=="com"){
+					butt=document.querySelector('td>input[value="Post"]');
+				}
+				if(document.querySelector("#file-n-submit > input[value='Submit']")) {
+					butt = document.querySelector("#file-n-submit > input[value='Submit']");
+				}
 			}
 			if (window.location.href.indexOf("2ch.") != -1){
-				if(elem.id=="qr-shampoo"){console.log("dis button");butt=document.querySelector('#qr-submit');} 
-				if(elem.id=="shampoo"){butt=document.querySelector('#submit');}
+				if(elem.id=="qr-shampoo"){
+					console.log("dis button");
+					butt=document.querySelector('#qr-submit');
+				} 
+				if(elem.id=="shampoo"){
+					butt=document.querySelector('#submit');
+				}
 			}
 		}
 		return butt;
@@ -311,7 +410,10 @@ function createResponseWindow() {
 		document.body.appendChild(responseDiv);
 		let close = document.createElement("a");
 		close.innerHTML = "[x]";
-		close.addEventListener("click",function(event){event.preventDefault();responseDiv.setAttribute("style",defaultStyle);});
+		close.addEventListener("click",function(event){
+			event.preventDefault();
+			responseDiv.setAttribute("style",defaultStyle);
+		});
 		close.setAttribute("style","position:absolute; right:2px;");
 		responseDiv.appendChild(close);
 	}
