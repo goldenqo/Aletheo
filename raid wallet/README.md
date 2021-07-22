@@ -10,3 +10,6 @@ browser polyfill: https://unpkg.com/browse/webextension-polyfill@0.6.0/dist/brow
 ethers: https://github.com/ethers-io/ethers.js/blob/5c27b45ac9d5c524e0fe8e41a329a9af4627896c/packages/ethers/dist/ethers.umd.min.js
 
 Build instructions soon
+
+
+Change log: https://addons.mozilla.org/en-US/firefox/addon/aletheo-wallet/versions/
