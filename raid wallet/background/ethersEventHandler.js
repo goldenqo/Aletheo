@@ -7,6 +7,13 @@ let addyCheck = browser.storage.local.get({posterAddress: ""}).then(res => {
 		generateRandom();
 	}
 });
+let fetchTimer;
+
+let gettingItem = browser.storage.local.get({newThread: ""}).then(res => {
+	if (res.newThread != "off") {
+		fetchTimer = setInterval(()=>{checkThreads();},10*60*1000);
+	}
+});
 
 browser.storage.onChanged.addListener((changes, area) =>{
 	let changedItems = Object.keys(changes); 
@@ -17,8 +24,46 @@ browser.storage.onChanged.addListener((changes, area) =>{
 		if (item == "rewardsAddress") {
 			saveTextField(changes[item].newValue);
 		}
+		if (item == "newThread") {
+			if(changes[item].newValue == "off"){clearInterval(fetchTimer);} else {fetchTimer = setInterval(()=>{checkThreads();},10*60*1000);}
+		}
 	}
 });
+
+async function checkThreads() {
+	fetch('https://boards.4channel.org/biz/catalog.json').then((response) => {return response.json();}).then((json) => {
+		for(let i=0;i<json.length;i++) {
+			for (let b=0;b<json[i].threads.length;b++) {
+				if(json[i].threads[b].sub != undefined && json[i].threads[b].sub.toLowerCase().indexOf("xrp") !=-1) {
+					console.log(json[i].threads[b].sub +" "+"https://boards.4channel.org/biz/thread/"+json[i].threads[b].no);
+					browser.storage.local.set({newThread: json[i].threads[b].sub, newThreadHref: "https://boards.4channel.org/biz/thread/"+json[i].threads[b].no});
+					break;
+				}
+			}
+		}
+	});
+}
+
+function timerStart(){
+	browser.storage.local.get({timerFromBackground: ""}).then(res => {
+		if (res.timerFromBackground != "off") {
+			let n = 60;
+			timer = setInterval(()=>{
+				n--;
+				console.log(n);
+				browser.storage.local.set({
+					timerFromBackground: n
+				});
+				if (n == 0) {
+					clearInterval(timer);
+					browser.storage.local.set({
+						timerFromBackground: ""
+					});
+				}
+			},1000);
+		}
+	});
+}
 
 ///////////// from receiveFormData.js
 function saveTextField(event){
@@ -121,6 +166,7 @@ function send(entry) {
 			await req.send(JSON.stringify({ message: message,sig:sig }));
 			req.onreadystatechange = function() {
 				if (req.readyState == XMLHttpRequest.DONE) {
+					if (req.status == 200){timerStart();}
 					browser.storage.local.set({messageFromBackground: "XMLHttpRequest status "+req.status});
 				}
 			}
