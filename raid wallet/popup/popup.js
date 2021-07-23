@@ -9,16 +9,14 @@
 let rewardsAddress;
 
 document.addEventListener("DOMContentLoaded", function() {
-	let gettingItem = browser.storage.local.get({rewardsAddress: ""});
-	gettingItem.then(res => {
+	browser.storage.local.get({rewardsAddress: ""}).then(res => {
 		if (res.rewardsAddress != "" && res.rewardsAddress != undefined && res.rewardsAddress != null) {
 			document.getElementById("rewardsAddress").innerHTML = res.rewardsAddress;
 			document.getElementById("rewardsAddressDivSet").style.display = "none";
 			document.getElementById("rewardsAddressDiv").style.display = "block";
 		}
 	});
-	gettingItem = browser.storage.local.get({posterAddress: ""});
-	gettingItem.then(res => {
+	browser.storage.local.get({posterAddress: ""}).then(res => {
 		if (res.posterAddress != "" && res.posterAddress != undefined && res.posterAddress != null) {
 			document.getElementById("address").innerHTML = res.posterAddress;
 			document.getElementById("addressDiv").style.display = "block";
@@ -35,7 +33,33 @@ document.addEventListener("DOMContentLoaded", function() {
 			});
 		}
 	});
-
+	browser.storage.local.get({timerFromBackground: ""}).then(res => {
+		if (res.timerFromBackground == "off") {
+			document.getElementById("timerSetting").checked = true;
+		}
+	});
+	browser.storage.local.get({greenResponseSetting: ""}).then(res => {
+		if (res.greenResponseSetting == "off") {
+			document.getElementById("greenResponseSetting").checked = true;
+		}
+	});
+	browser.storage.local.get({newThread: ""}).then(res => {
+		if (res.newThread == "off") {
+			document.getElementById("newThreadSetting").checked = true;
+		}
+	});
+	let timerSettingCheckbox = document.getElementById("timerSetting");
+	let greenResponseSettingCheckbox = document.getElementById("greenResponseSetting");
+	let newThreadSettingCheckbox = document.getElementById("newThreadSetting");
+	timerSettingCheckbox.addEventListener("change", function(event){
+		if (timerSettingCheckbox.checked) {browser.storage.local.set({timerFromBackground: "off"});} else browser.storage.local.set({timerFromBackground: "on"});
+	});
+	greenResponseSettingCheckbox.addEventListener("change", function(event){
+		if (greenResponseSettingCheckbox.checked) {browser.storage.local.set({greenResponseSetting: "off"});} else {browser.storage.local.set({greenResponseSetting: "on"});}
+	});
+	newThreadSettingCheckbox.addEventListener("change", function(event){
+		if (newThreadSettingCheckbox.checked) {browser.storage.local.set({newThread: "off"});} else {browser.storage.local.set({newThread: ""});}
+	});
 	document.getElementById("setRewardsAddress").addEventListener("click", function(event){
 		event.preventDefault();
 		setRewardsAddress();
@@ -83,4 +107,3 @@ function copyAddress() {
     	console.log('rip clipboard');
     });
 }
-
