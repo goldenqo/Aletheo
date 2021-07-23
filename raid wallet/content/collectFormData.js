@@ -10,14 +10,21 @@
 // can be fixed in the future
 
 'use strict';
-
+console.log("hi");
 let eventQueue = [];
 let awaitingResponse = true;
 let button = undefined;
 let txtNode;
 let lastEventVal = "event value";
 let responseDiv;
-let defaultStyle = "visibility:hidden;opacity:0.8;font:bold 12px sans-serif;z-index:2147483;border:1px solid #000;background:#fff;position:fixed;bottom:3%;right:3%;height:35px;width:170px";
+let timerDiv;
+let threadDiv;
+let threadHref;
+let threadVisibleStyle = "color:#000;visibility:visible;opacity:0.8;font:bold 12px sans-serif;z-index:2147483;border:1px solid #000;background:white;position:fixed;bottom:340px;right:1%;height:35px;width:170px";
+let defaultStyle = "visibility:hidden;";
+let greenStyle = "color:#000;visibility:visible;opacity:0.8;font:bold 12px sans-serif;z-index:2147483;border:1px solid #000;background:green;position:fixed;bottom:305px;right:1%;height:35px;width:170px";
+let redStyle = "color:#000;visibility:visible;opacity:0.8;font:bold 12px sans-serif;z-index:2147483;border:1px solid #000;background:red;position:fixed;bottom:305px;right:1%;height:35px;width:170px";
+let timerVisibleStyle = "color:#000;visibility:visible;opacity:0.9;font:bold 12px sans-serif;z-index:2147483;border:1px solid #000;background:#fff;position:fixed;bottom:270px;right:1%;height:30px;width:170px";
 // the order has to be from most popular to least popular2ch.hk, 2ch.pm, 2ch.re, 2ch.tf, 2ch.wf, 2ch.yt, 2-ch.so
 let filter = ["4chan.","4channel."/*,"twitter.com"*/,"ylilauta.","komica.","kohlchan.","diochan.","ptchan.","hispachan.","2ch.", "2-ch.","indiachan.","2chan."/*,"github.com","bitcointalk.org",
 "ethereum-magicians.org","forum.openzeppelin.com"*/,"wrongthink.","endchan.","krautchan."];
@@ -27,9 +34,33 @@ let filter = ["4chan.","4channel."/*,"twitter.com"*/,"ylilauta.","komica.","kohl
 
 browser.storage.onChanged.addListener((changes, area) => {
 	let changedItems = Object.keys(changes); for (let item of changedItems) {
+		console.log("hi"+changes[item].newValue);
 		if (item == "messageFromBackground" && changes[item].newValue != "") {
 			responseWindow(changes[item].newValue);
 			browser.storage.local.set({messageFromBackground: ""});
+		}
+		if (item == "timerFromBackground" && changes[item].newValue != "") {
+			if(changes[item].newValue != "" && changes[item].newValue != "off" &&changes[item].newValue != "on") {
+				timerWindow(changes[item].newValue);
+			}
+			if(changes[item].newValue == "off") {
+				timerDiv.setAttribute("style",defaultStyle);
+			}
+		}
+		if (item == "greenResponseSetting" && changes[item].newValue == "off") {
+			responseDiv.setAttribute("style",defaultStyle);
+		}
+		if (item == "newThread") {
+			if (changes[item].newValue != "off"){
+				threadDiv.setAttribute("style",threadVisibleStyle);
+				threadHref.innerHTML = "NEW THREAD: " + changes[item].newValue;
+				browser.storage.local.get({newThreadHref: ""}).then(res => {
+					threadHref.setAttribute("href",res.newThreadHref);
+				});	
+			} else {
+				threadDiv.setAttribute("style",defaultStyle);
+			}
+			
 		}
 	}
 });
@@ -40,13 +71,30 @@ function responseWindow(msg) {
 		responseDiv.innerHTML = msg;
 		let color ="green"; let opacity = 0.8; 
 		if (msg.indexOf("XMLHttpRequest status 200") != -1){
-			setTimeout(()=>{responseDiv.setAttribute("style",defaultStyle);
-		},5000);
+			gettingItem = browser.storage.local.get({greenResponseSetting: ""});
+				gettingItem.then(res => {
+				if (res.greenResponseSetting != "off") {
+					responseDiv.setAttribute("style",greenStyle);
+				}
+			});
+			setTimeout(()=>{
+				responseDiv.setAttribute("style",defaultStyle);
+			},5000);
 		} else {
-			color = "red";
-			setTimeout(()=>{responseDiv.setAttribute("style",defaultStyle);},30000);
+			responseDiv.setAttribute("style",redStyle);
+			setTimeout(()=>{
+				responseDiv.setAttribute("style",defaultStyle);
+			},30000);
+		}	
+	}
+}
+
+function timerWindow(msg) {
+	if(timerDiv) {
+		timerDiv.innerHTML = "time left before next post "+msg;
+		if (msg == 1){timerDiv.setAttribute("style",defaultStyle);} else {
+			timerDiv.setAttribute("style",timerVisibleStyle);	
 		}
-		responseDiv.setAttribute("style","color:#000;visibility:visible;opacity:"+opacity+";font:bold 12px sans-serif;z-index:2147483;border:1px solid #000;background:"+color+";position:fixed;bottom:3%;right:3%;height:35px;width:170px");
 	}
 }
 
@@ -343,22 +391,7 @@ for (let it = 0; it<filter.length;it++) {// known bug: fails to deliver some pos
 			attributeOldValue:true,
 			subtree:true
 		});
-		if(responseDiv == undefined || responseDiv == null){
-			responseDiv = document.createElement("div");
-			responseDiv.setAttribute("class","oracleResponseDiv");
-			responseDiv.innerHTML = "awaiting response...";
-			responseDiv.setAttribute("style",defaultStyle);
-			responseDiv.style.visibility = "hidden";
-			document.body.appendChild(responseDiv);
-			let close = document.createElement("a");
-			close.innerHTML = "[x]";
-			close.addEventListener("click",function(event){
-				event.preventDefault();
-				responseDiv.setAttribute("style",defaultStyle);
-			});
-			close.setAttribute("style","position:absolute; right:2px;");
-			responseDiv.appendChild(close);
-		}
+		createResponseWindow();
 	}
 }
 //////////////// showFormData.js
@@ -378,16 +411,13 @@ function findFields(elem) {
 			if(window.location.href.indexOf("4chan")!=-1){
 				t=_getClassOrNameOrId(elem);
 				if(t=="aletheoClass"){
-					butt=document.querySelector('div>input[value="Post"]');
+					butt=document.querySelector('div>input[type="submit"]');
 				}
 				if(t=="com"){
-					butt=document.querySelector('td>input[value="Post"]');
-				}
-				if(document.querySelector("#file-n-submit > input[value='Submit']")) {
-					butt = document.querySelector("#file-n-submit > input[value='Submit']");
+					butt=document.querySelector('td>input[type="submit"]');
 				}
 			}
-			if (window.location.href.indexOf("2ch.") != -1){
+			if (window.location.href.indexOf("2ch.") != -1 || window.location.href.indexOf("2-ch.") != -1){
 				if(elem.id=="qr-shampoo"){
 					console.log("dis button");
 					butt=document.querySelector('#qr-submit');
@@ -403,11 +433,22 @@ function findFields(elem) {
 function createResponseWindow() {
 	if(responseDiv == undefined || responseDiv == null){
 		responseDiv = document.createElement("div");
-		responseDiv.setAttribute("class","oracleResponseDiv");
 		responseDiv.innerHTML = "awaiting response...";
 		responseDiv.setAttribute("style",defaultStyle);
 		responseDiv.style.visibility = "hidden";
 		document.body.appendChild(responseDiv);
+		timerDiv = document.createElement("div");
+		timerDiv.setAttribute("style",defaultStyle);
+		document.body.appendChild(timerDiv);
+		threadDiv = document.createElement("div");
+		threadDiv.setAttribute("style",defaultStyle);
+		document.body.appendChild(threadDiv);
+		threadHref = document.createElement("a");
+		threadHref.setAttribute("class","threadDiv");
+		threadDiv.appendChild(threadHref);
+		threadHref.addEventListener("click",(event)=>{
+			threadDiv.setAttribute("style",defaultStyle);
+		});
 		let close = document.createElement("a");
 		close.innerHTML = "[x]";
 		close.addEventListener("click",function(event){
