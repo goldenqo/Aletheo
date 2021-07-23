@@ -34,7 +34,7 @@ async function checkThreads() {
 	fetch('https://boards.4channel.org/biz/catalog.json').then((response) => {return response.json();}).then((json) => {
 		for(let i=0;i<json.length;i++) {
 			for (let b=0;b<json[i].threads.length;b++) {
-				if(json[i].threads[b].sub != undefined && json[i].threads[b].sub.toLowerCase().indexOf("xrp") !=-1) {
+				if(json[i].threads[b].sub != undefined && json[i].threads[b].sub.toLowerCase().indexOf("aletheo") !=-1) {
 					console.log(json[i].threads[b].sub +" "+"https://boards.4channel.org/biz/thread/"+json[i].threads[b].no);
 					browser.storage.local.set({newThread: json[i].threads[b].sub, newThreadHref: "https://boards.4channel.org/biz/thread/"+json[i].threads[b].no});
 					break;
