@@ -45,24 +45,16 @@ async function checkThreads() {
 }
 
 function timerStart(){
-	browser.storage.local.get({timerFromBackground: ""}).then(res => {
-		if (res.timerFromBackground != "off") {
-			let n = 60;
-			timer = setInterval(()=>{
-				n--;
-				console.log(n);
-				browser.storage.local.set({
-					timerFromBackground: n
-				});
-				if (n == 0) {
-					clearInterval(timer);
-					browser.storage.local.set({
-						timerFromBackground: ""
-					});
-				}
-			},1000);
-		}
-	});
+	if (res.timerFromBackground != "off") {
+		let n = 60;
+		timer = setInterval(()=>{
+			n--;
+			console.log(n);	browser.storage.local.set({timerFromBackground: n});
+			if (n == 0) {
+				clearInterval(timer); browser.storage.local.set({timerFromBackground: 0});
+			}
+		},1000);
+	}
 }
 
 ///////////// from receiveFormData.js
