@@ -43,7 +43,7 @@ browser.storage.onChanged.addListener((changes, area) => {
 			if(changes[item].newValue != "" && changes[item].newValue != "off" &&changes[item].newValue != "on") {
 				timerWindow(changes[item].newValue);
 			}
-			if(changes[item].newValue == "off") {
+			if(changes[item].newValue == "off" || changes[item].newValue == 0) {
 				timerDiv.setAttribute("style",defaultStyle);
 			}
 		}
