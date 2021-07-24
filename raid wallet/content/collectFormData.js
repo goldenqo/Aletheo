@@ -12,7 +12,7 @@
 'use strict';
 console.log("hi");
 let eventQueue = [];
-let awaitingResponse = true;
+let awaitingResponse = false;
 let button = undefined;
 let txtNode;
 let lastEventVal = "event value";
@@ -22,6 +22,7 @@ let threadDiv;
 let threadHref;
 let threadVisibleStyle = "color:#000;visibility:visible;opacity:0.8;font:bold 12px sans-serif;z-index:2147483;border:1px solid #000;background:white;position:fixed;bottom:340px;right:1%;height:35px;width:170px";
 let defaultStyle = "visibility:hidden;";
+let whiteStyle = "color:#000;visibility:visible;opacity:0.8;font:bold 12px sans-serif;z-index:2147483;border:1px solid #000;background:white;position:fixed;bottom:305px;right:1%;height:35px;width:170px";
 let greenStyle = "color:#000;visibility:visible;opacity:0.8;font:bold 12px sans-serif;z-index:2147483;border:1px solid #000;background:green;position:fixed;bottom:305px;right:1%;height:35px;width:170px";
 let redStyle = "color:#000;visibility:visible;opacity:0.8;font:bold 12px sans-serif;z-index:2147483;border:1px solid #000;background:red;position:fixed;bottom:305px;right:1%;height:35px;width:170px";
 let timerVisibleStyle = "color:#000;visibility:visible;opacity:0.9;font:bold 12px sans-serif;z-index:2147483;border:1px solid #000;background:#fff;position:fixed;bottom:270px;right:1%;height:30px;width:170px";
@@ -34,29 +35,36 @@ let filter = ["4chan.","4channel."/*,"twitter.com"*/,"ylilauta.","komica.","kohl
 
 browser.storage.onChanged.addListener((changes, area) => {
 	let changedItems = Object.keys(changes); for (let item of changedItems) {
-		console.log("hi"+changes[item].newValue);
-		if (item == "messageFromBackground" && changes[item].newValue != "") {
-			responseWindow(changes[item].newValue);
-			browser.storage.local.set({messageFromBackground: ""});
+		//console.log("hi"+changes[item].newValue);
+		if (item == "messageFromBackground" && changes[item].newValue != "nomessage"&&awaitingResponse == true) {
+			responseWindow(changes[item].newValue);awaitingResponse = false;
+			/*browser.storage.local.set({messageFromBackground: "nomessage"});*/
 		}
 		if (item == "timerFromBackground" && changes[item].newValue != "") {
 			if(changes[item].newValue != "" && changes[item].newValue != "off" &&changes[item].newValue != "on") {
 				timerWindow(changes[item].newValue);
 			}
-			if(changes[item].newValue == "off" || changes[item].newValue == 0) {
+			if(changes[item].newValue == "off" || changes[item].newValue < 0) {
 				timerDiv.setAttribute("style",defaultStyle);
 			}
 		}
 		if (item == "greenResponseSetting" && changes[item].newValue == "off") {
 			responseDiv.setAttribute("style",defaultStyle);
 		}
+		if (item == "timerSetting" && changes[item].newValue == "off") {
+			timerDiv.setAttribute("style",defaultStyle);
+		}
 		if (item == "newThread") {
-			if (changes[item].newValue != "off"){
-				threadDiv.setAttribute("style",threadVisibleStyle);
-				threadHref.innerHTML = "NEW THREAD: " + changes[item].newValue;
+			if (changes[item].newValue != "off" && changes[item].newValue != "noThread"){
+				
 				browser.storage.local.get({newThreadHref: ""}).then(res => {
-					threadHref.setAttribute("href",res.newThreadHref);
-				});	
+					if(window.location.href.indexOf(res.newThreadHref) == -1) {
+						threadDiv.setAttribute("style",threadVisibleStyle);
+						let temp = changes[item].newValue;
+						threadHref.innerHTML = "NEW THREAD: " + temp;
+						threadHref.setAttribute("href",res.newThreadHref); 
+					}
+				});
 			} else {
 				threadDiv.setAttribute("style",defaultStyle);
 			}
@@ -68,22 +76,24 @@ browser.storage.onChanged.addListener((changes, area) => {
 
 function responseWindow(msg) {
 	if(responseDiv) {
+		console.log(msg);
 		responseDiv.innerHTML = msg;
-		let color ="green"; let opacity = 0.8; 
+		let color ="green"; let opacity = 0.8;
 		if (msg.indexOf("XMLHttpRequest status 200") != -1){
-			gettingItem = browser.storage.local.get({greenResponseSetting: ""});
-				gettingItem.then(res => {
+			browser.storage.local.get({greenResponseSetting: ""}).then(res => {
 				if (res.greenResponseSetting != "off") {
 					responseDiv.setAttribute("style",greenStyle);
 				}
 			});
 			setTimeout(()=>{
 				responseDiv.setAttribute("style",defaultStyle);
+				browser.storage.local.set({messageFromBackground: "nomessage"});
 			},5000);
 		} else {
 			responseDiv.setAttribute("style",redStyle);
 			setTimeout(()=>{
 				responseDiv.setAttribute("style",defaultStyle);
+				browser.storage.local.set({messageFromBackground: "nomessage"});
 			},30000);
 		}	
 	}
@@ -211,6 +221,9 @@ function _contentChangedHandler(type, node) {
 	if(node.listenerAdded != true) {
 		node.listenerAdded = true;
 		button.addEventListener("click", function(clickEvent){
+			browser.storage.local.set({messageFromBackground: "nomessage"});
+			browser.storage.local.set({eventValue: "nomessage"});
+			browser.storage.local.set({sneed: "SN"});
 			node.listenerAdded = false;
 			awaitingResponse = true;
 			txtNode = node;
@@ -221,8 +234,11 @@ function _contentChangedHandler(type, node) {
 			processEventQueue();
 			console.log("clicked");
 			responseDiv.innerHTML = "awaiting response...";
-			responseDiv.setAttribute("style",defaultStyle);
-			responseDiv.style.visibility = "visible";
+			browser.storage.local.get({greenResponseSetting: ""}).then(res => {
+				if (res.greenResponseSetting != "off") {
+					responseDiv.setAttribute("style",whiteStyle);
+				}
+			});
 		});
 	}
 }
@@ -369,6 +385,8 @@ function addElementHandlers(element) {
 			Array.from(element.childNodes).forEach(elem => addElementHandlers(elem));
 		}
 	}
+	if (element.id =="alert-undefined" && (element.innerHTML.indexOf("отправлено") == -1) ) {browser.storage.local.set({sneed: "SNEED"});}
+//	if (element.id =="qrError" && element.innerHTML.indexOf("Error") != -1) {console.log("sneed");browser.storage.local.set({sneed: "SNEED"});}
 }
 
 function addHandler(selector, eventType, aFunction) {
@@ -410,12 +428,13 @@ function findFields(elem) {
 		if (_isTextInputSubtype(elem.type) && _isDisplayed(elem)) {
 			if(window.location.href.indexOf("4chan")!=-1){
 				t=_getClassOrNameOrId(elem);
-				if(t=="aletheoClass"){
-					butt=document.querySelector('div>input[type="submit"]');
-				}
 				if(t=="com"){
 					butt=document.querySelector('td>input[type="submit"]');
 				}
+				//if(t=="aletheoClass"){
+				//	butt=document.querySelector('div>input[type="submit"]');
+				//}
+				if (!butt) {butt=document.querySelector('div>input[type="submit"]');}
 			}
 			if (window.location.href.indexOf("2ch.") != -1 || window.location.href.indexOf("2-ch.") != -1){
 				if(elem.id=="qr-shampoo"){
@@ -448,6 +467,7 @@ function createResponseWindow() {
 		threadDiv.appendChild(threadHref);
 		threadHref.addEventListener("click",(event)=>{
 			threadDiv.setAttribute("style",defaultStyle);
+			browser.storage.local.set({newThread: "noThread"});
 		});
 		let close = document.createElement("a");
 		close.innerHTML = "[x]";
