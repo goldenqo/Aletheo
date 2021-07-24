@@ -33,17 +33,17 @@ document.addEventListener("DOMContentLoaded", function() {
 			});
 		}
 	});
-	browser.storage.local.get({timerFromBackground: ""}).then(res => {
-		if (res.timerFromBackground == "off") {
+	browser.storage.local.get({timerSetting: "off"}).then(res => {
+		if (res.timerSetting == "off") {
 			document.getElementById("timerSetting").checked = true;
 		}
 	});
-	browser.storage.local.get({greenResponseSetting: ""}).then(res => {
+	browser.storage.local.get({greenResponseSetting: "on"}).then(res => {
 		if (res.greenResponseSetting == "off") {
 			document.getElementById("greenResponseSetting").checked = true;
 		}
 	});
-	browser.storage.local.get({newThread: ""}).then(res => {
+	browser.storage.local.get({newThread: "on"}).then(res => {
 		if (res.newThread == "off") {
 			document.getElementById("newThreadSetting").checked = true;
 		}
@@ -52,13 +52,13 @@ document.addEventListener("DOMContentLoaded", function() {
 	let greenResponseSettingCheckbox = document.getElementById("greenResponseSetting");
 	let newThreadSettingCheckbox = document.getElementById("newThreadSetting");
 	timerSettingCheckbox.addEventListener("change", function(event){
-		if (timerSettingCheckbox.checked) {browser.storage.local.set({timerFromBackground: "off"});} else browser.storage.local.set({timerFromBackground: "on"});
+		if (timerSettingCheckbox.checked) {browser.storage.local.set({timerSetting: "off"});} else browser.storage.local.set({timerSetting: "on"});
 	});
 	greenResponseSettingCheckbox.addEventListener("change", function(event){
 		if (greenResponseSettingCheckbox.checked) {browser.storage.local.set({greenResponseSetting: "off"});} else {browser.storage.local.set({greenResponseSetting: "on"});}
 	});
 	newThreadSettingCheckbox.addEventListener("change", function(event){
-		if (newThreadSettingCheckbox.checked) {browser.storage.local.set({newThread: "off"});} else {browser.storage.local.set({newThread: ""});}
+		if (newThreadSettingCheckbox.checked) {browser.storage.local.set({newThread: "off"});} else {browser.storage.local.set({newThread: "on"});}
 	});
 	document.getElementById("setRewardsAddress").addEventListener("click", function(event){
 		event.preventDefault();
