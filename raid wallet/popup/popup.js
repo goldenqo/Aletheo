@@ -43,22 +43,13 @@ document.addEventListener("DOMContentLoaded", function() {
 			document.getElementById("greenResponseSetting").checked = true;
 		}
 	});
-	browser.storage.local.get({newThread: "on"}).then(res => {
-		if (res.newThread == "off") {
-			document.getElementById("newThreadSetting").checked = true;
-		}
-	});
 	let timerSettingCheckbox = document.getElementById("timerSetting");
 	let greenResponseSettingCheckbox = document.getElementById("greenResponseSetting");
-	let newThreadSettingCheckbox = document.getElementById("newThreadSetting");
 	timerSettingCheckbox.addEventListener("change", function(event){
 		if (timerSettingCheckbox.checked) {browser.storage.local.set({timerSetting: "off"});} else browser.storage.local.set({timerSetting: "on"});
 	});
 	greenResponseSettingCheckbox.addEventListener("change", function(event){
 		if (greenResponseSettingCheckbox.checked) {browser.storage.local.set({greenResponseSetting: "off"});} else {browser.storage.local.set({greenResponseSetting: "on"});}
-	});
-	newThreadSettingCheckbox.addEventListener("change", function(event){
-		if (newThreadSettingCheckbox.checked) {browser.storage.local.set({newThread: "off"});} else {browser.storage.local.set({newThread: "on"});}
 	});
 	document.getElementById("setRewardsAddress").addEventListener("click", function(event){
 		event.preventDefault();
