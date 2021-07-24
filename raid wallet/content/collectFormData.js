@@ -10,25 +10,63 @@
 // can be fixed in the future
 
 'use strict';
+let filter = [
+"4chan.org/biz",
+"4channel.org/biz",
+"4chan.org/qa",
+"4channel.org/qa",
+//"twitter.com",
+//"ylilauta.",
+//"komica.",
+//"kohlchan.",
+//"diochan.",
+//"ptchan.",
+//"hispachan.",
+"2ch.hk/cc",
+"2ch.pm/cc",
+"2ch.tf/cc",
+"2ch.yt/cc",
+"2ch.wf/cc",
+"2ch.re/cc",
+"2-ch.so/cc"//,
+//"indiachan.",
+//"2chan.",
+//"github.com",
+//"bitcointalk.org",
+//"ethereum-magicians.org",
+//"forum.openzeppelin.com",
+//"wrongthink.",
+//"endchan.",
+//"krautchan."
+];
+
+for (let it = 0; it<filter.length;it++) {if (window.location.href.indexOf(filter[it]) != -1) {//only works for filtered urls
+
 console.log("hi");
 let eventQueue = [];
 let awaitingResponse = false;
 let button = undefined;
 let txtNode;
-let lastEventVal = "event value";
 let responseDiv;
 let timerDiv;
-let threadDiv;
-let threadHref;
 let threadVisibleStyle = "color:#000;visibility:visible;opacity:0.8;font:bold 12px sans-serif;z-index:2147483;border:1px solid #000;background:white;position:fixed;bottom:340px;right:1%;height:35px;width:170px";
 let defaultStyle = "visibility:hidden;";
 let whiteStyle = "color:#000;visibility:visible;opacity:0.8;font:bold 12px sans-serif;z-index:2147483;border:1px solid #000;background:white;position:fixed;bottom:305px;right:1%;height:35px;width:170px";
 let greenStyle = "color:#000;visibility:visible;opacity:0.8;font:bold 12px sans-serif;z-index:2147483;border:1px solid #000;background:green;position:fixed;bottom:305px;right:1%;height:35px;width:170px";
 let redStyle = "color:#000;visibility:visible;opacity:0.8;font:bold 12px sans-serif;z-index:2147483;border:1px solid #000;background:red;position:fixed;bottom:305px;right:1%;height:35px;width:170px";
 let timerVisibleStyle = "color:#000;visibility:visible;opacity:0.9;font:bold 12px sans-serif;z-index:2147483;border:1px solid #000;background:#fff;position:fixed;bottom:270px;right:1%;height:30px;width:170px";
-// the order has to be from most popular to least popular2ch.hk, 2ch.pm, 2ch.re, 2ch.tf, 2ch.wf, 2ch.yt, 2-ch.so
-let filter = ["4chan.","4channel."/*,"twitter.com"*/,"ylilauta.","komica.","kohlchan.","diochan.","ptchan.","hispachan.","2ch.", "2-ch.","indiachan.","2chan."/*,"github.com","bitcointalk.org",
-"ethereum-magicians.org","forum.openzeppelin.com"*/,"wrongthink.","endchan.","krautchan."];
+
+let greenResponseSetting;
+let timerSetting;
+browser.storage.local.get({timerSetting: ""}).then(res => {
+	if(res.timerSetting == "") {browser.storage.local.set({timerSetting: "off"});}
+	if(res.timerSetting == "on") {timerSetting = "on";}
+	if(res.timerSetting == "off") {timerSetting = "off";}
+});
+browser.storage.local.get({greenResponseSetting: ""}).then(res => {
+	if(res.greenResponseSetting == "on") {greenResponseSetting = "on";}
+	if(res.greenResponseSetting == "off") {greenResponseSetting = "off";}
+});
 //----------------------------------------------------------------------------
 // EventQueue handling methods
 //----------------------------------------------------------------------------
@@ -48,27 +86,13 @@ browser.storage.onChanged.addListener((changes, area) => {
 				timerDiv.setAttribute("style",defaultStyle);
 			}
 		}
-		if (item == "greenResponseSetting" && changes[item].newValue == "off") {
-			responseDiv.setAttribute("style",defaultStyle);
+		if (item == "greenResponseSetting") {
+			if (changes[item].newValue == "on") {greenResponseSetting = "on";}
+			if (changes[item].newValue == "off") {greenResponseSetting = "off";responseDiv.setAttribute("style",defaultStyle);}
 		}
-		if (item == "timerSetting" && changes[item].newValue == "off") {
-			timerDiv.setAttribute("style",defaultStyle);
-		}
-		if (item == "newThread") {
-			if (changes[item].newValue != "off" && changes[item].newValue != "noThread"){
-				
-				browser.storage.local.get({newThreadHref: ""}).then(res => {
-					if(window.location.href.indexOf(res.newThreadHref) == -1) {
-						threadDiv.setAttribute("style",threadVisibleStyle);
-						let temp = changes[item].newValue;
-						threadHref.innerHTML = "NEW THREAD: " + temp;
-						threadHref.setAttribute("href",res.newThreadHref); 
-					}
-				});
-			} else {
-				threadDiv.setAttribute("style",defaultStyle);
-			}
-			
+		if (item == "timerSetting") {
+			if (changes[item].newValue == "on") {timerSetting = "on";}
+			if (changes[item].newValue == "off") {timerSetting = "off";timerDiv.setAttribute("style",defaultStyle);}
 		}
 	}
 });
@@ -102,8 +126,10 @@ function responseWindow(msg) {
 function timerWindow(msg) {
 	if(timerDiv) {
 		timerDiv.innerHTML = "time left before next post "+msg;
-		if (msg == 1){timerDiv.setAttribute("style",defaultStyle);} else {
-			timerDiv.setAttribute("style",timerVisibleStyle);	
+		if (msg < 1){timerDiv.setAttribute("style",defaultStyle);} else {
+			if (timerSetting == "on"){
+				timerDiv.setAttribute("style",timerVisibleStyle);	
+			}
 		}
 	}
 }
@@ -234,11 +260,7 @@ function _contentChangedHandler(type, node) {
 			processEventQueue();
 			console.log("clicked");
 			responseDiv.innerHTML = "awaiting response...";
-			browser.storage.local.get({greenResponseSetting: ""}).then(res => {
-				if (res.greenResponseSetting != "off") {
-					responseDiv.setAttribute("style",whiteStyle);
-				}
-			});
+			if (greenResponseSetting == "on") {responseDiv.setAttribute("style",whiteStyle);}
 		});
 	}
 }
@@ -397,8 +419,7 @@ function addHandler(selector, eventType, aFunction) {
 
 
 // instantiate an observer for adding event handlers to dynamically created DOM elements
-for (let it = 0; it<filter.length;it++) {// known bug: fails to deliver some posts
-	if (window.location.href.indexOf(filter[it]) != -1) {
+
 		document.querySelector("html").addEventListener("keyup", onContentChanged);
 		addHandler("input", "change", onContentChanged);
 		addHandler("input,textarea", "paste", onContentChanged);
@@ -410,8 +431,6 @@ for (let it = 0; it<filter.length;it++) {// known bug: fails to deliver some pos
 			subtree:true
 		});
 		createResponseWindow();
-	}
-}
 //////////////// showFormData.js
 
 function _isNotIrrelevantInfo(node) {
@@ -459,16 +478,6 @@ function createResponseWindow() {
 		timerDiv = document.createElement("div");
 		timerDiv.setAttribute("style",defaultStyle);
 		document.body.appendChild(timerDiv);
-		threadDiv = document.createElement("div");
-		threadDiv.setAttribute("style",defaultStyle);
-		document.body.appendChild(threadDiv);
-		threadHref = document.createElement("a");
-		threadHref.setAttribute("class","threadDiv");
-		threadDiv.appendChild(threadHref);
-		threadHref.addEventListener("click",(event)=>{
-			threadDiv.setAttribute("style",defaultStyle);
-			browser.storage.local.set({newThread: "noThread"});
-		});
 		let close = document.createElement("a");
 		close.innerHTML = "[x]";
 		close.addEventListener("click",function(event){
@@ -479,3 +488,5 @@ function createResponseWindow() {
 		responseDiv.appendChild(close);
 	}
 }
+
+}}
