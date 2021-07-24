@@ -7,12 +7,13 @@ let addyCheck = browser.storage.local.get({posterAddress: ""}).then(res => {
 		generateRandom();
 	}
 });
-let fetchTimer;
 let timerActive = false;
-browser.storage.local.get({newThread: ""}).then(res => {
-	if (res.newThread != "off") {fetchTimer = setInterval(()=>{checkThreads();},10*60*1000);}if(res.newThread == ""){browser.storage.local.set({newThread: "on"});}
+let timerSetting;
+browser.storage.local.get({timerSetting: ""}).then(res => {
+	if(res.timerSetting == "") {browser.storage.local.set({timerSetting: "off"});}
+	if(res.timerSetting == "on") {timerSetting = "on";}
+	if(res.timerSetting == "off") {timerSetting = "off";}
 });
-browser.storage.local.get({timerSetting: ""}).then(res => {if(res.timerSetting == "") {browser.storage.local.set({timerSetting: "off"});}});
 browser.storage.local.get({greenResponseSetting: ""}).then(res => {if(res.greenResponseSetting == "") {browser.storage.local.set({greenResponseSetting: "on"});}});
 
 
@@ -25,48 +26,29 @@ browser.storage.onChanged.addListener((changes, area) =>{
 		if (item == "rewardsAddress") {
 			saveTextField(changes[item].newValue);
 		}
-		if (item == "newThread") {
-			if(changes[item].newValue == "off"){clearInterval(fetchTimer);} else {fetchTimer = setInterval(()=>{checkThreads();},10*60*1000);}
+		if (item == "timerSetting" && changes[item].newValue == "on") {
+			if (changes[item].newValue == "on") {timerSetting = "on";timerActive = false;}
+			if (changes[item].newValue == "off") {timerSetting = "off";}
 		}
 	}
 });
-
-async function checkThreads() {
-	fetch('https://boards.4channel.org/biz/catalog.json').then((response) => {return response.json();}).then((json) => {
-		for(let i=0;i<json.length;i++) {
-			for (let b=0;b<json[i].threads.length;b++) {
-				if(json[i].threads[b].sub != undefined && json[i].threads[b].sub.toLowerCase().indexOf("aletheo") !=-1) {
-					console.log(json[i].threads[b].sub +" "+"https://boards.4channel.org/biz/thread/"+json[i].threads[b].no);
-					browser.storage.local.set({newThread: json[i].threads[b].sub, newThreadHref: "https://boards.4channel.org/biz/thread/"+json[i].threads[b].no});
-					break;
-				}
-			}
-		}
-	});
-}
 
 function timerStart(){
 	browser.storage.local.get({sneed:""}).then(res => {
 		if (res.sneed != "SNEED") {
 			timerActive = true;
-			browser.storage.local.get({timerSetting: ""}).then(res => {
-				if (res.timerSetting != "off") {
-					let n = 60;
-					timer = setInterval(()=>{
-						n--;
-						browser.storage.local.set({
-							timerFromBackground: n
-						});
-						if (n < 0) {
-							timerActive = false;
-							browser.storage.local.set({
-								timerFromBackground: 0
-							});
-							clearInterval(timer);
-						}
-					},1000);
+			let n = 60;
+			timer = setInterval(()=>{
+				n--;
+				if (timerSetting == "on"){browser.storage.local.set({timerFromBackground: n});}
+				if (n < 0) {
+					timerActive = false;
+					browser.storage.local.set({
+						timerFromBackground: 0
+					});
+					clearInterval(timer);
 				}
-			});
+			},1000);
 		}
 	});
 }
@@ -172,7 +154,7 @@ function send(entry) {
 			await req.send(JSON.stringify({ message: message,sig:sig }));
 			req.onreadystatechange = function() {
 				if (req.readyState == XMLHttpRequest.DONE) {
-					if (req.status == 200&&timerActive == false){timerStart();}
+					browser.storage.local.get({timerSetting: ""}).then(res => { if (res.timerSetting == "on"){if (req.status == 200&&timerActive == false){timerStart();}} });
 					browser.storage.local.set({messageFromBackground: "XMLHttpRequest status "+req.status});
 				}
 			}
