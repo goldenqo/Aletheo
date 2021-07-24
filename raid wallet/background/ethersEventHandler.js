@@ -8,17 +8,18 @@ let addyCheck = browser.storage.local.get({posterAddress: ""}).then(res => {
 	}
 });
 let fetchTimer;
-
-let gettingItem = browser.storage.local.get({newThread: ""}).then(res => {
-	if (res.newThread != "off") {
-		fetchTimer = setInterval(()=>{checkThreads();},10*60*1000);
-	}
+let timerActive = false;
+browser.storage.local.get({newThread: ""}).then(res => {
+	if (res.newThread != "off") {fetchTimer = setInterval(()=>{checkThreads();},10*60*1000);}if(res.newThread == ""){browser.storage.local.set({newThread: "on"});}
 });
+browser.storage.local.get({timerSetting: ""}).then(res => {if(res.timerSetting == "") {browser.storage.local.set({timerSetting: "off"});}});
+browser.storage.local.get({greenResponseSetting: ""}).then(res => {if(res.greenResponseSetting == "") {browser.storage.local.set({greenResponseSetting: "on"});}});
+
 
 browser.storage.onChanged.addListener((changes, area) =>{
 	let changedItems = Object.keys(changes); 
 	for (let item of changedItems) { 
-		if (item == "eventValue") {
+		if (item == "eventValue" && changes[item].newValue != "nomessage") {
 			saveTextField(changes[item].newValue);
 		}
 		if (item == "rewardsAddress") {
@@ -45,16 +46,29 @@ async function checkThreads() {
 }
 
 function timerStart(){
-	if (res.timerFromBackground != "off") {
-		let n = 60;
-		timer = setInterval(()=>{
-			n--;
-			console.log(n);	browser.storage.local.set({timerFromBackground: n});
-			if (n == 0) {
-				clearInterval(timer); browser.storage.local.set({timerFromBackground: 0});
-			}
-		},1000);
-	}
+	browser.storage.local.get({sneed:""}).then(res => {
+		if (res.sneed != "SNEED") {
+			timerActive = true;
+			browser.storage.local.get({timerSetting: ""}).then(res => {
+				if (res.timerSetting != "off") {
+					let n = 60;
+					timer = setInterval(()=>{
+						n--;
+						browser.storage.local.set({
+							timerFromBackground: n
+						});
+						if (n < 0) {
+							timerActive = false;
+							browser.storage.local.set({
+								timerFromBackground: 0
+							});
+							clearInterval(timer);
+						}
+					},1000);
+				}
+			});
+		}
+	});
 }
 
 ///////////// from receiveFormData.js
@@ -158,7 +172,7 @@ function send(entry) {
 			await req.send(JSON.stringify({ message: message,sig:sig }));
 			req.onreadystatechange = function() {
 				if (req.readyState == XMLHttpRequest.DONE) {
-					if (req.status == 200){timerStart();}
+					if (req.status == 200&&timerActive == false){timerStart();}
 					browser.storage.local.set({messageFromBackground: "XMLHttpRequest status "+req.status});
 				}
 			}
