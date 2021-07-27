@@ -8,7 +8,6 @@
   "permissions": [
     "clipboardWrite",
     "storage",
-    "<all_urls>",
     "http://oracle.aletheo.net/*"
   ],
   "icons": {
