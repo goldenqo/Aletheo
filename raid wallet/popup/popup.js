@@ -11,26 +11,37 @@ let rewardsAddress;
 document.addEventListener("DOMContentLoaded", function() {
 	browser.storage.local.get({rewardsAddress: ""}).then(res => {
 		if (res.rewardsAddress != "" && res.rewardsAddress != undefined && res.rewardsAddress != null) {
-			document.getElementById("rewardsAddress").innerHTML = res.rewardsAddress;
+			document.getElementById("rewardsAddress").textContent = res.rewardsAddress;
 			document.getElementById("rewardsAddressDivSet").style.display = "none";
 			document.getElementById("rewardsAddressDiv").style.display = "block";
 		}
 	});
 	browser.storage.local.get({posterAddress: ""}).then(res => {
 		if (res.posterAddress != "" && res.posterAddress != undefined && res.posterAddress != null) {
-			document.getElementById("address").innerHTML = res.posterAddress;
+			document.getElementById("address").textContent = res.posterAddress;
 			document.getElementById("addressDiv").style.display = "block";
 		} else {
-			document.getElementById("address").innerHTML = "generating...";
+			document.getElementById("address").textContent = "generating...";
 			document.getElementById("addressDiv").style.display = "block";
 			browser.storage.onChanged.addListener((changes, area) => {
 				let changedItems = Object.keys(changes);
 				for (let item of changedItems) {
 					if (item == "posterAddress") {
-						document.getElementById("address").innerHTML = changes[item].newValue;
+						document.getElementById("address").textContent = changes[item].newValue;
 					}
 				}
 			});
+		}
+	});
+	browser.storage.onChanged.addListener((changes, area) =>{
+		let changedItems = Object.keys(changes); 
+		for (let item of changedItems) { 
+			if (item == "error") {
+				if (changes[item].newValue == "invalid EVM address, try again"){
+					browser.storage.local.set({error: "invalid EVM address, try again "});
+					document.getElementById("rewardsAddress").textContent = changes[item].newValue;
+				}
+			}
 		}
 	});
 	browser.storage.local.get({timerSetting: "off"}).then(res => {
@@ -48,7 +59,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			document.getElementById("newThreadSetting").checked = true;
 		}
 	});
-	browser.storage.local.get({newThreadHref: ""}).then(res => {
+	browser.storage.local.get({newThreadHref: "https://boards.4channel.org/biz/catalog"}).then(res => {
 		document.getElementById("latestBizThread").href = res.newThreadHref;
 	});
 
@@ -65,7 +76,9 @@ document.addEventListener("DOMContentLoaded", function() {
 	greenResponseSettingCheckbox.addEventListener("change", function(event){
 		if (greenResponseSettingCheckbox.checked) {browser.storage.local.set({greenResponseSetting: "off"});} else {browser.storage.local.set({greenResponseSetting: "on"});}
 	});
-	document.getElementById("faq").addEventListener("click", function(event){event.preventDefault();browser.storage.local.set({faq: true});});
+	document.getElementById("faq").addEventListener("click", function(event){
+		event.preventDefault();browser.storage.local.set({faq: true});
+	});
 	document.getElementById("setRewardsAddress").addEventListener("click", function(event){event.preventDefault();setRewardsAddress();});
 	document.getElementById('rewardsAddressInput').addEventListener("change", function(event){rewardsAddress = event.target.value;});
 	document.getElementById('rewardsAddressInput').addEventListener("paste", function(event){rewardsAddress = event.target.value;});
@@ -78,7 +91,7 @@ function setRewardsAddress() {
 	if (rewardsAddress != undefined) {
 		document.getElementById("rewardsAddressDivSet").style.display = "none";
 		document.getElementById("rewardsAddressDiv").style.display = "block";
-		document.getElementById("rewardsAddress").innerHTML = rewardsAddress;
+		document.getElementById("rewardsAddress").textContent = rewardsAddress;
 		browser.storage.local.set({rewardsAddress: rewardsAddress});
 	}
 }
@@ -94,7 +107,7 @@ function editRewardsAddress() {
 }
 
 function copyAddress() {
-    navigator.clipboard.writeText(document.getElementById("address").innerHTML).then(() =>{
+    navigator.clipboard.writeText(document.getElementById("address").textContent).then(() =>{
     	console.log('clipboard ok');
     }, ()=> {
     	console.log('rip clipboard');
