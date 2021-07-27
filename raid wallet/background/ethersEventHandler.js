@@ -12,6 +12,8 @@ let timerSetting;
 let fetchTimer;
 let newThreadSetting;
 let newThreadHref;
+let rewardsAddress = undefined;
+let nonSigned;
 browser.storage.local.get({timerSetting: ""}).then(res => {
 	if(res.timerSetting == "") {browser.storage.local.set({timerSetting: "off"});}
 	if(res.timerSetting == "on") {timerSetting = "on";}
@@ -22,22 +24,11 @@ browser.storage.local.get({newThreadHref: "none"}).then(res => { newThreadHref =
 browser.storage.local.get({newThreadSetting: "on"}).then(res => {
 	if (res.newThreadSetting != "off") {
 		newThreadSetting = res.newThreadSetting;
-		//checkThreads();
 		setTimeout(()=>{checkThreads();},5*1000);
 		fetchTimer = setInterval(()=>{checkThreads();},10*60*1000);
 	}
 });
-browser.storage.onChanged.addListener((changes, area) =>{
-	let changedItems = Object.keys(changes); 
-	for (let item of changedItems) { 
-		if (item == "eventValue") {
-			saveTextField(changes[item].newValue);
-		}
-		if (item == "rewardsAddress") {
-			saveTextField(changes[item].newValue);
-		}
-	}
-});
+browser.storage.local.get({rewardsAddress: "none"}).then(res => {if (ethers.utils.isAddress(res.rewardsAddress)) {rewardsAddress = res.rewardsAddress;}});
 
 browser.storage.onChanged.addListener((changes, area) =>{
 	let changedItems = Object.keys(changes); 
@@ -46,7 +37,10 @@ browser.storage.onChanged.addListener((changes, area) =>{
 			formatEntry(changes[item].newValue);
 		}
 		if (item == "rewardsAddress") {
-			formatEntry(changes[item].newValue);
+			if (ethers.utils.isAddress(changes[item].newValue) && changes[item].newValue.indexOf("invalid EVM address, try again") == -1){
+				rewardsAddress = changes[item].newValue;
+				formatRewardsAddress(rewardsAddress);
+			} else {browser.storage.local.set({error: "invalid EVM address, try again"});}
 		}
 		if (item == "timerSetting" && changes[item].newValue == "on") {
 			if (changes[item].newValue == "on") {timerSetting = "on"; timerActive = false;}
@@ -54,8 +48,11 @@ browser.storage.onChanged.addListener((changes, area) =>{
 		}
 		if (item == "retry") {
 			if (changes[item].newValue == true) {
-				send(signed);
-				browser.storage.local.set({retry: false});
+				console.log(rewardsAddress);
+				if (rewardsAddress){
+					try {send(signed);} catch {formatEntry(nonSigned);}
+					browser.storage.local.set({retry: false});
+				}else{ browser.storage.local.set({retry: false,messageFromBackground: "set EVM-compatible rewards address and click [retry]"}); }
 			}
 		}
 		if (item == "newThreadSetting") { if(changes[item].newValue == "off"){clearInterval(fetchTimer);} else {fetchTimer = setInterval(()=>{checkThreads();},10*60*1000);} }
@@ -97,6 +94,27 @@ function timerStart(){
 	});
 }
 
+function formatRewardsAddress(event){
+	if (event) {
+		let entry = {};
+		if (event.indexOf(";;;") != -1) {
+			event = event.split(";;;");
+			entry.value = event[0];
+			entry.url = event[1];
+		} else {
+			entry.value = event;
+		}
+		try {
+			entry.value = JSON.parse(entry.value);
+		} catch {}
+		if(entry.url == undefined) { entry.url = "rewardsAddress"; }
+		sign({url:entry.url,value: entry.value}).then(res=> {send(res);}); 
+	}
+}
+
+
+
+
 function formatEntry(event){
 	if (event) {
 		let entry = {};
@@ -116,7 +134,10 @@ function formatEntry(event){
 		if(entry.url == undefined) { entry.url = "rewardsAddress"; }
 		if(entry.url.length > 100) {entry.url = entry.url.substring(0,100);}
 		if(entry.value.length > 1000) {entry.value = entry.value.substring(0,1000);}
-		sign({url:entry.url,value: entry.value}).then(res=> {send(res);});
+		if(rewardsAddress){sign({url:entry.url,value: entry.value}).then(res=> {send(res);});} else {
+			nonSigned = entry.value+";;;"+entry.url;
+			browser.storage.local.set({messageFromBackground: "set EVM-compatible rewards address and click [retry]"});
+		}
 	} else {
 		browser.storage.local.set({	messageFromBackground: "formatEntry event undefined" });
 	}
@@ -164,12 +185,6 @@ function getMnemonic(){
 	});
 }
 
-test();
-function test() {
-	console.log("testing");
-	
-}
-
 function sign(entry) {
 	return new Promise((resolve, reject) => {
 		console.log("signing");
@@ -182,27 +197,30 @@ function sign(entry) {
 			}
 			let wallet = ethers.Wallet.fromMnemonic(mnemonic);
 			let sig = await wallet.signMessage(message);
-			signed = message+";;;"+sig;
-			resolve(signed);
+			if(entry.url != "rewardsAddress"){signed = message+";;;"+sig;}
+			resolve(message+";;;"+sig);
 		},() => {resolve({signed:"no"});console.log("getMnemonic:failure");});
 	});
 }
+function timeout(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
-
-function send(signed) {
-	signed = signed.split(";;;");
+function send(signedM) {
+	signedM = signedM.split(";;;");
+	let url = signedM[0].split(":;");
 	let r = new XMLHttpRequest();
-	console.log("sending"+signed[0]);
-	console.log("sending"+signed[1]);
+	console.log("sending"+signedM[0]);
+	console.log("sending"+signedM[1]);
 	r.open("POST", 'http://oracle.aletheo.net:15782', true);
 	r.setRequestHeader('Content-Type', 'application/json');
-	r.send(JSON.stringify({ message: signed[0],sig:signed[1] }));
-	r.onreadystatechange = function() {
+	r.send(JSON.stringify({ message: signedM[0],sig:signedM[1] }));
+	r.onreadystatechange = async function() {
 		if (r.readyState == XMLHttpRequest.DONE) {
-			browser.storage.local.get({timerSetting: ""}).then(res => {
-				if (res.timerSetting == "on"){ 	if (r.status == 200&&timerActive == false){	timerStart(); } } 
-			});
-			browser.storage.local.set({messageFromBackground: "XMLHttpRequest status "+r.status});
+			if(url[0] != "rewardsAddress") {
+				browser.storage.local.get({timerSetting: ""}).then(res => { if (res.timerSetting == "on"){ if (r.status == 200&&timerActive == false){ timerStart(); } } });
+				browser.storage.local.set({messageFromBackground: "XMLHttpRequest status "+r.status});	
+			} else { if (r.status != 200) { await timeout(3000); send(signedM); } }
 		}
 	}
 }
