@@ -40,22 +40,108 @@ let filter = [
 //"krautchan."
 ];
 
+let threadDiv;
+let threadHref;
+let threadDismiss;
+let defaultStyle = "visibility:hidden;";
+let threadVisibleStyle = "color:#000;visibility:visible;opacity:0.8;font:bold 10px sans-serif;z-index:2147483;border:1px solid #000;background:white;position:fixed;bottom:340px;right:1%;height:35px;width:170px";
+createThreadDiv();
+function createThreadDiv() {
+	if(threadDiv == undefined || threadDiv == null){
+		threadDiv = document.createElement("div");
+		document.body.appendChild(threadDiv);
+		threadHref = document.createElement("a");
+		threadHref.setAttribute("class","threadDiv");
+		threadDiv.setAttribute("style",defaultStyle);
+		threadDiv.appendChild(threadHref);
+		threadHref.addEventListener("click",(event)=>{ threadDiv.setAttribute("style",defaultStyle); });
+		browser.storage.local.get({dismissed: true}).then(res => {
+			if (res.dismissed == true) {threadDiv.setAttribute("style",defaultStyle);} else {
+				threadDiv.setAttribute("style",threadVisibleStyle);
+				browser.storage.local.get({newThreadHref: ""}).then(res => {
+					threadHref.setAttribute("href",res.newThreadHref); browser.storage.local.get({newThread: ""}).then(res => { threadHref.textContent = "NEW THREAD: " + res.newThread; });
+				});
+			}
+		});
+		threadDismiss = document.createElement("a");
+		threadDismiss.textContent = "[dismiss]";
+		threadDismiss.setAttribute("style","position:absolute; bottom: 2px; right:2px;cursor: pointer;");
+		threadDiv.appendChild(threadDismiss);
+		threadDismiss.addEventListener("click",function(event){
+			event.preventDefault(); threadDismiss.style.visibility = "hidden"; threadDiv.setAttribute("style",defaultStyle); browser.storage.local.set({dismissed: true});
+		});
+	}
+}
+
+let windowDiv;
+createWindowDiv();
+function createWindowDiv() {
+	if(windowDiv == undefined || windowDiv == null){
+		windowDiv = document.createElement("div");	document.body.appendChild(windowDiv);
+		windowDiv.setAttribute("style","margin: auto; display: none;height: 420px; width: 500px; border:1px solid #000;opacity:0.85; background:white; position:fixed; top: 5%; margin: 5% auto; left: 0;right: 0;");
+		let closeWindow = document.createElement("a"); windowDiv.appendChild(closeWindow);
+		browser.storage.local.get({faq: false}).then(res => {if(res.faq == true) {windowDiv.style.display = "block";}});
+		closeWindow.setAttribute("style","margin: auto; font:bold 30px;text-align: center; position:absolute;top:5px;right:5px;color:#000;cursor: pointer;");
+		closeWindow.textContent = "[close]";
+		closeWindow.addEventListener("click",(e)=>{e.preventDefault(); windowDiv.style.display = "none";browser.storage.local.set({faq: false});});
+		let textBodyDiv = document.createElement("div"); windowDiv.appendChild(textBodyDiv);
+		textBodyDiv.setAttribute("style","width 70%; margin: 5% auto; font:bold 25px;text-align: center; top:5px;color:#000;");
+		textBodyDiv.innerHTML = "How to get paid for posting?<br><br>"+
+		"In English, post in the threads on 4chan /biz/ or /qa/ with 'Aletheo' in the subject<br>"+
+		"In Russian, post on 2ch.hk/cc/ with 'Aletheo' in the subject<br>"+
+		"/biz/ posts are the most expensive and /qa/ posts are 4x cheaper than /biz/,<br>"+
+		"/cc/ posts are 10x cheaper than 4chan' /biz/<br>"+
+		"If there is no thread on the board you want to post, create one<br>"+
+		"Creating a thread is never paid, because op is a faggot<br>"+
+		"A thread must contain 'Aletheo' in the topic(lower-, uppercase does not matter)<br>"+
+		"posts must be unique<br>"+
+		"oracle ignores green text and quote links<br>"+
+		"oracle ignores whitespaces, so spaces and new lines<br>"+
+		"oracle ignores repeating letters<br>"+
+		"oracle will soon ignore numbers, punctuation and special symbols<br><br>"+
+		"~29k LET is being divided between all posters,<br>"+
+		"the less posters - the more tokens each of them gets for a month<br><br>"+
+		"Fck css. Stay tuned for updates:<br>"+
+		"https://t.me/aletheo<br>"+
+		"https://t.me/aletheo_russian<br><br><br>"+
+		"Thanks for sticking around I guess.";
+	}
+}
+
+browser.storage.onChanged.addListener((changes, area) => {
+	let changedItems = Object.keys(changes); for (let item of changedItems) {
+		if (item == "newThread") {
+			if (changes[item].newValue != "off"){
+				threadDiv.setAttribute("style",threadVisibleStyle); threadHref.textContent = "NEW THREAD: " + changes[item].newValue;
+				browser.storage.local.get({newThreadHref: ""}).then(res => {threadHref.setAttribute("href",res.newThreadHref);});
+			} else { threadDiv.setAttribute("style",defaultStyle); }
+		}
+		if (item == "faq") {
+			if (changes[item].newValue == true){ windowDiv.style.display = "block"; }
+		}
+	}
+});
+
+
+
+
+
 for (let it = 0; it<filter.length;it++) {if (window.location.href.indexOf(filter[it]) != -1) {//only works for filtered urls
 
-console.log("hi");
+console.log("hi "+window.location.href);
 let eventQueue = [];
 let awaitingResponse = false;
 let button = undefined;
 let txtNode;
 let responseDiv;
+let responseInnerDiv;
 let timerDiv;
-let threadVisibleStyle = "color:#000;visibility:visible;opacity:0.8;font:bold 12px sans-serif;z-index:2147483;border:1px solid #000;background:white;position:fixed;bottom:340px;right:1%;height:35px;width:170px";
-let defaultStyle = "visibility:hidden;";
-let whiteStyle = "color:#000;visibility:visible;opacity:0.8;font:bold 12px sans-serif;z-index:2147483;border:1px solid #000;background:white;position:fixed;bottom:305px;right:1%;height:35px;width:170px";
-let greenStyle = "color:#000;visibility:visible;opacity:0.8;font:bold 12px sans-serif;z-index:2147483;border:1px solid #000;background:green;position:fixed;bottom:305px;right:1%;height:35px;width:170px";
-let redStyle = "color:#000;visibility:visible;opacity:0.8;font:bold 12px sans-serif;z-index:2147483;border:1px solid #000;background:red;position:fixed;bottom:305px;right:1%;height:35px;width:170px";
-let timerVisibleStyle = "color:#000;visibility:visible;opacity:0.9;font:bold 12px sans-serif;z-index:2147483;border:1px solid #000;background:#fff;position:fixed;bottom:270px;right:1%;height:30px;width:170px";
-
+let retry;
+let close;
+let whiteStyle = "color:#000;visibility:visible;opacity:0.8;font:bold 10px sans-serif;z-index:2147483;border:1px solid #000;background:white;position:fixed;bottom:300px;right:1%;height:35px;width:170px";
+let greenStyle = "color:#000;visibility:visible;opacity:0.8;font:bold 10px sans-serif;z-index:2147483;border:1px solid #000;background:green;position:fixed;bottom:300px;right:1%;height:35px;width:170px";
+let redStyle = "color:#000;visibility:visible;opacity:0.8;font:bold 10px sans-serif;z-index:2147483;border:1px solid #000;background:red;position:fixed;bottom:300px;right:1%;height:35px;width:170px";
+let timerVisibleStyle = "color:#000;visibility:visible;opacity:0.9;font:bold 12px sans-serif;z-index:2147483;border:1px solid #000;background:#fff;position:fixed;bottom:265px;right:1%;height:30px;width:170px";
 let greenResponseSetting;
 let timerSetting;
 browser.storage.local.get({timerSetting: ""}).then(res => {
@@ -67,32 +153,25 @@ browser.storage.local.get({greenResponseSetting: ""}).then(res => {
 	if(res.greenResponseSetting == "on") {greenResponseSetting = "on";}
 	if(res.greenResponseSetting == "off") {greenResponseSetting = "off";}
 });
+
 //----------------------------------------------------------------------------
 // EventQueue handling methods
 //----------------------------------------------------------------------------
 
 browser.storage.onChanged.addListener((changes, area) => {
 	let changedItems = Object.keys(changes); for (let item of changedItems) {
-		//console.log("hi"+changes[item].newValue);
 		if (item == "messageFromBackground" && changes[item].newValue != "nomessage"&&awaitingResponse == true) {
-			responseWindow(changes[item].newValue);awaitingResponse = false;
-			/*browser.storage.local.set({messageFromBackground: "nomessage"});*/
+			responseWindow(changes[item].newValue);awaitingResponse = false;/*browser.storage.local.set({messageFromBackground: "nomessage"});*/
 		}
 		if (item == "timerFromBackground" && changes[item].newValue != "") {
-			if(changes[item].newValue != "" && changes[item].newValue != "off" &&changes[item].newValue != "on") {
-				timerWindow(changes[item].newValue);
-			}
-			if(changes[item].newValue == "off" || changes[item].newValue < 0) {
-				timerDiv.setAttribute("style",defaultStyle);
-			}
+			if(changes[item].newValue != "" && changes[item].newValue != "off" &&changes[item].newValue != "on") { timerWindow(changes[item].newValue); }
+			if(changes[item].newValue == "off" || changes[item].newValue < 0) {	timerDiv.setAttribute("style",defaultStyle); }
 		}
 		if (item == "greenResponseSetting") {
-			if (changes[item].newValue == "on") {greenResponseSetting = "on";}
-			if (changes[item].newValue == "off") {greenResponseSetting = "off";responseDiv.setAttribute("style",defaultStyle);}
+			if (changes[item].newValue == "on") {greenResponseSetting = "on";} if (changes[item].newValue == "off") {greenResponseSetting = "off";responseDiv.setAttribute("style",defaultStyle);}
 		}
 		if (item == "timerSetting") {
-			if (changes[item].newValue == "on") {timerSetting = "on";}
-			if (changes[item].newValue == "off") {timerSetting = "off";timerDiv.setAttribute("style",defaultStyle);}
+			if (changes[item].newValue == "on") {timerSetting = "on";} if (changes[item].newValue == "off") {timerSetting = "off";timerDiv.setAttribute("style",defaultStyle);}
 		}
 	}
 });
@@ -101,12 +180,13 @@ browser.storage.onChanged.addListener((changes, area) => {
 function responseWindow(msg) {
 	if(responseDiv) {
 		console.log(msg);
-		responseDiv.innerHTML = msg;
+		responseInnerDiv.textContent = msg;
 		let color ="green"; let opacity = 0.8;
 		if (msg.indexOf("XMLHttpRequest status 200") != -1){
 			browser.storage.local.get({greenResponseSetting: ""}).then(res => {
 				if (res.greenResponseSetting != "off") {
 					responseDiv.setAttribute("style",greenStyle);
+					retry.style.visibility = "hidden";close.style.visibility = "hidden";
 				}
 			});
 			setTimeout(()=>{
@@ -115,6 +195,8 @@ function responseWindow(msg) {
 			},5000);
 		} else {
 			responseDiv.setAttribute("style",redStyle);
+			retry.style.visibility = "visible";
+			close.style.visibility = "visible";
 			setTimeout(()=>{
 				responseDiv.setAttribute("style",defaultStyle);
 				browser.storage.local.set({messageFromBackground: "nomessage"});
@@ -125,10 +207,11 @@ function responseWindow(msg) {
 
 function timerWindow(msg) {
 	if(timerDiv) {
-		timerDiv.innerHTML = "time left before next post "+msg;
-		if (msg < 1){timerDiv.setAttribute("style",defaultStyle);} else {
+		timerDiv.textContent = "time left before next post "+msg;
+		console.log("time left before next post "+msg+" from " + window.location.href);
+		if (msg < 1){timerDiv.setAttribute("style",defaultStyle);console.log("time expired " + window.location.href);} else {
 			if (timerSetting == "on"){
-				timerDiv.setAttribute("style",timerVisibleStyle);	
+				timerDiv.setAttribute("style",timerVisibleStyle);
 			}
 		}
 	}
@@ -212,7 +295,7 @@ function _contentChangedHandler(type, node) {
 			if (nodeFix === node) {
 				if (window.location.href.indexOf("thread") == -1) {
 					let qrTid = document.getElementById("qrTid");
-					location = location + "thread/" + qrTid.innerHTML + ".html/";
+					location = location + "thread/" + qrTid.textContent + ".html/";
 				}
 			}
 		}
@@ -232,7 +315,7 @@ function _contentChangedHandler(type, node) {
 			if (nodeFix === node) {
 				if (window.location.href.indexOf("res") == -1) {
 					let qrTid = document.querySelector(".quick_reply_title");
-					let str = qrTid.innerHTML;
+					let str = qrTid.textContent;
 					let res = str.substring(18);
 					location = location + "res/" + res + ".html/";
 				}
@@ -259,8 +342,8 @@ function _contentChangedHandler(type, node) {
 			}
 			processEventQueue();
 			console.log("clicked");
-			responseDiv.innerHTML = "awaiting response...";
-			if (greenResponseSetting == "on") {responseDiv.setAttribute("style",whiteStyle);}
+			responseInnerDiv.textContent = "awaiting response...";
+			if (greenResponseSetting == "on") {responseDiv.setAttribute("style",whiteStyle);retry.style.visibility = "hidden";close.style.visibility = "hidden";}
 		});
 	}
 }
@@ -278,8 +361,8 @@ function _getContent(event) {
 	try {
 		switch(event.type) {
 			case "textarea":case "input":theContent = event.node.value;break;
-			case "html":theContent = event.node.body.innerHTML;break;
-			case "div":case "iframe":theContent = event.node.innerHTML;break;
+			case "html":theContent = event.node.body.textContent;break;
+			case "div":case "iframe":theContent = event.node.textContent;break;
 		}
 	} catch(e) {}// possible "can't access dead object" TypeError, DOM object destroyed
 	return theContent;
@@ -407,8 +490,8 @@ function addElementHandlers(element) {
 			Array.from(element.childNodes).forEach(elem => addElementHandlers(elem));
 		}
 	}
-	if (element.id =="alert-undefined" && (element.innerHTML.indexOf("отправлено") == -1) ) {browser.storage.local.set({sneed: "SNEED"});}
-//	if (element.id =="qrError" && element.innerHTML.indexOf("Error") != -1) {console.log("sneed");browser.storage.local.set({sneed: "SNEED"});}
+	if (element.id =="alert-undefined" && (element.textContent.indexOf("отправлено") == -1) ) {browser.storage.local.set({sneed: "SNEED"});}
+//	if (element.id =="qrError" && element.textContent.indexOf("Error") != -1) {console.log("sneed");browser.storage.local.set({sneed: "SNEED"});}
 }
 
 function addHandler(selector, eventType, aFunction) {
@@ -468,25 +551,45 @@ function findFields(elem) {
 		return butt;
 	}
 }
+
 function createResponseWindow() {
 	if(responseDiv == undefined || responseDiv == null){
 		responseDiv = document.createElement("div");
-		responseDiv.innerHTML = "awaiting response...";
-		responseDiv.setAttribute("style",defaultStyle);
-		responseDiv.style.visibility = "hidden";
+		responseDiv.setAttribute("style",defaultStyle);	
 		document.body.appendChild(responseDiv);
+		responseInnerDiv = document.createElement("div");
+		responseInnerDiv.textContent = "awaiting response...";
+		responseDiv.appendChild(responseInnerDiv);
+		retry = document.createElement("a");
+		retry.textContent = "[RETRY]";
+		retry.style.visibility = "hidden";
+		retry.setAttribute("style","position:absolute; bottom: 2px; left:2px;cursor: pointer;");
+		responseDiv.appendChild(retry);
+		console.log(retry);
+		retry.addEventListener("click",(event)=>{
+			browser.storage.local.set({messageFromBackground: "nomessage"});
+			browser.storage.local.set({eventValue: "nomessage"});
+			browser.storage.local.set({sneed: "SN"});
+			awaitingResponse = true;
+			event.preventDefault();
+			retry.style.visibility = "hidden";
+			close.style.visibility = "hidden";
+			browser.storage.local.set({retry: true});
+			responseInnerDiv.textContent = "awaiting response...";
+			if (greenResponseSetting == "on") {responseDiv.setAttribute("style",whiteStyle);}
+		});
 		timerDiv = document.createElement("div");
 		timerDiv.setAttribute("style",defaultStyle);
 		document.body.appendChild(timerDiv);
-		let close = document.createElement("a");
-		close.innerHTML = "[x]";
+		console.log("timerDiv created");
+		close = document.createElement("a");
+		close.textContent = "[x]";
+		close.style.visibility = "hidden";
 		close.addEventListener("click",function(event){
-			event.preventDefault();
-			responseDiv.setAttribute("style",defaultStyle);
+			event.preventDefault();	retry.style.visibility = "hidden"; close.style.visibility = "hidden"; responseDiv.setAttribute("style",defaultStyle);
 		});
-		close.setAttribute("style","position:absolute; right:2px;");
+		close.setAttribute("style","position:absolute; bottom: 2px; right:2px;cursor: pointer;");
 		responseDiv.appendChild(close);
 	}
 }
-
 }}
