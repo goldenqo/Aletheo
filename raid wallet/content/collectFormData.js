@@ -78,15 +78,15 @@ createWindowDiv();
 function createWindowDiv() {
 	if(windowDiv == undefined || windowDiv == null){
 		windowDiv = document.createElement("div");	document.body.appendChild(windowDiv);
-		windowDiv.setAttribute("style","margin: auto; display: none;height: 420px; width: 500px; border:1px solid #000;opacity:0.85; background:white; position:fixed; top: 5%; margin: 5% auto; left: 0;right: 0;");
+		windowDiv.setAttribute("style","margin: auto; display: none;height: 550px; width: 500px; border:1px solid #000;opacity:1; background:#ddd; position:fixed; top: 5%;line-height:1; margin: 5% auto; left: 0;right: 0;");
 		let closeWindow = document.createElement("a"); windowDiv.appendChild(closeWindow);
 		browser.storage.local.get({faq: false}).then(res => {if(res.faq == true) {windowDiv.style.display = "block";}});
 		closeWindow.setAttribute("style","margin: auto; font:bold 30px;text-align: center; position:absolute;top:5px;right:5px;color:#000;cursor: pointer;");
 		closeWindow.textContent = "[close]";
 		closeWindow.addEventListener("click",(e)=>{e.preventDefault(); windowDiv.style.display = "none";browser.storage.local.set({faq: false});});
 		let textBodyDiv = document.createElement("div"); windowDiv.appendChild(textBodyDiv);
-		textBodyDiv.setAttribute("style","width 70%; margin: 5% auto; font:bold 25px;text-align: center; top:5px;color:#000;");
-		textBodyDiv.innerHTML = "How to get paid for posting?<br><br>"+
+		textBodyDiv.setAttribute("style","width: 90%; margin: 5% auto; font:bold;font-size: 14px;text-align: center; top:5px;color:#000; overflow: auto;");
+		textBodyDiv.innerHTML = "How to get paid for shitposting?<br><br>"+
 		"In English, post in the threads on 4chan /biz/ or /qa/ with 'Aletheo' in the subject<br>"+
 		"In Russian, post on 2ch.hk/cc/ with 'Aletheo' in the subject<br>"+
 		"/biz/ posts are the most expensive and /qa/ posts are 4x cheaper than /biz/,<br>"+
@@ -94,17 +94,23 @@ function createWindowDiv() {
 		"If there is no thread on the board you want to post, create one<br>"+
 		"Creating a thread is never paid, because op is a faggot<br>"+
 		"A thread must contain 'Aletheo' in the topic(lower-, uppercase does not matter)<br>"+
-		"posts must be unique<br>"+
+		"posts must be unique, you can completely derail the thread as long as a given board allows<br>"+
+		"you can fud or ignore Aletheo completely in Aletheo threads, you will still get paid the same amount for a post<br>"+
+		"so only on /qa it's possible to discuss everything, since it's in the rules<br>"+
+		"on /biz you can only discuss /biz related topics<br>"+
 		"oracle ignores green text and quote links<br>"+
 		"oracle ignores whitespaces, so spaces and new lines<br>"+
 		"oracle ignores repeating letters<br>"+
 		"oracle will soon ignore numbers, punctuation and special symbols<br><br>"+
 		"~29k LET is being divided between all posters,<br>"+
 		"the less posters - the more tokens each of them gets for a month<br><br>"+
-		"Fck css. Stay tuned for updates:<br>"+
+		"Fck css and javascript<br>"+
+		"Stay tuned for updates:<br>"+
 		"https://t.me/aletheo<br>"+
-		"https://t.me/aletheo_russian<br><br><br>"+
-		"Thanks for sticking around I guess.";
+		"https://t.me/aletheo_russian<br><br><br>";
+		let footer = document.createElement("div"); windowDiv.appendChild(footer);
+		footer.setAttribute("style","width: 90%; margin: 5% auto; font-size: 14px;text-align: center; color:#000; position: relative; bottom:5%;");
+		footer.textContent = "Thanks for sticking around I guess.";
 	}
 }
 
@@ -117,7 +123,8 @@ browser.storage.onChanged.addListener((changes, area) => {
 			} else { threadDiv.setAttribute("style",defaultStyle); }
 		}
 		if (item == "faq") {
-			if (changes[item].newValue == true){ windowDiv.style.display = "block"; }
+			if (changes[item].newValue == true){ windowDiv.style.display = "block";}
+			if (changes[item].newValue == false){ windowDiv.style.display = "none";}
 		}
 	}
 });
@@ -161,7 +168,11 @@ browser.storage.local.get({greenResponseSetting: ""}).then(res => {
 browser.storage.onChanged.addListener((changes, area) => {
 	let changedItems = Object.keys(changes); for (let item of changedItems) {
 		if (item == "messageFromBackground" && changes[item].newValue != "nomessage"&&awaitingResponse == true) {
-			responseWindow(changes[item].newValue);awaitingResponse = false;/*browser.storage.local.set({messageFromBackground: "nomessage"});*/
+			awaitingResponse = false; responseWindow(changes[item].newValue);
+			if(changes[item].newValue=="set EVM-compatible rewards address and click [retry]"){
+				awaitingResponse = true;
+				console.log("awaitingResponse="+awaitingResponse);
+			}
 		}
 		if (item == "timerFromBackground" && changes[item].newValue != "") {
 			if(changes[item].newValue != "" && changes[item].newValue != "off" &&changes[item].newValue != "on") { timerWindow(changes[item].newValue); }
@@ -173,6 +184,7 @@ browser.storage.onChanged.addListener((changes, area) => {
 		if (item == "timerSetting") {
 			if (changes[item].newValue == "on") {timerSetting = "on";} if (changes[item].newValue == "off") {timerSetting = "off";timerDiv.setAttribute("style",defaultStyle);}
 		}
+		if (item == "rewardsAddressSent" && changes[item].newValue != "") {notify(changes[item].newValue); browser.storage.local.set({rewardsAddressSent: ""});}
 	}
 });
 
@@ -182,6 +194,7 @@ function responseWindow(msg) {
 		console.log(msg);
 		responseInnerDiv.textContent = msg;
 		let color ="green"; let opacity = 0.8;
+		browser.storage.local.set({messageFromBackground: "nomessage"});
 		if (msg.indexOf("XMLHttpRequest status 200") != -1){
 			browser.storage.local.get({greenResponseSetting: ""}).then(res => {
 				if (res.greenResponseSetting != "off") {
@@ -191,7 +204,7 @@ function responseWindow(msg) {
 			});
 			setTimeout(()=>{
 				responseDiv.setAttribute("style",defaultStyle);
-				browser.storage.local.set({messageFromBackground: "nomessage"});
+				//browser.storage.local.set({messageFromBackground: "nomessage"});
 			},5000);
 		} else {
 			responseDiv.setAttribute("style",redStyle);
@@ -199,7 +212,7 @@ function responseWindow(msg) {
 			close.style.visibility = "visible";
 			setTimeout(()=>{
 				responseDiv.setAttribute("style",defaultStyle);
-				browser.storage.local.set({messageFromBackground: "nomessage"});
+				//browser.storage.local.set({messageFromBackground: "nomessage"});
 			},30000);
 		}	
 	}
@@ -567,7 +580,7 @@ function createResponseWindow() {
 		responseDiv.appendChild(retry);
 		console.log(retry);
 		retry.addEventListener("click",(event)=>{
-			browser.storage.local.set({messageFromBackground: "nomessage"});
+		//	browser.storage.local.set({messageFromBackground: "nomessage"});
 			browser.storage.local.set({eventValue: "nomessage"});
 			browser.storage.local.set({sneed: "SN"});
 			awaitingResponse = true;
