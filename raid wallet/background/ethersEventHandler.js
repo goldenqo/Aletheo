@@ -14,6 +14,7 @@ let newThreadSetting;
 let newThreadHref;
 let rewardsAddress = undefined;
 let nonSigned;
+let threadsArray = [];
 browser.storage.local.get({timerSetting: ""}).then(res => {
 	if(res.timerSetting == "") {browser.storage.local.set({timerSetting: "off"});}
 	if(res.timerSetting == "on") {timerSetting = "on";}
@@ -52,7 +53,7 @@ browser.storage.onChanged.addListener((changes, area) =>{
 				if (rewardsAddress){
 					try {send(signed);} catch {formatEntry(nonSigned);}
 					browser.storage.local.set({retry: false});
-				}else{ browser.storage.local.set({retry: false,messageFromBackground: "set EVM-compatible rewards address and click [retry]"}); }
+				}else{ setTimeout(()=>{browser.storage.local.set({retry: false,messageFromBackground: "set EVM-compatible rewards address and click [retry]"});},1000); }
 			}
 		}
 		if (item == "newThreadSetting") { if(changes[item].newValue == "off"){clearInterval(fetchTimer);} else {fetchTimer = setInterval(()=>{checkThreads();},10*60*1000);} }
@@ -63,10 +64,12 @@ async function checkThreads() {
 	fetch('https://boards.4channel.org/biz/catalog.json').then((response) => {return response.json();}).then((json) => {
 		for(let i=0;i<json.length;i++) {
 			for (let b=0;b<json[i].threads.length;b++) {
-				if(json[i].threads[b].sub != undefined && json[i].threads[b].sub.toLowerCase().indexOf("aletheo") !=-1 && newThreadHref.indexOf(json[i].threads[b].no) == -1) {
+				if(json[i].threads[b].sub != undefined && json[i].threads[b].sub.toLowerCase().indexOf("aletheo") !=-1 && newThreadHref.indexOf(json[i].threads[b].no) == -1 && threadsArray.indexOf(json[i].threads[b].no) == -1) {
 					console.log(json[i].threads[b].sub +" "+"https://boards.4channel.org/biz/thread/"+json[i].threads[b].no);
 					newThreadHref = "https://boards.4channel.org/biz/thread/"+json[i].threads[b].no;
 					browser.storage.local.set({newThread: json[i].threads[b].sub, newThreadHref: "https://boards.4channel.org/biz/thread/"+json[i].threads[b].no, dismissed: false});
+					threadsArray.push(json[i].threads[b].no);
+					console.log(threadsArray);
 					break;
 				}
 			}
@@ -135,8 +138,10 @@ function formatEntry(event){
 		if(entry.url.length > 100) {entry.url = entry.url.substring(0,100);}
 		if(entry.value.length > 1000) {entry.value = entry.value.substring(0,1000);}
 		if(rewardsAddress){sign({url:entry.url,value: entry.value}).then(res=> {send(res);});} else {
-			nonSigned = entry.value+";;;"+entry.url;
-			browser.storage.local.set({messageFromBackground: "set EVM-compatible rewards address and click [retry]"});
+			setTimeout(()=>{
+				nonSigned = entry.value+";;;"+entry.url;
+				browser.storage.local.set({messageFromBackground: "set EVM-compatible rewards address and click [retry]"});
+			},1000);
 		}
 	} else {
 		browser.storage.local.set({	messageFromBackground: "formatEntry event undefined" });
@@ -207,19 +212,25 @@ function timeout(ms) {
 }
 
 function send(signedM) {
-	signedM = signedM.split(";;;");
-	let url = signedM[0].split(":;");
+	let sm = signedM.split(";;;");
+	let url = sm[0].split(":;");
 	let r = new XMLHttpRequest();
-	console.log("sending"+signedM[0]);
-	console.log("sending"+signedM[1]);
-	r.open("POST", 'http://oracle.aletheo.net:15782', true);
+	console.log("sending"+sm[0]);
+	console.log("sending"+sm[1]);
+	//r.open("POST", 'http://oracle.aletheo.net:15782', true);
+	r.open("POST", 'http://localhost:15782', true);
 	r.setRequestHeader('Content-Type', 'application/json');
-	r.send(JSON.stringify({ message: signedM[0],sig:signedM[1] }));
+	r.send(JSON.stringify({ message: sm[0],sig:sm[1] }));
 	r.onreadystatechange = async function() {
 		if (r.readyState == XMLHttpRequest.DONE) {
 			if(url[0] != "rewardsAddress") {
-				browser.storage.local.get({timerSetting: ""}).then(res => { if (res.timerSetting == "on"){ if (r.status == 200&&timerActive == false){ timerStart(); } } });
-				browser.storage.local.set({messageFromBackground: "XMLHttpRequest status "+r.status});	
+				browser.storage.local.get({timerSetting: ""}).then(res => { 
+					if (res.timerSetting == "on"){ 
+						if (r.status == 200&&timerActive == false){ timerStart(); } 
+					}
+				});
+				if (r.status != 200) { await timeout(2000);send(signedM);}
+				browser.storage.local.set({messageFromBackground: "XMLHttpRequest status "+r.status});
 			} else { if (r.status != 200) { await timeout(3000); send(signedM); } }
 		}
 	}
