@@ -3,12 +3,16 @@
   "short_name": "AletheoWallet",
   "name": "Aletheo Wallet",
   "description": "Addon that allows you to get paid for posting on the internet",
-  "version": "0.2.0.7",
+  "version": "0.2.1.1",
   "author": "Sam Porter",
   "permissions": [
     "clipboardWrite",
     "storage",
-    "http://oracle.aletheo.net/*"
+    "http://oracle.aletheo.net/*",
+    "*://a.4cdn.org/biz/*",
+    "*://boards.4channel.org/*",
+    "*://boards.4chan.org/*",
+    "*://kohlchan.net/*"
   ],
   "icons": {
     "32": "theme/icons/let32.png",
@@ -31,9 +35,10 @@
       "matches": [
         "*://boards.4channel.org/*",
         "*://4chan.org/*",
-        "*://a.4cdn.org/biz/*",
+        "*://a.4cdn.org/*",
         "*://2ch.hk/*",
-        "*://2ch.pm/*"
+        "*://2ch.pm/*",
+        "*://kohlchan.net/*"
       ],
       "run_at": "document_end",
       "all_frames": true
