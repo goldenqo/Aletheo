@@ -10,19 +10,13 @@
 // can be fixed in the future
 
 'use strict';
-let filter = [
-"4chan.org/biz",
-"4channel.org/biz",
-"4chan.org/qa",
-"4channel.org/qa",
-"2ch.hk/cc",
-"2ch.pm/cc",
-"2ch.tf/cc",
-"2ch.yt/cc",
-"2ch.wf/cc",
-"2ch.re/cc",
-"2-ch.so/cc",
-"kohlchan.net/ng/"//,
+let baseFilter = [
+"4chan.",
+"4channel.",
+"2ch.",
+"2-ch.",
+"kohlchan.",
+"endchan."//,
 //"twitter.com",
 //"ylilauta.",
 //"komica.",
@@ -33,12 +27,24 @@ let filter = [
 //"2chan.",
 //"github.com",
 //"bitcointalk.org",
-//"ethereum-magicians.org",
-//"forum.openzeppelin.com",
 //"wrongthink.",
-//"endchan.",
 //"krautchan."
 ];
+
+let secondaryFilter = [
+"/biz/thread/",
+"/cc/res/",
+"/wrk/res/",
+"/b/res/",
+"/ng/res/",
+"/int/res/",
+"/pol/res/",
+"/rus/res/",
+"/ausneets/res/",
+"/imouto/res/",
+"/kc/res/",
+"/librejp/res/"
+]
 
 let greenLock = false;
 let threadDiv;
@@ -90,15 +96,20 @@ function createWindowDiv() {
 		textBodyDiv.innerHTML = "How to get paid for shitposting?<br><br>"+
 		"In English, post in the threads on 4chan /biz/ with 'Aletheo' in the subject<br>"+
 		"In Russian, post on 2chhk/cc/ with 'Aletheo' in the subject<br>"+
-		"In German/English post on kohlchan/ng with 'Aletheo' in the subject<br>"+
+		"In German/English post on kohlchan/ng/ with 'Aletheo' in the subject<br>"+
 		"/biz/ posts are the most expensive<br>"+
-		"/cc/ and /ng/ posts are 10x cheaper than 4chan' /biz/ due to low traffic and other considerations<br>"+
+		"Other places include /ausneets/, /imouto/, /librejp/, /rus/, /pol/, /b/ on endchan<br>"+
+		"Also /pol/, /wrk/, /b/ on 2chhk<br>"+
+		"Also /int/,/pol/,/b/ on kohlchan<br>"+
+		"All posts on all boards that are not 4chan /biz/ are 10x cheaper than 4chan' /biz/ due to low traffic and other considerations<br>"+
+		"As threads on /biz/ gain more and more posters, other places payment modifier will increase depending on their traffic.<br>"+
 		"If there is no thread on the board you want to post, create one<br>"+
 		"Creating a thread is never paid, because op is redacted<br>"+
-		"A thread must contain 'Aletheo' in the topic(lower-, uppercase does not matter)<br>"+
+		"It's best if the thread topic contains not just 'aletheo'(lower-, uppercase does not matter) but also 'general' especially on /biz/ so that jannies won't clean it up<br>"+
 		"posts must be unique, you can completely derail the thread as long as a given board allows<br>"+
 		"you can fud or ignore Aletheo completely in Aletheo threads, you can shit on devs and architects, you can sage, you will still get paid the same amount for a post<br>"+
 		"on /biz you can only discuss /biz related topics<br>"+
+		"you can also post on aforementioned places in any thread except threads containing word 'general' in the subject and still get paid the same amount as long as your post contains 'aletheo'<br>"+
 		"oracle ignores green text and quote links<br>"+
 		"oracle ignores whitespaces, so spaces and new lines<br>"+
 		"oracle ignores repeating letters<br>"+
@@ -118,7 +129,9 @@ function createWindowDiv() {
 		"Fck css and javascript<br>"+
 		"Stay tuned for updates:<br>"+
 		"https://t.me/aletheo<br>"+
-		"https://t.me/aletheo_russian<br><br><br>"+
+		"https://t.me/aletheo_russian<br>"+
+		"https://discord.gg/rDd5sAHQ4S<br>"+
+		"irc channel was requested already a few times, it will be created<br><br>"+
 		"Thanks for sticking around I guess.";//+
 //		'<a style="margin: auto; font:bold 30px;text-align: center; position:absolute;bottom:5px;right:5px;color:#000;cursor: pointer;">[close]</a>';
 		let closeWindowB = document.createElement("a"); windowDiv.appendChild(closeWindowB);
@@ -149,11 +162,10 @@ browser.storage.onChanged.addListener((changes, area) => {
 	}
 });
 
-
-
-
-
-for (let it = 0; it<filter.length;it++) {if (window.location.href.indexOf(filter[it]) != -1) {//only works for filtered urls
+for (let it = 0; it<baseFilter.length;it++) {
+	if (window.location.href.indexOf(baseFilter[it]) != -1) {
+		for (let iter = 0; iter<secondaryFilter.length; iter++) {
+			if(window.location.href.indexOf(secondaryFilter[iter]) != -1) {
 
 console.log("hi "+window.location.href);
 let eventQueue = [];
@@ -227,7 +239,7 @@ function responseWindow(msg) {
 			},5000);
 		} else {
 			if (greenLock==false){
-				responseDiv.setAttribute("style",redStyle);	awaitingResponse = true; //browser.storage.local.set({retry: true});
+					awaitingResponse = true; //browser.storage.local.set({retry: true});
 				if (msg != "set EVM-compatible rewards address and click [retry]") {
 					responseInnerDiv.textContent = msg + " retrying...";
 					setTimeout(()=>{
@@ -235,7 +247,7 @@ function responseWindow(msg) {
 						browser.storage.local.set({eventValue: "nomessage", sneed: "SN"});responseInnerDiv.textContent = "retrying, awaiting response..."; responseDiv.setAttribute("style",whiteStyle);
 						}
 					},1000);
-				} else { responseInnerDiv.textContent = msg;	retry.style.visibility = "visible"; close.style.visibility = "visible"; }
+				} else {responseDiv.setAttribute("style",redStyle); responseInnerDiv.textContent = msg; retry.style.visibility = "visible"; close.style.visibility = "visible"; }
 			}
 		}	
 	}
@@ -573,22 +585,12 @@ function findFields(elem) {
 				if (!butt) {butt=document.querySelector('div>input[type="submit"]');}
 			}
 			if (window.location.href.indexOf("2ch.") != -1 || window.location.href.indexOf("2-ch.") != -1){
-				if(elem.id=="qr-shampoo"){
-					console.log("dis button");
-					butt=document.querySelector('#qr-submit');
-				} 
-				if(elem.id=="shampoo"){
-					butt=document.querySelector('#submit');
-				}
+				if(elem.id=="qr-shampoo"){butt=document.querySelector('#qr-submit');}
+				if(elem.id=="shampoo"){butt=document.querySelector('#submit');}
 			}
-			if (window.location.href.indexOf("kohlchan.") != -1){
-				if(elem.id=="qrbody"){
-					console.log("dis button");
-					butt=document.querySelector('#qrbutton');
-				} 
-				if(elem.id=="fieldMessage"){
-					butt=document.querySelector('#formButton');
-				}
+			if (window.location.href.indexOf("kohlchan.") != -1||window.location.href.indexOf("endchan.") != -1){
+				if(elem.id=="qrbody"){butt=document.querySelector('#qrbutton');}
+				if(elem.id=="fieldMessage"){butt=document.querySelector('#formButton');}
 			}
 		}
 		return butt;
@@ -634,4 +636,8 @@ function createResponseWindow() {
 		responseDiv.appendChild(close);
 	}
 }
-}}
+
+			}
+		}
+	}
+}
