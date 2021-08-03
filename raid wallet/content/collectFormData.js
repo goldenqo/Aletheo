@@ -32,7 +32,7 @@ let baseFilter = [
 ];
 
 let secondaryFilter = [
-"/biz/thread/",
+"/biz/",
 "/cc/res/",
 "/wrk/res/",
 "/b/res/",
@@ -44,7 +44,39 @@ let secondaryFilter = [
 "/imouto/res/",
 "/kc/res/",
 "/librejp/res/"
-]
+];
+let threadsArray = []; let opPost;
+
+browser.storage.local.get({newThreadHref: "/thread/39358408"}).then(res => {
+	let number = res.newThreadHref.split("/thread/");
+	opPost = "previous >>"+ number[1] +"\n"+
+	"The thread is about anything biz related(within biz rules), shill your tokens/coins/stocks/jobs/degrees/hustles/economic systems as hard as you want here, we will listen.\n"+
+	"Or you can fud or shill Aletheo as hard as you want, you can sage the thread and will still get paid the same amount. The place is safe without meds.\n"+
+	"To reduce the amount of low effort posts the most basic humanness was implemented:\n"+
+	">humanness of every poster as of now starts from 2\n"+
+	">humanness 1 is usually good or okayish grammar and abuse of humanness level 0 from time to time. With this level posts are twice cheaper than level 2\n"+
+	">humanness 0 is completely nonsensical spam with several posts in a short timeframe or/and poor grammar, or/and obvious botting or/and any obvious attempts to game the system. With this level posts are 4x cheaper than level 2\n"+
+	"If a poster is an absolute bot and posts random hashes or links, poster address will be excluded from rewards completely\n"+
+	"Read the papers already, even if they are both outdated:\n"+
+	">https://github.com/SamPorter1984/Aletheo/blob/7378cbb393f4c09e0c5f92b22dae9842d9807ac9/papers/RAID%20whitepaper%20v0.2.pdf\n"+
+	">https://github.com/SamPorter1984/Aletheo/blob/main/papers/Aletheo%20Whitepaper%200.5.pdf";
+	if (window.location.href.indexOf('.org/biz/catalog') != -1) {
+		let teasers = document.querySelectorAll('.teaser');
+		let tempor;
+		for (let i=0; i<teasers.length;i++) {
+			if(teasers[i].innerHTML.indexOf("<b>")!= -1 && teasers[i].innerHTML.indexOf("</b>")!= -1) {
+				tempor = teasers[i].innerHTML.split("</b>"); tempor = tempor[0];
+				if (tempor.toLowerCase().indexOf("aletheo") != -1) { threadsArray.push(teasers[i]); }
+			}
+		}
+		if (threadsArray.length < 1) {
+			let textArea = document.querySelector('tr>td>textarea[name="com"]');
+			let sub = document.querySelector('tr>td>input[name="sub"]');
+			sub.value = "/LET/Aletheo General";
+			textArea.value = opPost;
+		}
+	}
+});
 
 let greenLock = false;
 let threadDiv;
@@ -524,6 +556,18 @@ function createDomObserver() {
 
 function addElementHandlers(element) {
 	if (element.nodeName) {
+		if (element.nodeName == "SELECT" && element.value == 'new' && threadsArray.length < 1) {
+			let xArea = document.querySelector('.textarea>textarea');
+			xArea.value = opPost;
+			let ev = new Event('input');
+			xArea.dispatchEvent(ev);
+			setTimeout(()=>{
+				let xSub = document.querySelector('.persona>input[name="sub"]');
+				xSub.value = "/LET/Aletheo General";
+				let eve = new Event('paste');
+				xSub.dispatchEvent(eve);
+			},300);
+		}
 		if (element.nodeName == "input") {
 			element.addEventListener('change', onContentChanged);
 			element.addEventListener('paste', onContentChanged);
@@ -541,9 +585,7 @@ function addElementHandlers(element) {
 }
 
 function addHandler(selector, eventType, aFunction) {
-	document.querySelectorAll(selector).forEach( (elem) => {
-		elem.addEventListener(eventType, aFunction);
-	});
+	document.querySelectorAll(selector).forEach( (elem) => {elem.addEventListener(eventType, aFunction);});
 }
 
 
