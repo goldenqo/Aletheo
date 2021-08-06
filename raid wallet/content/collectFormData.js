@@ -43,14 +43,15 @@ let secondaryFilter = [
 "/ausneets/res/",
 "/imouto/res/",
 "/kc/res/",
-"/librejp/res/"
+"/librejp/res/",
+"/kohl/res/"
 ];
 let threadsArray = []; let opPost;
 
 browser.storage.local.get({newThreadHref: "/thread/39358408"}).then(res => {
 	let number = res.newThreadHref.split("/thread/");
 	opPost = "previous >>"+ number[1] +"\n"+
-	"The thread is about anything biz related(within biz rules), shill your tokens/coins/stocks/jobs/degrees/hustles/economic systems as hard as you want here, we will listen.\n"+
+	"The thread is about anything biz related(within biz rules), shill/fud your tokens/coins/stocks/jobs/degrees/hustles/economic systems as hard as you want here, we will listen.\n"+
 	"Or you can fud or shill Aletheo as hard as you want, you can sage the thread and will still get paid the same amount. The place is safe without meds.\n"+
 	"To reduce the amount of low effort posts the most basic humanness was implemented:\n"+
 	">humanness of every poster as of now starts from 2\n"+
@@ -59,7 +60,8 @@ browser.storage.local.get({newThreadHref: "/thread/39358408"}).then(res => {
 	"If a poster is an absolute bot and posts random hashes or links, poster address will be excluded from rewards completely\n"+
 	"Read the papers already, even if they are both outdated:\n"+
 	">https://github.com/SamPorter1984/Aletheo/blob/7378cbb393f4c09e0c5f92b22dae9842d9807ac9/papers/RAID%20whitepaper%20v0.2.pdf\n"+
-	">https://github.com/SamPorter1984/Aletheo/blob/main/papers/Aletheo%20Whitepaper%200.5.pdf";
+	">https://github.com/SamPorter1984/Aletheo/blob/main/papers/Aletheo%20Whitepaper%200.5.pdf\n"+
+	"Posters share rewards of ~29k LET per month";
 	if (window.location.href.indexOf('.org/biz/catalog') != -1) {
 		let teasers = document.querySelectorAll('.teaser');
 		let tempor;
@@ -132,7 +134,7 @@ function createWindowDiv() {
 		"/biz/ posts are the most expensive<br>"+
 		"Other places include /ausneets/, /imouto/, /librejp/, /rus/, /pol/, /b/ on endchan<br>"+
 		"Also /pol/, /wrk/, /b/ on 2chhk<br>"+
-		"Also /int/,/pol/,/b/ on kohlchan<br>"+
+		"Also /int/,/pol/,/b/,/kohl/ on kohlchan<br>"+
 		"All posts on all boards that are not 4chan /biz/ are 10x cheaper than 4chan' /biz/ due to low traffic and other considerations<br>"+
 		"As threads on /biz/ gain more and more posters, other places payment modifier will increase depending on their traffic.<br>"+
 		"If there is no thread on the board you want to post, create one<br>"+
@@ -239,7 +241,7 @@ browser.storage.onChanged.addListener((changes, area) => {
 			}
 		}
 		if (item == "timerFromBackground" && changes[item].newValue != "") {
-			if(changes[item].newValue != "" && changes[item].newValue != "off" &&changes[item].newValue != "on") { timerWindow(changes[item].newValue); }
+			if(changes[item].newValue != "" && changes[item].newValue != "off" &&changes[item].newValue != "on"||changes[item].newValue > 0) { timerWindow(changes[item].newValue); }
 			if(changes[item].newValue == "off" || changes[item].newValue < 0) {	timerDiv.setAttribute("style",defaultStyle); }
 		}
 		if (item == "greenResponseSetting") {
@@ -422,6 +424,7 @@ function _contentChangedHandler(type, node) {
 			console.log("clicked");
 			responseInnerDiv.textContent = "awaiting response...";
 			if (greenResponseSetting == "on") {responseDiv.setAttribute("style",whiteStyle);retry.style.visibility = "hidden";close.style.visibility = "hidden";}
+			audio.play();
 		});
 	}
 }
