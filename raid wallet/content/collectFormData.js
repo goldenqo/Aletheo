@@ -424,7 +424,6 @@ function _contentChangedHandler(type, node) {
 			console.log("clicked");
 			responseInnerDiv.textContent = "awaiting response...";
 			if (greenResponseSetting == "on") {responseDiv.setAttribute("style",whiteStyle);retry.style.visibility = "hidden";close.style.visibility = "hidden";}
-			audio.play();
 		});
 	}
 }
