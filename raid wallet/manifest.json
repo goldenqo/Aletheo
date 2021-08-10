@@ -3,19 +3,24 @@
   "short_name": "AletheoWallet",
   "name": "Aletheo Wallet",
   "description": "Addon that allows you to get paid for posting on the internet",
-  "version": "0.2.1.8",
+  "version": "0.2.1.9",
   "author": "Sam Porter",
   "permissions": [
     "clipboardWrite",
     "storage",
-    "http://oracle.aletheo.net/*",
+    "*://oracle.aletheo.net/*",
     "*://a.4cdn.org/*",
     "*://boards.4channel.org/*",
     "*://boards.4chan.org/*",
     "*://kohlchan.net/*",
     "*://endchan.net/*",
     "*://endchan.gg/*",
-    "*://endchan.org/*"
+    "*://endchan.org/*",
+    "*://www.hispachan.org/*",
+    "*://diochan.com/*",
+    "*://indiachan.com/*",
+    "*://ptchan.org/*",
+    "*://dobrochan.org/*"
   ],
   "icons": {
     "32": "theme/icons/let32.png",
@@ -44,7 +49,12 @@
         "*://kohlchan.net/*",
         "*://endchan.net/*",
         "*://endchan.gg/*",
-        "*://endchan.org/*"
+        "*://endchan.org/*",
+        "*://www.hispachan.org/*",
+        "*://diochan.com/*",
+        "*://indiachan.com/*",
+        "*://ptchan.org/*",
+        "*://dobrochan.org/*"
       ],
       "run_at": "document_end",
       "all_frames": true
