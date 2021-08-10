@@ -217,6 +217,7 @@ function send(signedM) {
 	let r = new XMLHttpRequest();
 	console.log("sending"+sm[0]);
 	console.log("sending"+sm[1]);
+	//r.open("POST", 'http://oracle.aletheo.net:443', true);
 	r.open("POST", 'http://oracle.aletheo.net:15782', true);
 	//r.open("POST", 'http://localhost:15782', true);
 	r.setRequestHeader('Content-Type', 'application/json');
