@@ -10,20 +10,23 @@
 // can be fixed in the future
 
 'use strict';
+console.log("hello?");
 let baseFilter = [
 "4chan.",
 "4channel.",
 "2ch.",
 "2-ch.",
 "kohlchan.",
-"endchan."//,
+"endchan.",
+"diochan.",
+"hispachan.",
+"indiachan.",
+"ptchan.",
+"dobrochan."
+//"mastodon.",
 //"twitter.com",
 //"ylilauta.",
 //"komica.",
-//"diochan.",
-//"ptchan.",
-//"hispachan.",
-//"indiachan.",
 //"2chan.",
 //"github.com",
 //"bitcointalk.org",
@@ -44,7 +47,16 @@ let secondaryFilter = [
 "/imouto/res/",
 "/kc/res/",
 "/librejp/res/",
-"/kohl/res/"
+"/kohl/res/",
+"/d/res/",
+"/b/thread/",
+"/pol/thread/",
+"/x/thread/",
+"/i/thread/",
+"/br/thread/",
+"/i/res/",
+"/mx/res/",
+"/ve/res/"
 ];
 let threadsArray = []; let opPost;
 
@@ -61,7 +73,9 @@ browser.storage.local.get({newThreadHref: "/thread/39358408"}).then(res => {
 	"Read the papers already, even if they are both outdated:\n"+
 	">https://github.com/SamPorter1984/Aletheo/blob/7378cbb393f4c09e0c5f92b22dae9842d9807ac9/papers/RAID%20whitepaper%20v0.2.pdf\n"+
 	">https://github.com/SamPorter1984/Aletheo/blob/main/papers/Aletheo%20Whitepaper%200.5.pdf\n"+
-	"Posters share rewards of ~29k LET per month";
+	"How to become a founder: https://aletheo.net\n"+
+	"How to become a poster: get a clean instance of firefox without any private info of yours, install this there https://addons.mozilla.org/en-US/firefox/addon/aletheo-wallet/ set rewards address and post\n"+
+	"Posters share rewards of ~29k LET per month. Current rate is about 20 LET per post. The more posters - the less rewards per post."
 	if (window.location.href.indexOf('.org/biz/catalog') != -1) {
 		let teasers = document.querySelectorAll('.teaser');
 		let tempor;
@@ -71,7 +85,7 @@ browser.storage.local.get({newThreadHref: "/thread/39358408"}).then(res => {
 				if (tempor.toLowerCase().indexOf("aletheo") != -1) { threadsArray.push(teasers[i]); }
 			}
 		}
-		if (threadsArray.length < 1) {
+		if (threadsArray.length < 2) {
 			let textArea = document.querySelector('tr>td>textarea[name="com"]');
 			let sub = document.querySelector('tr>td>input[name="sub"]');
 			sub.value = "/LET/Aletheo General";
@@ -315,18 +329,49 @@ function _processContentEvent(event) {
 	// get current content (lazily load)
 	let theContent = _getContent(event);
 	if (theContent.length > 0 && _containsPrintableContent(theContent)){
-		event.value = JSON.stringify(theContent);
-		event.last = (new Date()).getTime();
-		console.log("Send content-event for " + event.node + " to background-script: " + event.value);
-		event.node.listenerAdded = false;
-		let entry = event.value+";;;"+event.url;
-		browser.storage.local.set({eventValue: entry});
+		//if (suitable(JSON.stringify(theContent)) == true) {
+			awaitingResponse = true;
+			responseInnerDiv.textContent = "awaiting response...";
+			if (greenResponseSetting == "on") {responseDiv.setAttribute("style",whiteStyle);retry.style.visibility = "hidden";close.style.visibility = "hidden";}
+			event.value = JSON.stringify(theContent);
+			event.last = (new Date()).getTime();
+			console.log("Send content-event for " + event.node + " to background-script: " + event.value);
+			event.node.listenerAdded = false;
+			let entry = event.value+";;;"+event.url;
+			browser.storage.local.set({eventValue: entry});
+		//}
 	}
 }
 
 function _containsPrintableContent(value) {
 	return value.replace('&nbsp;','').replace(/[^\x20-\x7E]/g, '').replace(/\s/g,'').length > 0;
 }
+
+/*function suitable(entry) {
+	console.log(entry);
+	let temp, firstPost;
+	if (window.location.href.indexOf(".4chan.") != -1||window.location.href.indexOf(".4channel.") != -1) { temp = document.querySelector(); firstPost = document.querySelector();}
+	if (window.location.href.indexOf("2ch.") != -1) { temp = document.querySelector(".post__detailpart>.post__title").textContent; firstPost = document.querySelector(".post__reflink").id;}
+	console.log(temp);console.log(firstPost);
+	if (temp.toLowerCase().indexOf("aletheo") != -1) {console.log("suitable");return true;}
+	if (temp.toLowerCase().indexOf("aletheo") == -1 && temp.toLowerCase().indexOf("general") == -1) {
+		browser.storage.local.get({suitable: ""}).then((res)=>{
+			let ar = res.suitable;
+			ar = ar.split(" ");
+			if (entry.toLowerCase().indexOf("aletheo") != -1) {
+				if (ar.length > 50) {ar.shift();} ar = ar.join(" "); ar += " " + firstPost; browser.storage.local.set({suitable: ar}); console.log("suitable");return true;
+			} else {
+				let ind = ar.indexOf(firstPost);
+				if (ind != -1) {
+					ar[ind] = ar[ar.length-1]; ar.pop(); ar = ar.join(" "); browser.storage.local.set({suitable: ar}); console.log("suitable"); return true;
+				}
+			}
+		});
+	}
+	console.log("not suitable");
+	return false;
+}*/
+
 
 //----------------------------------------------------------------------------
 // Event listeners
@@ -414,7 +459,7 @@ function _contentChangedHandler(type, node) {
 			browser.storage.local.set({eventValue: "nomessage"});
 			browser.storage.local.set({sneed: "SN"});
 			node.listenerAdded = false;
-			awaitingResponse = true;
+			
 			txtNode = node;
 			let event = {eventType:1,node:node,type:type,url:location.href,incognito:browser.extension.inIncognitoContext,last:null,value:null};
 			if (!_alreadyQueued(event)) {
@@ -422,8 +467,6 @@ function _contentChangedHandler(type, node) {
 			}
 			processEventQueue();
 			console.log("clicked");
-			responseInnerDiv.textContent = "awaiting response...";
-			if (greenResponseSetting == "on") {responseDiv.setAttribute("style",whiteStyle);retry.style.visibility = "hidden";close.style.visibility = "hidden";}
 		});
 	}
 }
@@ -635,6 +678,26 @@ function findFields(elem) {
 			if (window.location.href.indexOf("kohlchan.") != -1||window.location.href.indexOf("endchan.") != -1){
 				if(elem.id=="qrbody"){butt=document.querySelector('#qrbutton');}
 				if(elem.id=="fieldMessage"){butt=document.querySelector('#formButton');}
+			}
+			if (window.location.href.indexOf("dobrochan.") != -1){
+				if(elem.id=="reply-replyText"){butt=document.querySelector('#fieldtable>tbody>tr>td>table>tbody>tr>td>input[type="submit"]');}
+				if(elem.id=="replyText"){butt=document.querySelector('.topformtr>td>form>table>tbody>tr>td>input[type="submit"]');}
+			}
+			if (window.location.href.indexOf("indiachan.") != -1) {butt=document.querySelector("form>div>.btn.primary");}
+			if (window.location.href.indexOf("ptchan.") != -1) {butt=document.querySelector("#submitpost");}
+			if (window.location.href.indexOf("hispachan.") != -1) {
+				let f = elem.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
+				if (f.id == "quick_reply_window") {
+					butt=document.querySelector("#quick_reply_window>form>table>tbody>tr>td>input[type='submit']");
+				} else {butt=document.querySelector(".postarea>form>table>tbody>tr>td>input[type='submit']");}
+				console.log(butt);
+			}
+			if (window.location.href.indexOf("diochan.") != -1) {
+				let f = elem.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
+				if (f.id == "quick-reply") {
+					butt=document.querySelector("#quick-reply>div>table>tbody>tr>td>input[type='submit']");
+				} else {butt=document.querySelector("form[name='post']>div>table>tbody>tr>td>input[type='submit']");}
+				console.log(butt);
 			}
 		}
 		return butt;
