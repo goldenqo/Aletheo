@@ -10,7 +10,7 @@
 // can be fixed in the future
 
 'use strict';
-console.log("hello?");
+
 let baseFilter = [
 "4chan.",
 "4channel.",
@@ -683,7 +683,7 @@ function findFields(elem) {
 				if(elem.id=="reply-replyText"){butt=document.querySelector('#fieldtable>tbody>tr>td>table>tbody>tr>td>input[type="submit"]');}
 				if(elem.id=="replyText"){butt=document.querySelector('.topformtr>td>form>table>tbody>tr>td>input[type="submit"]');}
 			}
-			if (window.location.href.indexOf("indiachan.") != -1) {butt=document.querySelector("form>div>.btn.primary");}
+			if (window.location.href.indexOf("indiachan.") != -1) {	butt=document.querySelector("#postingForm>button.btn.primary");	}
 			if (window.location.href.indexOf("ptchan.") != -1) {butt=document.querySelector("#submitpost");}
 			if (window.location.href.indexOf("hispachan.") != -1) {
 				let f = elem.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
