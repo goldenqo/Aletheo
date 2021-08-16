@@ -3,7 +3,7 @@
   "short_name": "AletheoWallet",
   "name": "Aletheo Wallet",
   "description": "Addon that allows you to get paid for posting on the internet",
-  "version": "0.2.2",
+  "version": "0.2.2.2",
   "author": "Sam Porter",
   "permissions": [
     "clipboardWrite",
@@ -20,7 +20,8 @@
     "*://diochan.com/*",
     "*://indiachan.com/*",
     "*://ptchan.org/*",
-    "*://dobrochan.org/*"
+    "*://dobrochan.org/*",
+    "*://pajeet.top/*"
   ],
   "icons": {
     "32": "theme/icons/let32.png",
@@ -54,7 +55,8 @@
         "*://diochan.com/*",
         "*://indiachan.com/*",
         "*://ptchan.org/*",
-        "*://dobrochan.org/*"
+        "*://dobrochan.org/*",
+        "*://pajeet.top/*"
       ],
       "run_at": "document_end",
       "all_frames": true
