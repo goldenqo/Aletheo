@@ -9,9 +9,9 @@
 let rewardsAddress;
 
 document.addEventListener("DOMContentLoaded", function() {
-	browser.storage.local.get({rewardsAddress: ""}).then(res => {
-		if (res.rewardsAddress != "" && res.rewardsAddress != undefined && res.rewardsAddress != null) {
-			document.getElementById("rewardsAddress").textContent = res.rewardsAddress;
+	browser.storage.local.get({rewardsAddressSet: ""}).then(res => {
+		if (res.rewardsAddressSet != "" && res.rewardsAddressSet != undefined && res.rewardsAddressSet != null) {
+			document.getElementById("rewardsAddress").textContent = res.rewardsAddressSet;
 			document.getElementById("rewardsAddressDivSet").style.display = "none";
 			document.getElementById("rewardsAddressDiv").style.display = "block";
 		}
@@ -99,9 +99,9 @@ function setRewardsAddress() {
 function editRewardsAddress() {
 	document.getElementById("rewardsAddressDivSet").style.display = "block";
 	document.getElementById("rewardsAddressDiv").style.display = "none";
-	browser.storage.local.get({rewardsAddress: ""}).then(res => {
-		if (res.rewardsAddress != "" && res.rewardsAddress != undefined && res.rewardsAddress != null) {
-			document.getElementById("rewardsAddressInput").value = res.rewardsAddress;
+	browser.storage.local.get({rewardsAddressSet: ""}).then(res => {
+		if (res.rewardsAddressSet != "" && res.rewardsAddressSet != undefined && res.rewardsAddressSet != null) {
+			document.getElementById("rewardsAddressInput").value = res.rewardsAddressSet;
 		}
 	});
 }
