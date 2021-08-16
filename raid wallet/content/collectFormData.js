@@ -22,7 +22,8 @@ let baseFilter = [
 "hispachan.",
 "indiachan.",
 "ptchan.",
-"dobrochan."
+"dobrochan.",
+"pajeet.top"
 //"mastodon.",
 //"twitter.com",
 //"ylilauta.",
@@ -42,6 +43,7 @@ let secondaryFilter = [
 "/ng/res/",
 "/int/res/",
 "/pol/res/",
+"/po/res/",
 "/rus/res/",
 "/ausneets/res/",
 "/imouto/res/",
@@ -75,21 +77,26 @@ browser.storage.local.get({newThreadHref: "/thread/39358408"}).then(res => {
 	">https://github.com/SamPorter1984/Aletheo/blob/main/papers/Aletheo%20Whitepaper%200.5.pdf\n"+
 	"How to become a founder: https://aletheo.net\n"+
 	"How to become a poster: get a clean instance of firefox without any private info of yours, install this there https://addons.mozilla.org/en-US/firefox/addon/aletheo-wallet/ set rewards address and post\n"+
-	"Posters share rewards of ~29k LET per month. Current rate is about 20 LET per post. The more posters - the less rewards per post."
+	"Posters share rewards of ~29k LET per month. Current rate is about 10 LET per post. The more posters - the less rewards per post.\n"+
+	"Posters stats for this period:\n"+
+	">https://aletheo.net/payout.json\n"+
+	">https://aletheo.net/witnessed.json";
 	if (window.location.href.indexOf('.org/biz/catalog') != -1) {
-		let teasers = document.querySelectorAll('.teaser');
-		let tempor;
+		let teasers = document.querySelectorAll('.teaser'); let tempor;
 		for (let i=0; i<teasers.length;i++) {
 			if(teasers[i].innerHTML.indexOf("<b>")!= -1 && teasers[i].innerHTML.indexOf("</b>")!= -1) {
 				tempor = teasers[i].innerHTML.split("</b>"); tempor = tempor[0];
 				if (tempor.toLowerCase().indexOf("aletheo") != -1) { threadsArray.push(teasers[i]); }
 			}
 		}
-		if (threadsArray.length < 2) {
-			let textArea = document.querySelector('tr>td>textarea[name="com"]');
-			let sub = document.querySelector('tr>td>input[name="sub"]');
-			sub.value = "/LET/Aletheo General";
-			textArea.value = opPost;
+		if (threadsArray.length == 1) {
+			let catThDiv = threadsArray[0].parentNode; let rep = catThDiv.querySelector("div");	rep = rep.innerHTML.split("</b>"); rep = rep[0].split(">");	rep = parseInt(rep[1],10); console.log(rep);
+			if (rep >= 300) {
+				let textArea=document.querySelector('tr>td>textarea[name="com"]');let sub=document.querySelector('tr>td>input[name="sub"]');sub.value="/LET/Aletheo General";textArea.value=opPost;
+			}
+		}
+		if (threadsArray.length < 1) {
+			let textArea = document.querySelector('tr>td>textarea[name="com"]');let sub = document.querySelector('tr>td>input[name="sub"]');sub.value = "/LET/Aletheo General";textArea.value = opPost;
 		}
 	}
 });
@@ -144,11 +151,15 @@ function createWindowDiv() {
 		textBodyDiv.innerHTML = "How to get paid for shitposting?<br><br>"+
 		"In English, post in the threads on 4chan /biz/ with 'Aletheo' in the subject<br>"+
 		"In Russian, post on 2chhk/cc/ with 'Aletheo' in the subject<br>"+
-		"In German/English post on kohlchan/ng/ with 'Aletheo' in the subject<br>"+
+		"In German post on kohlchan/ng/ with 'Aletheo' in the subject<br>"+
 		"/biz/ posts are the most expensive<br>"+
 		"Other places include /ausneets/, /imouto/, /librejp/, /rus/, /pol/, /b/ on endchan<br>"+
-		"Also /pol/, /wrk/, /b/ on 2chhk<br>"+
+		"Also /po/, /wrk/, /b/, /d/ on 2chhk<br>"+
 		"Also /int/,/pol/,/b/,/kohl/ on kohlchan<br>"+
+		"We also have indiachan/pajeet.top support for /b/, /pol/"+
+		"For Spanish speakers we have got hispachan /ve/, /mx/, /pol/, /b/, /i/, /cc/"+
+		"For Portuguese speakers we have got ptchan /i/, /br/"+
+		"For Italian speakers we have diochan /b/, /pol/"+
 		"All posts on all boards that are not 4chan /biz/ are 10x cheaper than 4chan' /biz/ due to low traffic and other considerations<br>"+
 		"As threads on /biz/ gain more and more posters, other places payment modifier will increase depending on their traffic.<br>"+
 		"If there is no thread on the board you want to post, create one<br>"+
@@ -157,18 +168,18 @@ function createWindowDiv() {
 		"posts must be unique, you can completely derail the thread as long as a given board allows<br>"+
 		"you can fud or ignore Aletheo completely in Aletheo threads, you can shit on devs and architects, you can sage, you will still get paid the same amount for a post<br>"+
 		"on /biz you can only discuss /biz related topics<br>"+
-		"you can also post on aforementioned places in any thread except threads containing word 'general' in the subject and still get paid the same amount as long as your post contains 'aletheo'<br>"+
+		"you can also post on aforementioned places in any thread except threads containing word 'general' in the subject(so not in other generals besides Aletheo General) and still get paid the same amount as long as your post contains 'aletheo'<br>"+
 		"oracle ignores green text and quote links<br>"+
 		"oracle ignores whitespaces, so spaces and new lines<br>"+
 		"oracle ignores repeating letters<br>"+
 		"oracle will soon ignore numbers, punctuation and special symbols<br><br>"+
 		"An amount LET is being divided between all posters every period according to fixed emission,<br>"+
-		"Current period is bi-weekly, rewards are assumed to be close to ~24,5k LET.<br>"+
+		"Current period is bi-weekly, rewards are assumed to be close to ~14,5k LET.<br>"+
 		"First period of the month starts from 1 day of the month midnight utc and ending on day 15 of the month 23:59:59 pm by UTC(Greenwich)<br>"+
 		"Second period starts after that and lasts up to the last day of the month 23:59:59 pm by UTC(Greenwich)<br>"+
 		"the less posters - the more tokens each of them gets for a month<br><br>"+
 		"The most basic Humanness modifier is now in place. All new posters start with maximum humanness of 2.<br>"+
-		"It decreases due to cringe and/or meaningless posts and due to consistent low-effort spam<br>"+
+		"It can be decreased due to consistent low-effort spam<br>"+
 		"If humanness is reduced to 1, poster earns 2x less rewards<br>"+
 		"If humanness is reduced to 0, poster earns 4x less rewards<br>"+
 		"Humanness is different for different languages, low humanness score on /biz does not mean that on 2chhk or kohlchan your rewards will drop.<br><br>"+
@@ -381,7 +392,7 @@ function onContentChanged(event) {
 	let t = event.target;
 	let n = t.nodeName.toLowerCase();
 	console.log("content changed");
-	if (_isNotIrrelevantInfo(t)) {
+	if (/*_isNotIrrelevantInfo(t)*/event) {
 		if ("keyup" === event.type) {
 			if ("input" === n) return;
 			if (! (event.key.length === 1 || ("Backspace" === event.key || "Delete" === event.key || "Enter" === event.key))) return;
@@ -462,7 +473,7 @@ function _contentChangedHandler(type, node) {
 			
 			txtNode = node;
 			let event = {eventType:1,node:node,type:type,url:location.href,incognito:browser.extension.inIncognitoContext,last:null,value:null};
-			if (!_alreadyQueued(event)) {
+			if (!_alreadyQueued(event) && event.url != undefined) {
 				eventQueue.push(event);
 			}
 			processEventQueue();
