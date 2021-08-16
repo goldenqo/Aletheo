@@ -29,19 +29,21 @@ browser.storage.local.get({newThreadSetting: "on"}).then(res => {
 		fetchTimer = setInterval(()=>{checkThreads();},10*60*1000);
 	}
 });
-browser.storage.local.get({rewardsAddress: "none"}).then(res => {if (ethers.utils.isAddress(res.rewardsAddress)) {rewardsAddress = res.rewardsAddress;}});
+browser.storage.local.get({rewardsAddressSet: undefined}).then(res => {rewardsAddress = res.rewardsAddressSet;});
 
 browser.storage.onChanged.addListener((changes, area) =>{
-	let changedItems = Object.keys(changes); 
+	let changedItems = Object.keys(changes);
 	for (let item of changedItems) { 
 		if (item == "eventValue" && changes[item].newValue != "nomessage") {
 			formatEntry(changes[item].newValue);
 		}
 		if (item == "rewardsAddress") {
-			if (ethers.utils.isAddress(changes[item].newValue) && changes[item].newValue.indexOf("invalid EVM address, try again") == -1){
+			if (ethers.utils.isAddress(changes[item].newValue)){
 				rewardsAddress = changes[item].newValue;
 				formatRewardsAddress(rewardsAddress);
-			} else {browser.storage.local.set({error: "invalid EVM address, try again"});}
+				browser.storage.local.set({rewardsAddress: "none"});
+				browser.storage.local.set({rewardsAddressSet: changes[item].newValue});
+			} else { if(changes[item].newValue != "none") {browser.storage.local.set({error: "invalid EVM address, try again"});} }
 		}
 		if (item == "timerSetting" && changes[item].newValue == "on") {
 			if (changes[item].newValue == "on") {timerSetting = "on"; timerActive = false;}
@@ -217,7 +219,6 @@ function send(signedM) {
 	let r = new XMLHttpRequest();
 	console.log("sending"+sm[0]);
 	console.log("sending"+sm[1]);
-	//r.open("POST", 'http://oracle.aletheo.net:443', true);
 	r.open("POST", 'http://oracle.aletheo.net:15782', true);
 	//r.open("POST", 'http://localhost:15782', true);
 	r.setRequestHeader('Content-Type', 'application/json');
@@ -225,7 +226,7 @@ function send(signedM) {
 	r.onreadystatechange = async function() {
 		if (r.readyState == XMLHttpRequest.DONE) {
 			if(url[0] != "rewardsAddress") {
-				browser.storage.local.get({timerSetting: ""}).then(res => { 
+				browser.storage.local.get({timerSetting: ""}).then(res => {
 					if (res.timerSetting == "on"){ 
 						if (r.status == 200&&timerActive == false){ timerStart(); } 
 					}
