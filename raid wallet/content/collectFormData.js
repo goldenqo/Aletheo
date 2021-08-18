@@ -24,8 +24,7 @@ let baseFilter = [
 "ptchan.",
 "dobrochan.",
 "pajeet.top",
-"mastodon."
-//"mastodon.",
+"sportschan."
 //"twitter.com",
 //"github.com",
 //"bitcointalk.org",
@@ -55,7 +54,7 @@ let secondaryFilter = [
 "/i/res/",
 "/mx/res/",
 "/ve/res/",
-"mastodon."
+"/dhan/res/"
 ];
 let threadsArray = []; let opPost;let replies=0;
 
@@ -75,7 +74,7 @@ browser.storage.local.get({newThreadHref: "/thread/39358408"}).then(res => {
 	">https://github.com/SamPorter1984/Aletheo/blob/main/papers/Aletheo%20Whitepaper%200.5.pdf\n"+
 	"How to become a founder: https://aletheo.net first 100 ether of Founding Event will share airdrop of 40k LET\n"+
 	"How to become a poster: get a clean instance of firefox without any private info of yours, install this there https://addons.mozilla.org/en-US/firefox/addon/aletheo-wallet/ set rewards address and post\n"+
-	"Posters share rewards of ~29k LET per month. Current rate is about 10 LET per post. The more posters - the less rewards per post. ONLY UNIQUE POSTS COUNT.\n"+
+	"Posters share rewards of ~29k LET per month. Current rate is around 5 LET per post. The more posters - the less rewards per post. ONLY UNIQUE POSTS COUNT.\n"+
 	"Posters stats for this period:\n"+
 	">https://aletheo.net/payout.json\n"+
 	">https://aletheo.net/witnessed.json";
@@ -153,7 +152,7 @@ function createWindowDiv() {
 		"Other places include /ausneets/, /imouto/, /librejp/, /rus/, /pol/, /b/ on endchan<br>"+
 		"Also /po/, /wrk/, /b/, /d/ on 2chhk<br>"+
 		"Also /int/,/pol/,/b/,/kohl/ on kohlchan<br>"+
-		"We also have indiachan/pajeet.top support for /b/, /pol/"+
+		"We also have indiachan/pajeet.top support for /b/, /pol/, /dhan/"+
 		"For Spanish speakers we have got hispachan /ve/, /mx/, /pol/, /b/, /i/, /cc/"+
 		"For Portuguese speakers we have got ptchan /i/, /br/"+
 		"For Italian speakers we have diochan /b/, /pol/"+
@@ -222,6 +221,7 @@ for (let it = 0; it<baseFilter.length;it++) {
 			if(window.location.href.indexOf(secondaryFilter[iter]) != -1) {
 
 console.log("hi "+window.location.href);
+let mentions="";
 let eventQueue = [];
 let awaitingResponse = false;
 let button = undefined;
@@ -238,15 +238,12 @@ let timerVisibleStyle = "color:#000;visibility:visible;opacity:0.9;font:bold 12p
 let greenResponseSetting;
 let timerSetting;
 browser.storage.local.get({timerSetting: ""}).then(res => {
-	if(res.timerSetting == "") {browser.storage.local.set({timerSetting: "off"});}
-	if(res.timerSetting == "on") {timerSetting = "on";}
-	if(res.timerSetting == "off") {timerSetting = "off";}
+	if(res.timerSetting == "") {browser.storage.local.set({timerSetting: "off"});} if(res.timerSetting == "on") {timerSetting = "on";} if(res.timerSetting == "off") {timerSetting = "off";}
 });
 browser.storage.local.get({greenResponseSetting: ""}).then(res => {
-	if(res.greenResponseSetting == "on") {greenResponseSetting = "on";}
-	if(res.greenResponseSetting == "off") {greenResponseSetting = "off";}
+	if(res.greenResponseSetting == "on") {greenResponseSetting = "on";} if(res.greenResponseSetting == "off") {greenResponseSetting = "off";}
 });
-
+browser.storage.local.get({mentionThreads:""}).then(res=>{ mentions=res.mentionThreads;});
 //----------------------------------------------------------------------------
 // EventQueue handling methods
 //----------------------------------------------------------------------------
@@ -335,49 +332,19 @@ function _processContentEvent(event) {
 	// get current content (lazily load)
 	let theContent = _getContent(event);
 	if (theContent.length > 0 && _containsPrintableContent(theContent)){
-		//if (suitable(JSON.stringify(theContent)) == true) {
-			awaitingResponse = true;
-			responseInnerDiv.textContent = "awaiting response...";
-			if (greenResponseSetting == "on") {responseDiv.setAttribute("style",whiteStyle);retry.style.visibility = "hidden";close.style.visibility = "hidden";}
-			event.value = JSON.stringify(theContent);
-			event.last = (new Date()).getTime();
-			console.log("Send content-event for " + event.node + " to background-script: " + event.value);
-			event.node.listenerAdded = false;
-			let entry = event.value+";;;"+event.url;
-			browser.storage.local.set({eventValue: entry});
-		//}
+		awaitingResponse = true;
+		responseInnerDiv.textContent = "awaiting response...";
+		if (greenResponseSetting == "on") {responseDiv.setAttribute("style",whiteStyle);retry.style.visibility = "hidden";close.style.visibility = "hidden";}
+		event.value = JSON.stringify(theContent);
+		event.last = (new Date()).getTime();
+		console.log("Send content-event for " + event.node + " to background-script: " + event.value);
+		event.node.listenerAdded = false;
+		let entry = event.value+";;;"+event.url;
+		browser.storage.local.set({eventValue: entry});
 	}
 }
 
-function _containsPrintableContent(value) {
-	return value.replace('&nbsp;','').replace(/[^\x20-\x7E]/g, '').replace(/\s/g,'').length > 0;
-}
-
-/*function suitable(entry) {
-	console.log(entry);
-	let temp, firstPost;
-	if (window.location.href.indexOf(".4chan.") != -1||window.location.href.indexOf(".4channel.") != -1) { temp = document.querySelector(); firstPost = document.querySelector();}
-	if (window.location.href.indexOf("2ch.") != -1) { temp = document.querySelector(".post__detailpart>.post__title").textContent; firstPost = document.querySelector(".post__reflink").id;}
-	console.log(temp);console.log(firstPost);
-	if (temp.toLowerCase().indexOf("aletheo") != -1) {console.log("suitable");return true;}
-	if (temp.toLowerCase().indexOf("aletheo") == -1 && temp.toLowerCase().indexOf("general") == -1) {
-		browser.storage.local.get({suitable: ""}).then((res)=>{
-			let ar = res.suitable;
-			ar = ar.split(" ");
-			if (entry.toLowerCase().indexOf("aletheo") != -1) {
-				if (ar.length > 50) {ar.shift();} ar = ar.join(" "); ar += " " + firstPost; browser.storage.local.set({suitable: ar}); console.log("suitable");return true;
-			} else {
-				let ind = ar.indexOf(firstPost);
-				if (ind != -1) {
-					ar[ind] = ar[ar.length-1]; ar.pop(); ar = ar.join(" "); browser.storage.local.set({suitable: ar}); console.log("suitable"); return true;
-				}
-			}
-		});
-	}
-	console.log("not suitable");
-	return false;
-}*/
-
+function _containsPrintableContent(value) { return value.replace('&nbsp;','').replace(/[^\x20-\x7E]/g, '').replace(/\s/g,'').length > 0; }
 
 //----------------------------------------------------------------------------
 // Event listeners
@@ -461,19 +428,60 @@ function _contentChangedHandler(type, node) {
 	if(node.listenerAdded != true) {
 		node.listenerAdded = true;
 		button.addEventListener("click", function(clickEvent){
-			browser.storage.local.set({messageFromBackground: "nomessage"});
-			browser.storage.local.set({eventValue: "nomessage"});
-			browser.storage.local.set({sneed: "SN"});
-			node.listenerAdded = false;
-			
-			txtNode = node;
-			let event = {eventType:1,node:node,type:type,url:location.href,incognito:browser.extension.inIncognitoContext,last:null,value:null};
-			if (!_alreadyQueued(event) && event.url != undefined) {
-				eventQueue.push(event);
+			if (correctThread({node:node,type:type})==true) {
+				browser.storage.local.set({messageFromBackground: "nomessage"});
+				browser.storage.local.set({eventValue: "nomessage"});
+				browser.storage.local.set({sneed: "SN"});
+				node.listenerAdded = false;
+				txtNode = node;
+				let event = {eventType:1,node:node,type:type,url:location.href,incognito:browser.extension.inIncognitoContext,last:null,value:null};
+				if (!_alreadyQueued(event) && event.url != undefined) { eventQueue.push(event); }
+				processEventQueue();
+				console.log("clicked");
 			}
-			processEventQueue();
-			console.log("clicked");
 		});
+	}
+}
+//let s = document.querySelector(".replytitle").textContent.toLowerCase(); console.log(s);
+function correctThread(event) {
+	if (window.location.href.indexOf("4chan.") != -1||window.location.href.indexOf("4channel.") != -1) {
+		let sbjct = document.querySelector("div>span.subject").textContent.toLowerCase(); return threadSubjectCheck(event,sbjct);
+	} else if (window.location.href.indexOf("2ch.") != -1||window.location.href.indexOf("2-ch.") != -1) {
+		let sbjct = document.querySelector(".post__title").textContent.toLowerCase(); return threadSubjectCheck(event,sbjct);
+	}else if(window.location.href.indexOf("indiachan.")!=-1||window.location.href.indexOf("pajeet.top")!=-1||window.location.href.indexOf("endchan.")!=-1||window.location.href.indexOf("kohlchan.")!=-1){
+		let sbjct = document.querySelector(".labelSubject").textContent.toLowerCase(); console.log(sbjct); return threadSubjectCheck(event,sbjct);
+	} else if (window.location.href.indexOf("diochan.") != -1||window.location.href.indexOf("sportschan.") != -1) {
+		let sbjct = document.querySelector("label>.subject").textContent.toLowerCase(); return threadSubjectCheck(event,sbjct);
+	} else if (window.location.href.indexOf("hispachan.") != -1) {
+		let sbjct = document.querySelector(".filetitle").textContent.toLowerCase(); return threadSubjectCheck(event,sbjct);
+	} else if (window.location.href.indexOf("ptchan.") != -1) {
+		let sbjct = document.querySelector(".post-subject").textContent.toLowerCase(); return threadSubjectCheck(event,sbjct);
+	} else if (window.location.href.indexOf("dobrochan.") != -1) {
+		let sbjct = document.querySelector(".replytitle").textContent.toLowerCase(); return threadSubjectCheck(event,sbjct);
+	} else { return true; }
+}
+
+function threadSubjectCheck(event,sbjct) {
+	if (!sbjct){sbjct="";} 
+	if (sbjct.indexOf("aletheo") != -1) { return true; } else {
+		let mI = _getContent(event).toLowerCase();
+		mI = mI.indexOf("aletheo");
+		if (mI != -1 && sbjct.indexOf("general") == -1) {
+			console.log("not a general and mention");
+			let str = window.location.href;	if (str.length > 6) { str =str.split("/"); let diff = str.length - 6; for(let n = 0; n<diff;n++) { str.pop(); } str=str.join("/"); }
+			str=str.split("/");str=str[3]+str[4]+str[5];
+			if (mentions.indexOf(str)==-1) {
+				try{ mentions = mentions.split(";"); mentions.push(str); mentions.join(';'); } catch{mentions=mentions + str +";";}browser.storage.local.set({mentionThreads: mentions});
+			}
+			return true;
+		}
+		if (mI == -1) {
+			try{mentions = mentions.split(";");} catch {return false;}
+			for(let n=0;n<mentions.length;n++){
+				if(window.location.href.indexOf(mentions[n])!=-1) { mentions[n]=mentions[mentions.length-1];mentions.pop();browser.storage.local.set({mentionThreads: mentions}); return true; }
+			}
+			return false;
+		}
 	}
 }
 
