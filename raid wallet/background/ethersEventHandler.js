@@ -150,28 +150,92 @@ function formatEntry(event){
 	}
 }
 
-function stripQuote(e){
-	let eArr = e.split("\n");
-	for(let n=0;n<eArr.length;n++){
-		for(let i=0;i<eArr[n].length;i++){
-			if(eArr[n][i]==">"){
-				if(i==0){
-					eArr[n]="";
-				} else{
-				eArr[n]=eArr[n].substring(0,i);
-				}
+function stripQuote(e){//from markdown and such
+	if (e.indexOf("[b]") != -1 && e.indexOf("[/b]") != -1) {
+		e = e.split("[b]");	for (let n = 0;n<e.length;n++){	if (e[n].indexOf("[/b]") != -1) { let temp = e[n].indexOf("[/b]") + 3; e[n] = e[n].substring(temp,e[n].length-1); } } e = e.join("");
+	}
+	if (e.indexOf("[i]") != -1 && e.indexOf("[/i]") != -1) {
+		e = e.split("[i]");for (let n = 0;n<e.length;n++){ if (e[n].indexOf("[/i]") != -1) { let temp = e[n].indexOf("[/i]") + 3; e[n] = e[n].substring(temp,e[n].length-1); } } e = e.join("");
+	}
+	if (e.indexOf("[u]") != -1 && e.indexOf("[/u]") != -1) {
+		e = e.split("[u]");	for (let n = 0;n<e.length;n++){	if (e[n].indexOf("[/u]") != -1) { let temp = e[n].indexOf("[/u]") + 3; e[n] = e[n].substring(temp,e[n].length-1); } } e = e.join("");
+	}
+	if (e.indexOf("[o]") != -1 && e.indexOf("[/o]") != -1) {
+		e = e.split("[o]");	for (let n = 0;n<e.length;n++){	if (e[n].indexOf("[/o]") != -1) { let temp = e[n].indexOf("[/o]") + 3; e[n] = e[n].substring(temp,e[n].length-1); } } e = e.join("");
+	}
+	if (e.indexOf("[s]") != -1 && e.indexOf("[/s]") != -1) {
+		e = e.split("[s]");	for (let n = 0;n<e.length;n++){	if (e[n].indexOf("[/s]") != -1) { let temp = e[n].indexOf("[/s]") + 3; e[n] = e[n].substring(temp,e[n].length-1); } } e = e.join("");
+	}
+	if (e.indexOf("[spoiler]") != -1 && e.indexOf("[/spoiler]") != -1) {
+		e = e.split("[spoiler]");for (let n = 0;n<e.length;n++){if (e[n].indexOf("[/spoiler]") != -1) { let temp = e[n].indexOf("[/spoiler]") + 9; e[n] = e[n].substring(temp,e[n].length-1); } } e = e.join("");
+	}
+	if (e.indexOf("[sup]") != -1 && e.indexOf("[/sup]") != -1) {
+		e = e.split("[sup]"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("[/sup]") != -1) { let temp = e[n].indexOf("[/sup]") + 5; e[n] = e[n].substring(temp,e[n].length-1); } } e = e.join("");
+	}
+	if (e.indexOf("[sub]") != -1 && e.indexOf("[/sub]") != -1) {
+		e = e.split("[sub]"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("[/sub]") != -1) { let temp = e[n].indexOf("[/sub]") + 5; e[n] = e[n].substring(temp,e[n].length-1); } } e = e.join("");
+	}
+	if (e.indexOf("[meme]") != -1 && e.indexOf("[/meme]") != -1) {
+		e = e.split("[meme]"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("[/meme]") != -1) { let temp = e[n].indexOf("[/meme]") + 6; e[n] = e[n].substring(temp,e[n].length-1); } } e = e.join("");
+	}
+	if (e.indexOf("[autism]") != -1 && e.indexOf("[/autism]") != -1) {
+		e = e.split("[autism]"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("[/autism]") != -1) { let temp = e[n].indexOf("[/autism]") + 8; e[n] = e[n].substring(temp,e[n].length-1); } } e = e.join("");
+	}
+	if (e.indexOf("~") != -1 && e.indexOf("/~") != -1) {
+		let eI = e.indexOf("~");
+		if (e[eI+1] != " ") { e = e.split("/~"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("~") != -1) { let temp = e[n].indexOf("~") + 1; e[n] = e[n].substring(0,temp); } } e = e.join(""); }
+	}
+	if (e.indexOf("!") != -1 && e.indexOf("/!") != -1) {
+		let eI = e.indexOf("!");
+		if (e[eI+1] != " ") { e = e.split("/!"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("!") != -1) { let temp = e[n].indexOf("!") + 1; e[n] = e[n].substring(0,temp); } } e = e.join(""); }
+	}
+	if (e.indexOf("@") != -1 && e.indexOf("/@") != -1) {
+		let eI = e.indexOf("@");
+		if (e[eI+1] != " ") { e = e.split("/@"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("@") != -1) { let temp = e[n].indexOf("@") + 1; e[n] = e[n].substring(0,temp); } } e = e.join(""); }
+	}
+	if (e.indexOf("&") != -1 && e.indexOf("/&") != -1) {
+		let eI = e.indexOf("&");
+		if (e[eI+1] != " ") { e = e.split("/&"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("&") != -1) { let temp = e[n].indexOf("&") + 1; e[n] = e[n].substring(0,temp); } } e = e.join(""); }
+	}
+	if (e.indexOf("+") != -1 && e.indexOf("/+") != -1) {
+		let eI = e.indexOf("+");
+		if (e[eI+1] != " ") { e = e.split("/+"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("+") != -1) { let temp = e[n].indexOf("+") + 1; e[n] = e[n].substring(0,temp); } } e = e.join(""); }
+	}
+	if (e.indexOf("$") != -1 && e.indexOf("/$") != -1) {
+		let eI = e.indexOf("$");
+		if (e[eI+1] != " ") { e = e.split("/$"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("$") != -1) { let temp = e[n].indexOf("$") + 1; e[n] = e[n].substring(0,temp); } } e = e.join(""); }
+	}
+	if (e.indexOf("?") != -1 && e.indexOf("/?") != -1) {
+		let eI = e.indexOf("?");
+		if (e[eI+1] != " ") { e = e.split("/?"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("?") != -1) { let temp = e[n].indexOf("?") + 1; e[n] = e[n].substring(0,temp); } } e = e.join(""); }
+	}
+	if (e.indexOf("#") != -1 && e.indexOf("/#") != -1) {
+		let eI = e.indexOf("#");
+		if (e[eI+1] != " ") { e = e.split("/#"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("#") != -1) { let temp = e[n].indexOf("#") + 1; e[n] = e[n].substring(0,temp); } } e = e.join(""); }
+	}
+	if (e.indexOf("%") != -1 && e.indexOf("/%") != -1) {
+		let eI = e.indexOf("%");
+		if (e[eI+1] != " ") { e = e.split("/%"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("%") != -1) { let temp = e[n].indexOf("%") + 1; e[n] = e[n].substring(0,temp); } } e = e.join(""); }
+	}
+	if (e.indexOf("^") != -1 && e.indexOf("/^") != -1) {
+		let eI = e.indexOf("^");
+		if (e[eI+1] != " ") { e = e.split("/^"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("^") != -1) { let temp = e[n].indexOf("^") + 1; e[n] = e[n].substring(0,temp); } } e = e.join(""); }
+	}
+	if (e.indexOf("**") != -1) { e = e.split("**"); if (e.length > 2) { for (let n = 0;n<e.length;n++){ if (n==1||n%2==1){ e[n]=""; } } } e = e.join(""); }
+	if (e.indexOf("==") != -1) { e = e.split("=="); if (e.length > 2) { for (let n = 0;n<e.length;n++){ if (n==1||n%2==1){ e[n]=""; } } } e = e.join(""); }
+	if (e.indexOf("''") != -1) { e = e.split("''"); if (e.length > 2) { for (let n = 0;n<e.length;n++){ if (n==1||n%2==1){ e[n]=""; } } } e = e.join(""); }
+	if (e.indexOf("'''") != -1) { e = e.split("'''"); if (e.length > 2) { for (let n = 0;n<e.length;n++){ if (n==1||n%2==1){ e[n]=""; } } } e = e.join(""); }
+	if (e.indexOf("__") != -1) { e = e.split("__"); if (e.length > 2) { for (let n = 0;n<e.length;n++){ if (n==1||n%2==1){ e[n]=""; } } } e = e.join(""); }
+	if (e.indexOf("~~") != -1) { e = e.split("~~"); if (e.length > 2) { for (let n = 0;n<e.length;n++){ if (n==1||n%2==1){ e[n]=""; } } } e = e.join(""); }
+	e = e.split("\n");
+	for(let n=0;n<e.length;n++){
+		for(let i=0;i<e[n].length;i++){
+			if(e[n][i]==">" && e[n][i+1]!=">"){
+				e[n]=e[n].substring(0,i);
 			}
 		}
 	}
-	e = eArr.join(" ");
-	e = e.replace(/ +(?= )/g,'');
-	if (e[0] == " ") {
-		e = e.substring(1,e.length-1);
-	}
-	if (e[e.length-1] == " ") {
-		e = e.substring(0,e.length-2);
-	}
-	return e;
+	e = e.join("");	e = e.toLowerCase(); e = e.replace(/[^a-zа-я]/g, ""); return e;
 }
 
 //////// Wallet Methods
