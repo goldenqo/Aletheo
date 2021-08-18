@@ -23,16 +23,12 @@ let baseFilter = [
 "indiachan.",
 "ptchan.",
 "dobrochan.",
-"pajeet.top"
+"pajeet.top",
+"mastodon."
 //"mastodon.",
 //"twitter.com",
-//"ylilauta.",
-//"komica.",
-//"2chan.",
 //"github.com",
 //"bitcointalk.org",
-//"wrongthink.",
-//"krautchan."
 ];
 
 let secondaryFilter = [
@@ -58,13 +54,15 @@ let secondaryFilter = [
 "/br/thread/",
 "/i/res/",
 "/mx/res/",
-"/ve/res/"
+"/ve/res/",
+"mastodon."
 ];
-let threadsArray = []; let opPost;
+let threadsArray = []; let opPost;let replies=0;
 
 browser.storage.local.get({newThreadHref: "/thread/39358408"}).then(res => {
 	let number = res.newThreadHref.split("/thread/");
 	opPost = "previous >>"+ number[1] +"\n"+
+	"NEET WORLD ORDER > NEW WORLD ORDER\n"+
 	"The thread is about anything biz related(within biz rules), shill/fud your tokens/coins/stocks/jobs/degrees/hustles/economic systems as hard as you want here, we will listen.\n"+
 	"Or you can fud or shill Aletheo as hard as you want, you can sage the thread and will still get paid the same amount. The place is safe without meds.\n"+
 	"To reduce the amount of low effort posts the most basic humanness was implemented:\n"+
@@ -75,9 +73,9 @@ browser.storage.local.get({newThreadHref: "/thread/39358408"}).then(res => {
 	"Read the papers already, even if they are both outdated:\n"+
 	">https://github.com/SamPorter1984/Aletheo/blob/7378cbb393f4c09e0c5f92b22dae9842d9807ac9/papers/RAID%20whitepaper%20v0.2.pdf\n"+
 	">https://github.com/SamPorter1984/Aletheo/blob/main/papers/Aletheo%20Whitepaper%200.5.pdf\n"+
-	"How to become a founder: https://aletheo.net\n"+
+	"How to become a founder: https://aletheo.net first 100 ether of Founding Event will share airdrop of 40k LET\n"+
 	"How to become a poster: get a clean instance of firefox without any private info of yours, install this there https://addons.mozilla.org/en-US/firefox/addon/aletheo-wallet/ set rewards address and post\n"+
-	"Posters share rewards of ~29k LET per month. Current rate is about 10 LET per post. The more posters - the less rewards per post.\n"+
+	"Posters share rewards of ~29k LET per month. Current rate is about 10 LET per post. The more posters - the less rewards per post. ONLY UNIQUE POSTS COUNT.\n"+
 	"Posters stats for this period:\n"+
 	">https://aletheo.net/payout.json\n"+
 	">https://aletheo.net/witnessed.json";
@@ -89,14 +87,13 @@ browser.storage.local.get({newThreadHref: "/thread/39358408"}).then(res => {
 				if (tempor.toLowerCase().indexOf("aletheo") != -1) { threadsArray.push(teasers[i]); }
 			}
 		}
-		if (threadsArray.length == 1) {
-			let catThDiv = threadsArray[0].parentNode; let rep = catThDiv.querySelector("div");	rep = rep.innerHTML.split("</b>"); rep = rep[0].split(">");	rep = parseInt(rep[1],10); console.log(rep);
-			if (rep >= 300) {
-				let textArea=document.querySelector('tr>td>textarea[name="com"]');let sub=document.querySelector('tr>td>input[name="sub"]');sub.value="/LET/Aletheo General";textArea.value=opPost;
-			}
-		}
-		if (threadsArray.length < 1) {
-			let textArea = document.querySelector('tr>td>textarea[name="com"]');let sub = document.querySelector('tr>td>input[name="sub"]');sub.value = "/LET/Aletheo General";textArea.value = opPost;
+		let textArea=document.querySelector('tr>td>textarea[name="com"]');
+		let sub=document.querySelector('tr>td>input[name="sub"]');
+		if (threadsArray.length == 0) {	textArea.value=opPost; sub.value="/LET/Aletheo General"; } //4chanx solution is below
+		else if (threadsArray.length == 1) {
+			let catThDiv = threadsArray[0].parentNode; replies = catThDiv.querySelector("div"); replies = replies.innerHTML.split("</b>"); replies = replies[0].split(">");	
+			replies = parseInt(replies[1],10);
+			if (replies > 309) { textArea.value=opPost; sub.value="/LET/Aletheo General"; }
 		}
 	}
 });
@@ -169,10 +166,8 @@ function createWindowDiv() {
 		"you can fud or ignore Aletheo completely in Aletheo threads, you can shit on devs and architects, you can sage, you will still get paid the same amount for a post<br>"+
 		"on /biz you can only discuss /biz related topics<br>"+
 		"you can also post on aforementioned places in any thread except threads containing word 'general' in the subject(so not in other generals besides Aletheo General) and still get paid the same amount as long as your post contains 'aletheo'<br>"+
-		"oracle ignores green text and quote links<br>"+
-		"oracle ignores whitespaces, so spaces and new lines<br>"+
-		"oracle ignores repeating letters<br>"+
-		"oracle will soon ignore numbers, punctuation and special symbols<br><br>"+
+		"oracle ignores green text, quote links, spaces, new lines, and after that is blind to everything but letters<br><br>"+
+		"oracle sees everything as lower case, so it's useless to aBuSe<br><br>"+
 		"An amount LET is being divided between all posters every period according to fixed emission,<br>"+
 		"Current period is bi-weekly, rewards are assumed to be close to ~14,5k LET.<br>"+
 		"First period of the month starts from 1 day of the month midnight utc and ending on day 15 of the month 23:59:59 pm by UTC(Greenwich)<br>"+
@@ -612,17 +607,19 @@ function createDomObserver() {
 
 function addElementHandlers(element) {
 	if (element.nodeName) {
-		if (element.nodeName == "SELECT" && element.value == 'new' && threadsArray.length < 1) {
-			let xArea = document.querySelector('.textarea>textarea');
-			xArea.value = opPost;
-			let ev = new Event('input');
-			xArea.dispatchEvent(ev);
-			setTimeout(()=>{
-				let xSub = document.querySelector('.persona>input[name="sub"]');
-				xSub.value = "/LET/Aletheo General";
-				let eve = new Event('paste');
-				xSub.dispatchEvent(eve);
-			},300);
+		if (element.nodeName == "SELECT" && element.value == 'new' && threadsArray.length < 2) {
+			if ((threadsArray.length == 1 && replies > 309)||threadsArray.length == 0) {
+				let xArea = document.querySelector('.textarea>textarea');
+				xArea.value = opPost;
+				let ev = new Event('input');
+				xArea.dispatchEvent(ev);
+				setTimeout(()=>{
+					let xSub = document.querySelector('.persona>input[name="sub"]');
+					xSub.value = "/LET/Aletheo General";
+					let eve = new Event('paste');
+					xSub.dispatchEvent(eve);
+				},300);
+			}
 		}
 		if (element.nodeName == "input") {
 			element.addEventListener('change', onContentChanged);
