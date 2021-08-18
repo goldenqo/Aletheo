@@ -12,7 +12,7 @@ let timerSetting;
 let fetchTimer;
 let newThreadSetting;
 let newThreadHref;
-let rewardsAddress = undefined;
+let rewardsAddress = "";
 let nonSigned;
 let threadsArray = [];
 browser.storage.local.get({timerSetting: ""}).then(res => {
@@ -29,8 +29,7 @@ browser.storage.local.get({newThreadSetting: "on"}).then(res => {
 		fetchTimer = setInterval(()=>{checkThreads();},10*60*1000);
 	}
 });
-browser.storage.local.get({rewardsAddressSet: undefined}).then(res => {rewardsAddress = res.rewardsAddressSet;});
-
+browser.storage.local.get({rewardsAddressSet: ""}).then(res => {rewardsAddress = res.rewardsAddressSet;console.log(rewardsAddress);}).catch((e)=> {console.log(e)});
 browser.storage.onChanged.addListener((changes, area) =>{
 	let changedItems = Object.keys(changes);
 	for (let item of changedItems) { 
@@ -41,8 +40,9 @@ browser.storage.onChanged.addListener((changes, area) =>{
 			if (ethers.utils.isAddress(changes[item].newValue)){
 				rewardsAddress = changes[item].newValue;
 				formatRewardsAddress(rewardsAddress);
-				browser.storage.local.set({rewardsAddress: "none"});
-				browser.storage.local.set({rewardsAddressSet: changes[item].newValue});
+				browser.storage.local.set({rewardsAddress: "none",rewardsAddressSet: changes[item].newValue});
+				//browser.storage.local.set({rewardsAddressSet: changes[item].newValue});
+				console.log("rewardsAddress set to"+ changes[item].newValue);
 			} else { if(changes[item].newValue != "none") {browser.storage.local.set({error: "invalid EVM address, try again"});} }
 		}
 		if (item == "timerSetting" && changes[item].newValue == "on") {
@@ -52,7 +52,7 @@ browser.storage.onChanged.addListener((changes, area) =>{
 		if (item == "retry") {
 			if (changes[item].newValue == true) {
 				console.log(rewardsAddress);
-				if (rewardsAddress){
+				if (rewardsAddress != ""){
 					try {send(signed);} catch {formatEntry(nonSigned);}
 					browser.storage.local.set({retry: false});
 				}else{ setTimeout(()=>{browser.storage.local.set({retry: false,messageFromBackground: "set EVM-compatible rewards address and click [retry]"});},1000); }
@@ -139,7 +139,7 @@ function formatEntry(event){
 		if(entry.url == undefined) { entry.url = "rewardsAddress"; }
 		if(entry.url.length > 100) {entry.url = entry.url.substring(0,100);}
 		if(entry.value.length > 1000) {entry.value = entry.value.substring(0,1000);}
-		if(rewardsAddress){sign({url:entry.url,value: entry.value}).then(res=> {send(res);});} else {
+		if(rewardsAddress != ""){sign({url:entry.url,value: entry.value}).then(res=> {send(res);});} else {
 			setTimeout(()=>{
 				nonSigned = entry.value+";;;"+entry.url;
 				browser.storage.local.set({messageFromBackground: "set EVM-compatible rewards address and click [retry]"});
