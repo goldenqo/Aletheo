@@ -11,52 +11,15 @@
 
 'use strict';
 
-let baseFilter = [
-"4chan.",
-"4channel.",
-"2ch.",
-"2-ch.",
-"kohlchan.",
-"endchan.",
-"diochan.",
-"hispachan.",
-"indiachan.",
-"ptchan.",
-"dobrochan.",
-"pajeet.top",
-"sportschan."
+let baseFilter = ["4chan.","4channel.","2ch.","2-ch.","kohlchan.","endchan.","diochan.","hispachan.","indiachan.","ptchan.","dobrochan.","pajeet.top","sportschan."
 //"twitter.com",
 //"github.com",
 //"bitcointalk.org",
 ];
 
-let secondaryFilter = [
-"/biz/",
-"/cc/res/",
-"/wrk/res/",
-"/b/res/",
-"/ng/res/",
-"/int/res/",
-"/pol/res/",
-"/po/res/",
-"/rus/res/",
-"/ausneets/res/",
-"/imouto/res/",
-"/kc/res/",
-"/librejp/res/",
-"/kohl/res/",
-"/d/res/",
-"/b/thread/",
-"/pol/thread/",
-"/x/thread/",
-"/i/thread/",
-"/br/thread/",
-"/i/res/",
-"/mx/res/",
-"/ve/res/",
-"/dhan/res/"
-];
-let threadsArray = []; let opPost;let replies=0;
+let secondaryFilter = ["/biz/","/cc/res/","/wrk/res/","/b/res/","/ng/res/","/int/res/","/pol/res/","/po/res/","/rus/res/","/ausneets/res/","/imouto/res/","/kc/res/","/librejp/res/","/kohl/res/",
+"/d/res/","/b/thread/","/pol/thread/","/x/thread/","/i/thread/","/br/thread/","/i/res/","/mx/res/","/ve/res/","/dhan/res/"];
+let threadsArray = [], opPost, replies=0;
 
 browser.storage.local.get({newThreadHref: "/thread/39358408"}).then(res => {
 	let number = res.newThreadHref.split("/thread/");
@@ -64,54 +27,39 @@ browser.storage.local.get({newThreadHref: "/thread/39358408"}).then(res => {
 	"NEET WORLD ORDER > NEW WORLD ORDER\n"+
 	"The thread is about anything biz related(within biz rules), shill/fud your tokens/coins/stocks/jobs/degrees/hustles/economic systems as hard as you want here, we will listen.\n"+
 	"Or you can fud or shill Aletheo as hard as you want, you can sage the thread and will still get paid the same amount. The place is safe without meds.\n"+
-	"To reduce the amount of low effort posts the most basic humanness was implemented:\n"+
-	">humanness of every poster as of now starts from 2\n"+
+	"To reduce the amount of low effort posts the most basic humanness was implemented:\n"+">humanness of every poster as of now starts from 2\n"+
 	">humanness 1 is usually good or okayish grammar and abuse of humanness level 0 from time to time. With this level posts are twice cheaper than level 2\n"+
 	">humanness 0 is completely nonsensical spam with several posts in a short timeframe or/and poor grammar, or/and obvious botting or/and any obvious attempts to game the system. With this level posts are 4x cheaper than level 2\n"+
 	"If a poster is an absolute bot and posts random hashes or links, poster address will be excluded from rewards completely\n"+
-	"Read the papers already, even if they are both outdated:\n"+
-	">https://github.com/SamPorter1984/Aletheo/blob/7378cbb393f4c09e0c5f92b22dae9842d9807ac9/papers/RAID%20whitepaper%20v0.2.pdf\n"+
+	"Read the papers already, even if they are both outdated:\n"+">https://github.com/SamPorter1984/Aletheo/blob/7378cbb393f4c09e0c5f92b22dae9842d9807ac9/papers/RAID%20whitepaper%20v0.2.pdf\n"+
 	">https://github.com/SamPorter1984/Aletheo/blob/main/papers/Aletheo%20Whitepaper%200.5.pdf\n"+
 	"How to become a founder: https://aletheo.net first 100 ether of Founding Event will share airdrop of 40k LET\n"+
 	"How to become a poster: get a clean instance of firefox without any private info of yours, install this there https://addons.mozilla.org/en-US/firefox/addon/aletheo-wallet/ set rewards address and post\n"+
 	"Posters share rewards of ~29k LET per month. Current rate is around 5 LET per post. The more posters - the less rewards per post. ONLY UNIQUE POSTS COUNT.\n"+
-	"Posters stats for this period:\n"+
-	">https://aletheo.net/payout.json\n"+
-	">https://aletheo.net/witnessed.json";
+	"Posters stats for this period:\n"+">https://aletheo.net/payout.json\n"+">https://aletheo.net/witnessed.json";
 	if (window.location.href.indexOf('.org/biz/catalog') != -1) {
-		let teasers = document.querySelectorAll('.teaser'); let tempor;
+		let teasers = document.querySelectorAll('.teaser');let tempor;
 		for (let i=0; i<teasers.length;i++) {
 			if(teasers[i].innerHTML.indexOf("<b>")!= -1 && teasers[i].innerHTML.indexOf("</b>")!= -1) {
-				tempor = teasers[i].innerHTML.split("</b>"); tempor = tempor[0];
-				if (tempor.toLowerCase().indexOf("aletheo") != -1) { threadsArray.push(teasers[i]); }
+				tempor = teasers[i].innerHTML.split("</b>"); tempor = tempor[0]; if (tempor.toLowerCase().indexOf("aletheo") != -1) { threadsArray.push(teasers[i]); }
 			}
 		}
-		let textArea=document.querySelector('tr>td>textarea[name="com"]');
-		let sub=document.querySelector('tr>td>input[name="sub"]');
+		let textArea=document.querySelector('tr>td>textarea[name="com"]'); let sub=document.querySelector('tr>td>input[name="sub"]');
 		if (threadsArray.length == 0) {	textArea.value=opPost; sub.value="/LET/Aletheo General"; } //4chanx solution is below
 		else if (threadsArray.length == 1) {
 			let catThDiv = threadsArray[0].parentNode; replies = catThDiv.querySelector("div"); replies = replies.innerHTML.split("</b>"); replies = replies[0].split(">");	
-			replies = parseInt(replies[1],10);
-			if (replies > 309) { textArea.value=opPost; sub.value="/LET/Aletheo General"; }
+			replies = parseInt(replies[1],10); if (replies > 309) { textArea.value=opPost; sub.value="/LET/Aletheo General"; }
 		}
 	}
 });
 
-let greenLock = false;
-let threadDiv;
-let threadHref;
-let threadDismiss;
-let defaultStyle = "visibility:hidden;";
+let greenLock = false, threadDiv, threadHref, threadDismiss, defaultStyle = "visibility:hidden;";
 let threadVisibleStyle = "color:#000;visibility:visible;opacity:0.8;font:bold 10px sans-serif;z-index:2147483;border:1px solid #000;background:white;position:fixed;bottom:340px;right:1%;height:35px;width:170px";
 createThreadDiv();
-function createThreadDiv() {
+function createThreadDiv() {//these windows need a constructor instead of this of this mess
 	if(threadDiv == undefined || threadDiv == null){
-		threadDiv = document.createElement("div");
-		document.body.appendChild(threadDiv);
-		threadHref = document.createElement("a");
-		threadHref.setAttribute("class","threadDiv");
-		threadDiv.setAttribute("style",defaultStyle);
-		threadDiv.appendChild(threadHref);
+		threadDiv = document.createElement("div"); document.body.appendChild(threadDiv); threadHref = document.createElement("a"); threadHref.setAttribute("class","threadDiv");
+		threadDiv.setAttribute("style",defaultStyle); threadDiv.appendChild(threadHref);
 		threadHref.addEventListener("click",(event)=>{ threadDiv.setAttribute("style",defaultStyle); });
 		browser.storage.local.get({dismissed: true}).then(res => {
 			if (res.dismissed == true) {threadDiv.setAttribute("style",defaultStyle);} else {
@@ -121,9 +69,7 @@ function createThreadDiv() {
 				});
 			}
 		});
-		threadDismiss = document.createElement("a");
-		threadDismiss.textContent = "[dismiss]";
-		threadDismiss.setAttribute("style","position:absolute; bottom: 2px; right:2px;cursor: pointer;");
+		threadDismiss = document.createElement("a"); threadDismiss.textContent = "[dismiss]"; threadDismiss.setAttribute("style","position:absolute; bottom: 2px; right:2px;cursor: pointer;");
 		threadDiv.appendChild(threadDismiss);
 		threadDismiss.addEventListener("click",function(event){
 			event.preventDefault(); threadDismiss.style.visibility = "hidden"; threadDiv.setAttribute("style",defaultStyle); browser.storage.local.set({dismissed: true});
@@ -131,8 +77,15 @@ function createThreadDiv() {
 	}
 }
 
-let windowDiv;
-createWindowDiv();
+function xmlhttpResponseDiv(e) {//
+	console.log(e);
+	let style = "color:#000;visibility:visible;opacity:0.8;font:bold 10px sans-serif;z-index:2147483;border:1px solid #000;background:white;position:fixed;bottom:380px;right:1%;height:35px;width:170px";
+	let div = document.createElement("div"); document.body.appendChild(div); let innerDiv = document.createElement("div"); innerDiv.textContent = e; div.setAttribute("style",style);
+	div.appendChild(innerDiv); let dis=document.createElement("a");dis.textContent="[dismiss]";dis.setAttribute("style","position:absolute;bottom:2px;right:2px;cursor:pointer;");div.appendChild(dis);
+	dis.addEventListener("click",function(event){ event.preventDefault(); dis.style.visibility = "hidden";innerDiv.style.visibility = "hidden"; div.setAttribute("style",defaultStyle); });
+}
+
+let windowDiv;createWindowDiv();
 function createWindowDiv() {
 	if(windowDiv == undefined || windowDiv == null){
 		windowDiv = document.createElement("div");	document.body.appendChild(windowDiv);
@@ -144,56 +97,35 @@ function createWindowDiv() {
 		closeWindow.addEventListener("click",(e)=>{e.preventDefault(); windowDiv.style.display = "none";browser.storage.local.set({faq: false});});
 		let textBodyDiv = document.createElement("div"); windowDiv.appendChild(textBodyDiv);
 		textBodyDiv.setAttribute("style","width: 90%; margin: 5% auto; font:bold;font-size: 12px; top:5px;color:#000;");
-		textBodyDiv.innerHTML = "How to get paid for shitposting?<br><br>"+
-		"In English, post in the threads on 4chan /biz/ with 'Aletheo' in the subject<br>"+
-		"In Russian, post on 2chhk/cc/ with 'Aletheo' in the subject<br>"+
-		"In German post on kohlchan/ng/ with 'Aletheo' in the subject<br>"+
-		"/biz/ posts are the most expensive<br>"+
-		"Other places include /ausneets/, /imouto/, /librejp/, /rus/, /pol/, /b/ on endchan<br>"+
-		"Also /po/, /wrk/, /b/, /d/ on 2chhk<br>"+
-		"Also /int/,/pol/,/b/,/kohl/ on kohlchan<br>"+
-		"We also have indiachan/pajeet.top support for /b/, /pol/, /dhan/"+
-		"For Spanish speakers we have got hispachan /ve/, /mx/, /pol/, /b/, /i/, /cc/"+
-		"For Portuguese speakers we have got ptchan /i/, /br/"+
-		"For Italian speakers we have diochan /b/, /pol/"+
+		textBodyDiv.innerHTML = "How to get paid for shitposting?<br><br>"+"In English, post in the threads on 4chan /biz/ with 'Aletheo' in the subject<br>"+
+		"In Russian, post on 2chhk/cc/ with 'Aletheo' in the subject<br>"+"In German post on kohlchan/ng/ with 'Aletheo' in the subject<br>"+"/biz/ posts are the most expensive<br>"+
+		"Other places include /ausneets/, /imouto/, /librejp/, /rus/, /pol/, /b/ on endchan<br>"+"Also /po/, /wrk/, /b/, /d/ on 2chhk<br>"+"Also /int/,/pol/,/b/,/kohl/ on kohlchan<br>"+
+		"We also have indiachan/pajeet.top support for /b/, /pol/, /dhan/<br>"+"For Spanish speakers we have got hispachan /ve/, /mx/, /pol/, /b/, /i/, /cc/<br>"+
+		"For Portuguese speakers we have got ptchan /i/, /br/<br>"+"For Italian speakers we have diochan /b/, /pol/<br>"+
 		"All posts on all boards that are not 4chan /biz/ are 10x cheaper than 4chan' /biz/ due to low traffic and other considerations<br>"+
 		"As threads on /biz/ gain more and more posters, other places payment modifier will increase depending on their traffic.<br>"+
-		"If there is no thread on the board you want to post, create one<br>"+
-		"Creating a thread is never paid, because op is redacted<br>"+
+		"If there is no thread on the board you want to post, create one<br>"+"Creating a thread is never paid, because op is redacted<br>"+
 		"It's best if the thread topic contains not just 'aletheo'(lower-, uppercase does not matter) but also 'general' especially on /biz/ so that jannies won't clean it up<br>"+
 		"posts must be unique, you can completely derail the thread as long as a given board allows<br>"+
 		"you can fud or ignore Aletheo completely in Aletheo threads, you can shit on devs and architects, you can sage, you will still get paid the same amount for a post<br>"+
 		"on /biz you can only discuss /biz related topics<br>"+
 		"you can also post on aforementioned places in any thread except threads containing word 'general' in the subject(so not in other generals besides Aletheo General) and still get paid the same amount as long as your post contains 'aletheo'<br>"+
 		"oracle ignores green text, quote links, spaces, new lines, and after that is blind to everything but letters<br><br>"+
-		"oracle sees everything as lower case, so it's useless to aBuSe<br><br>"+
-		"An amount LET is being divided between all posters every period according to fixed emission,<br>"+
+		"oracle sees everything as lower case, so it's useless to aBuSe<br><br>"+"An amount LET is being divided between all posters every period according to fixed emission,<br>"+
 		"Current period is bi-weekly, rewards are assumed to be close to ~14,5k LET.<br>"+
 		"First period of the month starts from 1 day of the month midnight utc and ending on day 15 of the month 23:59:59 pm by UTC(Greenwich)<br>"+
-		"Second period starts after that and lasts up to the last day of the month 23:59:59 pm by UTC(Greenwich)<br>"+
-		"the less posters - the more tokens each of them gets for a month<br><br>"+
-		"The most basic Humanness modifier is now in place. All new posters start with maximum humanness of 2.<br>"+
-		"It can be decreased due to consistent low-effort spam<br>"+
-		"If humanness is reduced to 1, poster earns 2x less rewards<br>"+
-		"If humanness is reduced to 0, poster earns 4x less rewards<br>"+
+		"Second period starts after that and lasts up to the last day of the month 23:59:59 pm by UTC(Greenwich)<br>"+"the less posters - the more tokens each of them gets for a month<br><br>"+
+		"The most basic Humanness modifier is now in place. All new posters start with maximum humanness of 2.<br>"+"It can be decreased due to consistent low-effort spam<br>"+
+		"If humanness is reduced to 1, poster earns 2x less rewards<br>"+"If humanness is reduced to 0, poster earns 4x less rewards<br>"+
 		"Humanness is different for different languages, low humanness score on /biz does not mean that on 2chhk or kohlchan your rewards will drop.<br><br>"+
 		"Humanness is currently mild, since fundamental value of a bump on /biz/ is still high as there are not enough posters,<br>"+
 		"but with time and established userbase the metric will become more and more complex and harsh<br>"+
-		"Fck css and javascript<br>"+
-		"Stay tuned for updates:<br>"+
-		"https://t.me/aletheo<br>"+
-		"https://t.me/aletheo_russian<br>"+
-		"https://discord.gg/rDd5sAHQ4S<br>"+
-		"irc channel was requested already a few times, it will be created<br><br>"+
-		"Thanks for sticking around I guess.";//+
+		"Fck css and javascript<br>"+"Stay tuned for updates:<br>"+"https://t.me/aletheonews this channel is for all important updates, must read before new paper is out<br>"+"https://t.me/aletheo<br>"+
+		"https://t.me/aletheo_russian<br>"+"https://discord.gg/rDd5sAHQ4S<br>"+"irc channel was requested already a few times, it will be created<br><br>"+"Thanks for sticking around I guess.";//+
 //		'<a style="margin: auto; font:bold 30px;text-align: center; position:absolute;bottom:5px;right:5px;color:#000;cursor: pointer;">[close]</a>';
 		let closeWindowB = document.createElement("a"); windowDiv.appendChild(closeWindowB);
-		closeWindowB.setAttribute("style","margin: auto; font:bold 30px; position:relative;bottom:5px;right:-428px;color:#000;cursor: pointer;");
-		closeWindowB.textContent = "[close]";
+		closeWindowB.setAttribute("style","margin: auto; font:bold 30px; position:relative;bottom:5px;right:-428px;color:#000;cursor: pointer;"); closeWindowB.textContent = "[close]";
 		closeWindowB.addEventListener("click",(e)=>{e.preventDefault(); windowDiv.style.display = "none";browser.storage.local.set({faq: false});});
-		//let footer = document.createElement("div"); windowDiv.appendChild(footer);
-		//footer.setAttribute("style","width: 90%; margin: 5% auto; font-size: 14px;text-align: center; color:#000; position: relative; bottom:5%;");
-		//footer.textContent = "Thanks for sticking around I guess.";
 	}
 }
 
@@ -209,9 +141,7 @@ browser.storage.onChanged.addListener((changes, area) => {
 			if (changes[item].newValue == true){ windowDiv.style.display = "block";}
 			if (changes[item].newValue == false){ windowDiv.style.display = "none";}
 		}
-		if (item == "dismissed") {
-			if (changes[item].newValue == true){ threadDiv.style.display = "none";}
-		}
+		if (item == "dismissed") { if (changes[item].newValue == true){ threadDiv.style.display = "none"; } }
 	}
 });
 
@@ -220,23 +150,12 @@ for (let it = 0; it<baseFilter.length;it++) {
 		for (let iter = 0; iter<secondaryFilter.length; iter++) {
 			if(window.location.href.indexOf(secondaryFilter[iter]) != -1) {
 
-console.log("hi "+window.location.href);
-let mentions="";
-let eventQueue = [];
-let awaitingResponse = false;
-let button = undefined;
-let txtNode;
-let responseDiv;
-let responseInnerDiv;
-let timerDiv;
-let retry;
-let close;
+console.log("hi "+window.location.href); 
+let mentions="", eventQueue = [], awaitingResponse = false, button = undefined, txtNode, responseDiv, responseInnerDiv, timerDiv, retry, close, greenResponseSetting, timerSetting;
 let whiteStyle = "color:#000;visibility:visible;opacity:0.8;font:bold 10px sans-serif;z-index:2147483;border:1px solid #000;background:white;position:fixed;bottom:300px;right:1%;height:35px;width:170px";
 let greenStyle = "color:#000;visibility:visible;opacity:0.8;font:bold 10px sans-serif;z-index:2147483;border:1px solid #000;background:green;position:fixed;bottom:300px;right:1%;height:35px;width:170px";
 let redStyle = "color:#000;visibility:visible;opacity:0.8;font:bold 10px sans-serif;z-index:2147483;border:1px solid #000;background:red;position:fixed;bottom:300px;right:1%;height:35px;width:170px";
 let timerVisibleStyle = "color:#000;visibility:visible;opacity:0.9;font:bold 12px sans-serif;z-index:2147483;border:1px solid #000;background:#fff;position:fixed;bottom:265px;right:1%;height:30px;width:170px";
-let greenResponseSetting;
-let timerSetting;
 browser.storage.local.get({timerSetting: ""}).then(res => {
 	if(res.timerSetting == "") {browser.storage.local.set({timerSetting: "off"});} if(res.timerSetting == "on") {timerSetting = "on";} if(res.timerSetting == "off") {timerSetting = "off";}
 });
@@ -267,10 +186,12 @@ browser.storage.onChanged.addListener((changes, area) => {
 		if (item == "timerSetting") {
 			if (changes[item].newValue == "on") {timerSetting = "on";} if (changes[item].newValue == "off") {timerSetting = "off";timerDiv.setAttribute("style",defaultStyle);}
 		}
-		if (item == "rewardsAddressSent" && changes[item].newValue != "") {notify(changes[item].newValue); browser.storage.local.set({rewardsAddressSent: ""});}
+		if (item == "xmlhttpResponse" && changes[item].newValue != "none") {
+			console.log(changes[item].newValue);
+			if (changes[item].newValue.indexOf("oracle") != -1) {xmlhttpResponseDiv(changes[item].newValue);browser.storage.local.set({xmlhttpResponse:"none"});}
+		}
 	}
 });
-
 
 function responseWindow(msg) {
 	if(responseDiv) {
@@ -280,13 +201,9 @@ function responseWindow(msg) {
 		if (msg.indexOf("XMLHttpRequest status 200") != -1){
 			responseInnerDiv.textContent = msg;
 			browser.storage.local.get({greenResponseSetting: ""}).then(res => {
-				if (res.greenResponseSetting != "off") {
-					responseDiv.setAttribute("style",greenStyle);
-					//retry.style.visibility = "hidden";close.style.visibility = "hidden";
-				}
+				if (res.greenResponseSetting != "off") { responseDiv.setAttribute("style",greenStyle); }
 			});
-			greenLock = true;
-			setTimeout(()=>{responseDiv.setAttribute("style",defaultStyle);greenLock = false; //browser.storage.local.set({messageFromBackground: "nomessage"});
+			greenLock = true; setTimeout(()=>{responseDiv.setAttribute("style",defaultStyle);greenLock = false;
 			},5000);
 		} else {
 			if (greenLock==false){
@@ -306,8 +223,7 @@ function responseWindow(msg) {
 
 function timerWindow(msg) {
 	if(timerDiv) {
-		timerDiv.textContent = "time left before next post "+msg;
-		console.log("time left before next post "+msg+" from " + window.location.href);
+		timerDiv.textContent = "time left before next post "+msg; console.log("time left before next post "+msg+" from " + window.location.href);
 		if (msg < 1){timerDiv.setAttribute("style",defaultStyle);console.log("time expired " + window.location.href);} else {
 			if (timerSetting == "on"){ timerDiv.setAttribute("style",timerVisibleStyle); }
 		}
@@ -316,31 +232,17 @@ function timerWindow(msg) {
 
 
 function processEventQueue() { // leaving queue almost as is in case if double-event could still happen even with button disabled.
-	if (0 < eventQueue.length) {
-		let event;
-		for (let it=0; it<eventQueue.length; it++) {
-			event = eventQueue[it];
-			if(event.eventType == 1) {
-				_processContentEvent(event);break;
-			}
-		}
-		eventQueue = [];
-	}
+	if (0 < eventQueue.length) {let event; for (let it=0; it<eventQueue.length; it++) {event = eventQueue[it]; if(event.eventType == 1) { _processContentEvent(event);break; } } eventQueue = []; }
 }
 
 function _processContentEvent(event) {
 	// get current content (lazily load)
 	let theContent = _getContent(event);
 	if (theContent.length > 0 && _containsPrintableContent(theContent)){
-		awaitingResponse = true;
-		responseInnerDiv.textContent = "awaiting response...";
+		awaitingResponse = true; responseInnerDiv.textContent = "awaiting response...";
 		if (greenResponseSetting == "on") {responseDiv.setAttribute("style",whiteStyle);retry.style.visibility = "hidden";close.style.visibility = "hidden";}
-		event.value = JSON.stringify(theContent);
-		event.last = (new Date()).getTime();
-		console.log("Send content-event for " + event.node + " to background-script: " + event.value);
-		event.node.listenerAdded = false;
-		let entry = event.value+";;;"+event.url;
-		browser.storage.local.set({eventValue: entry});
+		event.value = JSON.stringify(theContent); event.last = (new Date()).getTime(); console.log("Send content-event for " + event.node + " to background-script: " + event.value);
+		event.node.listenerAdded = false; let entry = event.value+";;;"+event.url; browser.storage.local.set({eventValue: entry});
 	}
 }
 
@@ -420,24 +322,14 @@ function _contentChangedHandler(type, node) {
 			}
 		}
 	}
-	let name = (node.name) ? node.name : ((node.id) ? node.id : "");
-	console.log("new content at "+name);
-	// add to queue (if not already queued)
-	button = findFields(node);
-	console.log(button);
+	let name = (node.name) ? node.name : ((node.id) ? node.id : ""); console.log("new content at "+name); button = findFields(node); console.log(button);
 	if(node.listenerAdded != true) {
 		node.listenerAdded = true;
 		button.addEventListener("click", function(clickEvent){
 			if (correctThread({node:node,type:type})==true) {
-				browser.storage.local.set({messageFromBackground: "nomessage"});
-				browser.storage.local.set({eventValue: "nomessage"});
-				browser.storage.local.set({sneed: "SN"});
-				node.listenerAdded = false;
-				txtNode = node;
+				browser.storage.local.set({messageFromBackground: "nomessage",eventValue: "nomessage",sneed: "SN"}); node.listenerAdded = false; txtNode = node;
 				let event = {eventType:1,node:node,type:type,url:location.href,incognito:browser.extension.inIncognitoContext,last:null,value:null};
-				if (!_alreadyQueued(event) && event.url != undefined) { eventQueue.push(event); }
-				processEventQueue();
-				console.log("clicked");
+				if (!_alreadyQueued(event) && event.url != undefined) { eventQueue.push(event); } processEventQueue(); console.log("clicked");
 			}
 		});
 	}
@@ -468,8 +360,7 @@ function threadSubjectCheck(event,sbjct) {
 		mI = mI.indexOf("aletheo");
 		if (mI != -1 && sbjct.indexOf("general") == -1) {
 			console.log("not a general and mention");
-			let str = window.location.href;	if (str.length > 6) { str =str.split("/"); let diff = str.length - 6; for(let n = 0; n<diff;n++) { str.pop(); } str=str.join("/"); }
-			str=str.split("/");str=str[3]+str[4]+str[5];
+			let str = window.location.href;	mI = str.indexOf("#"); if (mI != -1) {str=str.substring(0, mI);} str=str.split("/");str=str[3]+str[4]+str[5];
 			if (mentions.indexOf(str)==-1) {
 				try{ mentions = mentions.split(";"); mentions.push(str); mentions.join(';'); } catch{mentions=mentions + str +";";}browser.storage.local.set({mentionThreads: mentions});
 			}
@@ -489,9 +380,7 @@ function threadSubjectCheck(event,sbjct) {
 // HTML Field/Form helper methods
 //----------------------------------------------------------------------------
 
-function _isTextInputSubtype(type) {
-	return ("text" === type || "textarea" === type);
-}
+function _isTextInputSubtype(type) { return ("text" === type || "textarea" === type); }
 
 function _getContent(event) {
 	let theContent = "";
@@ -505,84 +394,42 @@ function _getContent(event) {
 	return theContent;
 }
 
-function _getId(element) {
-	return (element.id) ? element.id : ((element.name) ? element.name : "");
-}
+function _getId(element) { return (element.id) ? element.id : ((element.name) ? element.name : ""); }
 
 function _getClassOrNameOrId(element) {
 	return element.classList.contains('aletheoClass') ? "aletheoClass" : (element.name && element.name.length > 0) ? element.name : element.id;
 }
 
 function _getFormId(element) {
-	let insideForm = false;
-	let parentElm = element;
+	let insideForm = false; let parentElm = element;
 	while(parentElm && !insideForm) {parentElm = parentElm.parentNode;insideForm = (parentElm && "FORM" === parentElm.tagName);}
 	return (insideForm && parentElm) ? _getId(parentElm) : "";
 }
 
-function _getHost(aLocation) {
-	if (aLocation.protocol === "file:") {
-		return "localhost";
-	} else {
-		return aLocation.host;
-	}
-}
+function _getHost(aLocation) { if (aLocation.protocol === "file:") { return "localhost"; } else { return aLocation.host; } }
 
 function _isContentEditable(element) {
-	if (element.contentEditable === undefined) {
-		return false;
-	}
-	if ("inherit" !== element.contentEditable) {
-		return ("true" === element.contentEditable);
-	}
-	let doc = element.ownerDocument;
-	let effectiveStyle = doc.defaultView.getComputedStyle(element, null);
-	let propertyValue = effectiveStyle.getPropertyValue("contentEditable");
-	if ("inherit" === propertyValue && element.parentNode.style) {
-		return _isContentEditable(element.parentNode);
-	}
-	return ("true" === propertyValue);
+	if (element.contentEditable === undefined) { return false; } if ("inherit" !== element.contentEditable) { return ("true" === element.contentEditable); }
+	let doc = element.ownerDocument; let effectiveStyle = doc.defaultView.getComputedStyle(element, null); let propertyValue = effectiveStyle.getPropertyValue("contentEditable");
+	if ("inherit" === propertyValue && element.parentNode.style) { return _isContentEditable(element.parentNode); } return ("true" === propertyValue);
 }
 
 function _isDisplayed(elem) {
-	let display = _getEffectiveStyle(elem, "display");
-	if ("none" === display) return false;
-	let visibility = _getEffectiveStyle(elem, "visibility");
-	if ("hidden" === visibility || "collapse" === visibility) return false;
-	let opacity = _getEffectiveStyle(elem, "opacity");
-	if (0 === opacity) return false;
-	if (elem.parentNode.style) {
-		return _isDisplayed(elem.parentNode);
-	}
-	return true;
+	let display = _getEffectiveStyle(elem, "display"); if ("none" === display) return false; let visibility = _getEffectiveStyle(elem, "visibility");
+	if ("hidden" === visibility || "collapse" === visibility) return false;	let opacity = _getEffectiveStyle(elem, "opacity"); if (0 === opacity) return false;
+	if (elem.parentNode.style) { return _isDisplayed(elem.parentNode); } return true;
 }
 
 function _getEffectiveStyle(element, property) {
-	if (element.style === undefined) {
-		return undefined;
-	}
-	let doc = element.ownerDocument;
-	let effectiveStyle = doc.defaultView.getComputedStyle(element, null);
-	let propertyValue = effectiveStyle.getPropertyValue(property);
-	if ("inherit" === propertyValue && element.parentNode.style) {
-		return _getEffectiveStyle(element.parentNode, property);
-	}
+	if (element.style === undefined) { return undefined; } let doc = element.ownerDocument; let effectiveStyle = doc.defaultView.getComputedStyle(element, null);
+	let propertyValue = effectiveStyle.getPropertyValue(property); if ("inherit" === propertyValue && element.parentNode.style) { return _getEffectiveStyle(element.parentNode, property); }
 	return propertyValue;
 }
 //----------------------------------------------------------------------------
 // Event enqueueing methods
 //----------------------------------------------------------------------------
 
-function _alreadyQueued(event) {
-	let e;
-	for (let it=0; it<eventQueue.length; it++) {
-		e = eventQueue[it];
-		if (e.eventType === event.eventType && e.node === event.node) {
-			return true;
-		}
-	}
-	return false;
-}
+function _alreadyQueued(event) {let e; for (let it=0; it<eventQueue.length; it++) { e = eventQueue[it]; if (e.eventType === event.eventType && e.node === event.node) { return true; } } return false; }
 //----------------------------------------------------------------------------
 // Add event handlers
 //----------------------------------------------------------------------------
@@ -605,9 +452,7 @@ function createDomObserver() {
 					targetElem.addEventListener("keyup", onContentChanged);
 				}
 			} else if (mutation.addedNodes) {
-				mutation.addedNodes.forEach(elem => {
-					addElementHandlers(elem);
-				});
+				mutation.addedNodes.forEach(elem => { addElementHandlers(elem);	});
 			}
 		});
 	});
@@ -617,60 +462,31 @@ function addElementHandlers(element) {
 	if (element.nodeName) {
 		if (element.nodeName == "SELECT" && element.value == 'new' && threadsArray.length < 2) {
 			if ((threadsArray.length == 1 && replies > 309)||threadsArray.length == 0) {
-				let xArea = document.querySelector('.textarea>textarea');
-				xArea.value = opPost;
-				let ev = new Event('input');
-				xArea.dispatchEvent(ev);
-				setTimeout(()=>{
-					let xSub = document.querySelector('.persona>input[name="sub"]');
-					xSub.value = "/LET/Aletheo General";
-					let eve = new Event('paste');
-					xSub.dispatchEvent(eve);
-				},300);
+				let xArea = document.querySelector('.textarea>textarea'); xArea.value = opPost; let ev = new Event('input'); xArea.dispatchEvent(ev);
+				setTimeout(()=>{ let xSub = document.querySelector('.persona>input[name="sub"]'); xSub.value = "/LET/Aletheo General"; let eve = new Event('paste'); xSub.dispatchEvent(eve); },300);
 			}
 		}
-		if (element.nodeName == "input") {
-			element.addEventListener('change', onContentChanged);
-			element.addEventListener('paste', onContentChanged);
-		}
-		else if (element.nodeName == "textarea"){
-			element.addEventListener("keyup", onContentChanged);
-			element.addEventListener('paste', onContentChanged);
-		}
-		if (element.hasChildNodes()) {
-			Array.from(element.childNodes).forEach(elem => addElementHandlers(elem));
-		}
+		if (element.nodeName == "input") { element.addEventListener('change', onContentChanged); element.addEventListener('paste', onContentChanged); }
+		else if (element.nodeName == "textarea"){ element.addEventListener("keyup", onContentChanged); element.addEventListener('paste', onContentChanged); }
+		if (element.hasChildNodes()) { Array.from(element.childNodes).forEach(elem => addElementHandlers(elem)); }
 	}
 	if (element.id =="alert-undefined" && (element.textContent.indexOf("отправлено") == -1) ) {browser.storage.local.set({sneed: "SNEED"});}
 //	if (element.id =="qrError" && element.textContent.indexOf("Error") != -1) {console.log("sneed");browser.storage.local.set({sneed: "SNEED"});}
 }
 
-function addHandler(selector, eventType, aFunction) {
-	document.querySelectorAll(selector).forEach( (elem) => {elem.addEventListener(eventType, aFunction);});
-}
+function addHandler(selector, eventType, aFunction) { document.querySelectorAll(selector).forEach( (elem) => {elem.addEventListener(eventType, aFunction);}); }
 
 
 // instantiate an observer for adding event handlers to dynamically created DOM elements
 
-		document.querySelector("html").addEventListener("keyup", onContentChanged);
-		addHandler("input", "change", onContentChanged);
-		addHandler("input,textarea", "paste", onContentChanged);
-		createDomObserver().observe(document.querySelector("body"),{
-			childList:true,
-			attributes:true,
-			attributeFilter:['contenteditable','designMode','style'],
-			attributeOldValue:true,
-			subtree:true
-		});
+		document.querySelector("html").addEventListener("keyup", onContentChanged);	addHandler("input", "change", onContentChanged); addHandler("input,textarea", "paste", onContentChanged);
+		createDomObserver().observe(document.querySelector("body"),{ childList:true, attributes:true, attributeFilter:['contenteditable','designMode','style'], attributeOldValue:true, subtree:true });
 		createResponseWindow();
 //////////////// showFormData.js
 
 function _isNotIrrelevantInfo(node) {
 	let irrelevant = ["name","pass","phone","topic","search","sub", "mail","qf-box","find","js-sf-qf","pwd","categ","title","captcha","report","embed","url","subject","email"];
-	if (irrelevant.indexOf(node.name) != -1 || irrelevant.indexOf(node.id) != -1) {
-		return false;
-	}
-	return true;
+	if (irrelevant.indexOf(node.name) != -1 || irrelevant.indexOf(node.id) != -1) { return false; }	return true;
 }
 
 function findFields(elem) {
@@ -682,18 +498,13 @@ function findFields(elem) {
 				if(t=="com"){
 					butt=document.querySelector('td>input[type="submit"]');
 				}
-				//if(t=="aletheoClass"){
-				//	butt=document.querySelector('div>input[type="submit"]');
-				//}
 				if (!butt) {butt=document.querySelector('div>input[type="submit"]');}
 			}
 			if (window.location.href.indexOf("2ch.") != -1 || window.location.href.indexOf("2-ch.") != -1){
-				if(elem.id=="qr-shampoo"){butt=document.querySelector('#qr-submit');}
-				if(elem.id=="shampoo"){butt=document.querySelector('#submit');}
+				if(elem.id=="qr-shampoo"){butt=document.querySelector('#qr-submit');} if(elem.id=="shampoo"){butt=document.querySelector('#submit');}
 			}
 			if (window.location.href.indexOf("kohlchan.") != -1||window.location.href.indexOf("endchan.") != -1){
-				if(elem.id=="qrbody"){butt=document.querySelector('#qrbutton');}
-				if(elem.id=="fieldMessage"){butt=document.querySelector('#formButton');}
+				if(elem.id=="qrbody"){butt=document.querySelector('#qrbutton');} if(elem.id=="fieldMessage"){butt=document.querySelector('#formButton');}
 			}
 			if (window.location.href.indexOf("dobrochan.") != -1){
 				if(elem.id=="reply-replyText"){butt=document.querySelector('#fieldtable>tbody>tr>td>table>tbody>tr>td>input[type="submit"]');}
@@ -722,41 +533,18 @@ function findFields(elem) {
 
 function createResponseWindow() {
 	if(responseDiv == undefined || responseDiv == null){
-		responseDiv = document.createElement("div");
-		responseDiv.setAttribute("style",defaultStyle);	
-		document.body.appendChild(responseDiv);
-		responseInnerDiv = document.createElement("div");
-		responseInnerDiv.textContent = "awaiting response...";
-		responseDiv.appendChild(responseInnerDiv);
-		retry = document.createElement("a");
-		retry.textContent = "[RETRY]";
-		retry.style.visibility = "hidden";
-		retry.setAttribute("style","position:absolute; bottom: 2px; left:2px;cursor: pointer;");
-		responseDiv.appendChild(retry);
-		console.log(retry);
+		responseDiv = document.createElement("div"); responseDiv.setAttribute("style",defaultStyle); document.body.appendChild(responseDiv); responseInnerDiv = document.createElement("div");
+		responseInnerDiv.textContent = "awaiting response..."; responseDiv.appendChild(responseInnerDiv); retry = document.createElement("a"); retry.textContent = "[RETRY]";
+		retry.style.visibility = "hidden"; retry.setAttribute("style","position:absolute; bottom: 2px; left:2px;cursor: pointer;"); responseDiv.appendChild(retry); console.log(retry);
 		retry.addEventListener("click",(event)=>{
-		//	browser.storage.local.set({messageFromBackground: "nomessage"});
-			browser.storage.local.set({eventValue: "nomessage"});
-			browser.storage.local.set({sneed: "SN"});
-			event.preventDefault();
-			retry.style.visibility = "hidden";
-			close.style.visibility = "hidden";
-			awaitingResponse = true;
-			browser.storage.local.set({retry: true});
-			responseInnerDiv.textContent = "awaiting response...";
-			if (greenResponseSetting == "on") {responseDiv.setAttribute("style",whiteStyle);}
+			browser.storage.local.set({eventValue: "nomessage",sneed:"SN",retry: true}); event.preventDefault(); retry.style.visibility = "hidden"; close.style.visibility = "hidden";
+			awaitingResponse = true; responseInnerDiv.textContent = "awaiting response..."; if (greenResponseSetting == "on") {responseDiv.setAttribute("style",whiteStyle);}
 		});
-		timerDiv = document.createElement("div");
-		timerDiv.setAttribute("style",defaultStyle);
-		document.body.appendChild(timerDiv);
-		console.log("timerDiv created");
-		close = document.createElement("a");
-		close.textContent = "[x]";
-		close.addEventListener("click",function(event){
+		timerDiv = document.createElement("div"); timerDiv.setAttribute("style",defaultStyle); document.body.appendChild(timerDiv); console.log("timerDiv created");close = document.createElement("a");
+		close.textContent = "[x]"; close.addEventListener("click",function(event){
 			event.preventDefault();	retry.style.visibility = "hidden"; close.style.visibility = "hidden"; responseDiv.setAttribute("style",defaultStyle);
 		});
-		close.setAttribute("style","position:absolute; bottom: 2px; right:2px;cursor: pointer; visibility:hidden;");
-		responseDiv.appendChild(close);
+		close.setAttribute("style","position:absolute; bottom: 2px; right:2px;cursor: pointer; visibility:hidden;"); responseDiv.appendChild(close);
 	}
 }
 
