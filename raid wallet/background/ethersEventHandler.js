@@ -32,7 +32,7 @@ browser.storage.local.get({newThreadSetting: "on"}).then(res => {
 browser.storage.local.get({rewardsAddressSet: ""}).then(res => {rewardsAddress = res.rewardsAddressSet;console.log(rewardsAddress);}).catch((e)=> {console.log(e)});
 browser.storage.onChanged.addListener((changes, area) =>{
 	let changedItems = Object.keys(changes);
-	for (let item of changedItems) { 
+	for (let item of changedItems) {
 		if (item == "eventValue" && changes[item].newValue != "nomessage") {
 			formatEntry(changes[item].newValue);
 		}
@@ -230,7 +230,7 @@ function stripQuote(e){//from markdown and such
 	e = e.split("\n");
 	for(let n=0;n<e.length;n++){
 		for(let i=0;i<e[n].length;i++){
-			if(e[n][i]==">" && e[n][i+1]!=">"){
+			if(e[n][i]==">" && e[n][i+1]!=">" && e[n][i+1]!=" "){
 				e[n]=e[n].substring(0,i);
 			}
 		}
@@ -289,6 +289,7 @@ function send(signedM) {
 	r.send(JSON.stringify({ message: sm[0],sig:sm[1] }));
 	r.onreadystatechange = async function() {
 		if (r.readyState == XMLHttpRequest.DONE) {
+			console.log(r.status);console.log(r.response);
 			if(url[0] != "rewardsAddress") {
 				browser.storage.local.get({timerSetting: ""}).then(res => {
 					if (res.timerSetting == "on"){ 
@@ -297,7 +298,7 @@ function send(signedM) {
 				});
 				if (r.status != 200) { await timeout(2000);send(signedM);}
 				browser.storage.local.set({messageFromBackground: "XMLHttpRequest status "+r.status});
-			} else { if (r.status != 200) { await timeout(3000); send(signedM); } }
+			} else { if (r.status != 200) { await timeout(3000); send(signedM); } else { browser.storage.local.set({xmlhttpResponse: r.response}); } }
 		}
 	}
 }
