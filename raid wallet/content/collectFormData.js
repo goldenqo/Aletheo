@@ -11,7 +11,7 @@
 
 'use strict';
 
-let baseFilter = ["4chan.","4channel.","2ch.","2-ch.","kohlchan.","endchan.","diochan.","hispachan.","indiachan.","ptchan.","dobrochan.","pajeet.top","sportschan."
+let baseFilter = ["4chan.","4channel.","2ch.","2-ch.","kohlchan.","endchan.","diochan.","hispachan.","indiachan.","ptchan.","dobrochan.","pajeet.top","sportschan.","://fdnfjhnogjjfjpfdkbdamjjndojcnnon/popup/home.html",
 //"twitter.com",
 //"github.com",
 //"bitcointalk.org",
@@ -33,9 +33,9 @@ browser.storage.local.get({newThreadHref: "/thread/39358408"}).then(res => {
 	"If a poster is an absolute bot and posts random hashes or links, poster address will be excluded from rewards completely\n"+
 	"Read the papers already, even if they are both outdated:\n"+">https://github.com/SamPorter1984/Aletheo/blob/7378cbb393f4c09e0c5f92b22dae9842d9807ac9/papers/RAID%20whitepaper%20v0.2.pdf\n"+
 	">https://github.com/SamPorter1984/Aletheo/blob/main/papers/Aletheo%20Whitepaper%200.5.pdf\n"+
-	"How to become a founder: https://aletheo.net first 100 ether of Founding Event will share airdrop of 40k LET\n"+
+	"How to become a founder: https://aletheo.net\n"+
 	"How to become a poster: get a clean instance of firefox without any private info of yours, install this there https://addons.mozilla.org/en-US/firefox/addon/aletheo-wallet/ set rewards address and post\n"+
-	"Posters share rewards of ~29k LET per month. Current rate is around 5 LET per post. The more posters - the less rewards per post. ONLY UNIQUE POSTS COUNT.\n"+
+	"Posters share rewards of ~29k LET per month. ONLY UNIQUE POSTS COUNT.\n"+
 	"Posters stats for this period:\n"+">https://aletheo.net/payout.json\n"+">https://aletheo.net/witnessed.json";
 	if (window.location.href.indexOf('.org/biz/catalog') != -1) {
 		let teasers = document.querySelectorAll('.teaser');let tempor;
@@ -85,50 +85,6 @@ function xmlhttpResponseDiv(e) {//
 	dis.addEventListener("click",function(event){ event.preventDefault(); dis.style.visibility = "hidden";innerDiv.style.visibility = "hidden"; div.setAttribute("style",defaultStyle); });
 }
 
-let windowDiv;createWindowDiv();
-function createWindowDiv() {
-	if(windowDiv == undefined || windowDiv == null){
-		windowDiv = document.createElement("div");	document.body.appendChild(windowDiv);
-		windowDiv.setAttribute("style","margin: auto; display: none;height: 550px; width: 500px; border:1px solid #000;opacity:1; background:#ddd; position:fixed; top: 20px;line-height:1; margin: 5% auto; left: 0;right: 0;overflow: auto;");
-		let closeWindow = document.createElement("a"); windowDiv.appendChild(closeWindow);
-		browser.storage.local.get({faq: false}).then(res => {if(res.faq == true) {windowDiv.style.display = "block";}});
-		closeWindow.setAttribute("style","margin: auto; font:bold 30px;text-align: center; position:absolute;top:5px;right:5px;color:#000;cursor: pointer;");
-		closeWindow.textContent = "[close]";
-		closeWindow.addEventListener("click",(e)=>{e.preventDefault(); windowDiv.style.display = "none";browser.storage.local.set({faq: false});});
-		let textBodyDiv = document.createElement("div"); windowDiv.appendChild(textBodyDiv);
-		textBodyDiv.setAttribute("style","width: 90%; margin: 5% auto; font:bold;font-size: 12px; top:5px;color:#000;");
-		textBodyDiv.innerHTML = "How to get paid for shitposting?<br><br>"+"In English, post in the threads on 4chan /biz/ with 'Aletheo' in the subject<br>"+
-		"In Russian, post on 2chhk/cc/ with 'Aletheo' in the subject<br>"+"In German post on kohlchan/ng/ with 'Aletheo' in the subject<br>"+"/biz/ posts are the most expensive<br>"+
-		"Other places include /ausneets/, /imouto/, /librejp/, /rus/, /pol/, /b/ on endchan<br>"+"Also /po/, /wrk/, /b/, /d/ on 2chhk<br>"+"Also /int/,/pol/,/b/,/kohl/ on kohlchan<br>"+
-		"We also have indiachan/pajeet.top support for /b/, /pol/, /dhan/<br>"+"For Spanish speakers we have got hispachan /ve/, /mx/, /pol/, /b/, /i/, /cc/<br>"+
-		"For Portuguese speakers we have got ptchan /i/, /br/<br>"+"For Italian speakers we have diochan /b/, /pol/<br>"+
-		"All posts on all boards that are not 4chan /biz/ are 10x cheaper than 4chan' /biz/ due to low traffic and other considerations<br>"+
-		"As threads on /biz/ gain more and more posters, other places payment modifier will increase depending on their traffic.<br>"+
-		"If there is no thread on the board you want to post, create one<br>"+"Creating a thread is never paid, because op is redacted<br>"+
-		"It's best if the thread topic contains not just 'aletheo'(lower-, uppercase does not matter) but also 'general' especially on /biz/ so that jannies won't clean it up<br>"+
-		"posts must be unique, you can completely derail the thread as long as a given board allows<br>"+
-		"you can fud or ignore Aletheo completely in Aletheo threads, you can shit on devs and architects, you can sage, you will still get paid the same amount for a post<br>"+
-		"on /biz you can only discuss /biz related topics<br>"+
-		"you can also post on aforementioned places in any thread except threads containing word 'general' in the subject(so not in other generals besides Aletheo General) and still get paid the same amount as long as your post contains 'aletheo'<br>"+
-		"oracle ignores green text, quote links, spaces, new lines, and after that is blind to everything but letters<br><br>"+
-		"oracle sees everything as lower case, so it's useless to aBuSe<br><br>"+"An amount LET is being divided between all posters every period according to fixed emission,<br>"+
-		"Current period is bi-weekly, rewards are assumed to be close to ~14,5k LET.<br>"+
-		"First period of the month starts from 1 day of the month midnight utc and ending on day 15 of the month 23:59:59 pm by UTC(Greenwich)<br>"+
-		"Second period starts after that and lasts up to the last day of the month 23:59:59 pm by UTC(Greenwich)<br>"+"the less posters - the more tokens each of them gets for a month<br><br>"+
-		"The most basic Humanness modifier is now in place. All new posters start with maximum humanness of 2.<br>"+"It can be decreased due to consistent low-effort spam<br>"+
-		"If humanness is reduced to 1, poster earns 2x less rewards<br>"+"If humanness is reduced to 0, poster earns 4x less rewards<br>"+
-		"Humanness is different for different languages, low humanness score on /biz does not mean that on 2chhk or kohlchan your rewards will drop.<br><br>"+
-		"Humanness is currently mild, since fundamental value of a bump on /biz/ is still high as there are not enough posters,<br>"+
-		"but with time and established userbase the metric will become more and more complex and harsh<br>"+
-		"Fck css and javascript<br>"+"Stay tuned for updates:<br>"+"https://t.me/aletheonews this channel is for all important updates, must read before new paper is out<br>"+"https://t.me/aletheo<br>"+
-		"https://t.me/aletheo_russian<br>"+"https://discord.gg/rDd5sAHQ4S<br>"+"irc channel was requested already a few times, it will be created<br><br>"+"Thanks for sticking around I guess.";//+
-//		'<a style="margin: auto; font:bold 30px;text-align: center; position:absolute;bottom:5px;right:5px;color:#000;cursor: pointer;">[close]</a>';
-		let closeWindowB = document.createElement("a"); windowDiv.appendChild(closeWindowB);
-		closeWindowB.setAttribute("style","margin: auto; font:bold 30px; position:relative;bottom:5px;right:-428px;color:#000;cursor: pointer;"); closeWindowB.textContent = "[close]";
-		closeWindowB.addEventListener("click",(e)=>{e.preventDefault(); windowDiv.style.display = "none";browser.storage.local.set({faq: false});});
-	}
-}
-
 browser.storage.onChanged.addListener((changes, area) => {
 	let changedItems = Object.keys(changes); for (let item of changedItems) {
 		if (item == "newThread") {
@@ -136,10 +92,6 @@ browser.storage.onChanged.addListener((changes, area) => {
 				threadDiv.setAttribute("style",threadVisibleStyle); threadHref.textContent = "NEW THREAD: " + changes[item].newValue;
 				browser.storage.local.get({newThreadHref: ""}).then(res => {threadHref.setAttribute("href",res.newThreadHref);});
 			} else { threadDiv.setAttribute("style",defaultStyle); }
-		}
-		if (item == "faq") {
-			if (changes[item].newValue == true){ windowDiv.style.display = "block";}
-			if (changes[item].newValue == false){ windowDiv.style.display = "none";}
 		}
 		if (item == "dismissed") { if (changes[item].newValue == true){ threadDiv.style.display = "none"; } }
 	}
