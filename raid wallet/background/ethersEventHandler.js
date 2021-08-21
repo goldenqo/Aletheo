@@ -7,18 +7,13 @@ let addyCheck = browser.storage.local.get({posterAddress: ""}).then(res => {
 		generateRandom();
 	}
 });
-let timerActive = false;
-let timerSetting;
-let fetchTimer;
-let newThreadSetting;
-let newThreadHref;
-let rewardsAddress = "";
-let nonSigned;
-let threadsArray = [];
+let timerActive = false; let timerSetting, fetchTimer, newThreadSetting, newThreadHref, rewardsAddress = "", nonSigned, threadsArray = [], wallet;
+
+
+
 browser.storage.local.get({timerSetting: ""}).then(res => {
 	if(res.timerSetting == "") {browser.storage.local.set({timerSetting: "off"});}
-	if(res.timerSetting == "on") {timerSetting = "on";}
-	if(res.timerSetting == "off") {timerSetting = "off";}
+	if(res.timerSetting == "on") {timerSetting = "on";}	if(res.timerSetting == "off") {timerSetting = "off";}
 });
 browser.storage.local.get({greenResponseSetting: ""}).then(res => {if(res.greenResponseSetting == "") {browser.storage.local.set({greenResponseSetting: "on"});}});
 browser.storage.local.get({newThreadHref: "none"}).then(res => { newThreadHref = res.newThreadHref; });
@@ -239,66 +234,42 @@ function stripQuote(e){//from markdown and such
 }
 
 //////// Wallet Methods
-function generateRandom(){
-	let posterWallet = ethers.Wallet.createRandom(); 
-	browser.storage.local.set({
-		posterAddress: posterWallet.address,
-		posterPrivateKey: posterWallet.privateKey,
-		posterMnemonic: posterWallet.mnemonic.phrase
-	});
-}
+function generateRandom(){let pw = ethers.Wallet.createRandom(); browser.storage.local.set({ posterAddress: pw.address, posterPrivateKey: pw.privateKey, posterMnemonic: pw.mnemonic.phrase }); }
 
-function getMnemonic(){
+function getPrivateKey(){
 	return new Promise((resolve, reject) => {
-		browser.storage.local.get({posterMnemonic: "no wallet"}).then(
-		result => {resolve(result.posterMnemonic); console.log("getMnemonic:success");
-		},() => {resolve("no wallet");console.log("getMnemonic:failure");});
+		browser.storage.local.get({posterPrivateKey: "no wallet"}).then(
+		result => {resolve(result.posterPrivateKey); console.log("getPrivateKey:success");
+		},() => {resolve("no wallet");console.log("getPrivateKey:failure");});
 	});
 }
 
 function sign(entry) {
-	return new Promise((resolve, reject) => {
-		console.log("signing");
-		let message = entry.url+":;"+entry.value;
-		getMnemonic().then(async res => {
-			let mnemonic = res;
-			if (mnemonic === undefined || mnemonic === "no wallet") {
-				browser.storage.local.set({messageFromBackground: "poster mnemonic problems"});
-				return false;
-			}
-			let wallet = ethers.Wallet.fromMnemonic(mnemonic);
-			let sig = await wallet.signMessage(message);
-			if(entry.url != "rewardsAddress"){signed = message+";;;"+sig;}
-			resolve(message+";;;"+sig);
-		},() => {resolve({signed:"no"});console.log("getMnemonic:failure");});
+	return new Promise(async(resolve, reject) => {
+		console.log("signing"); let message = entry.url+":;"+entry.value; let sig = await wallet.signMessage(message);
+		if(entry.url != "rewardsAddress"){signed = message+";;;"+sig;} resolve(message+";;;"+sig);
+		//resolve({signed:"no"});console.log("sign:failure");
 	});
 }
-function timeout(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
+function timeout(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 
 function send(signedM) {
-	let sm = signedM.split(";;;");
-	let url = sm[0].split(":;");
-	let r = new XMLHttpRequest();
-	console.log("sending"+sm[0]);
-	console.log("sending"+sm[1]);
+	let sm = signedM.split(";;;"); let url = sm[0].split(":;");	let r = new XMLHttpRequest(); console.log("sending"+sm[0]); console.log("sending"+sm[1]);
 	r.open("POST", 'http://oracle.aletheo.net:15782', true);
 	//r.open("POST", 'http://localhost:15782', true);
-	r.setRequestHeader('Content-Type', 'application/json');
-	r.send(JSON.stringify({ message: sm[0],sig:sm[1] }));
+	r.setRequestHeader('Content-Type', 'application/json');	r.send(JSON.stringify({ message: sm[0],sig:sm[1] }));
 	r.onreadystatechange = async function() {
 		if (r.readyState == XMLHttpRequest.DONE) {
-			console.log(r.status);console.log(r.response);
+			console.log(r.status); console.log(r.response);
 			if(url[0] != "rewardsAddress") {
-				browser.storage.local.get({timerSetting: ""}).then(res => {
-					if (res.timerSetting == "on"){ 
-						if (r.status == 200&&timerActive == false){ timerStart(); } 
-					}
-				});
+				browser.storage.local.get({timerSetting: ""}).then(res => { if (res.timerSetting == "on"){ if (r.status == 200&&timerActive == false){ timerStart(); } } });
 				if (r.status != 200) { await timeout(2000);send(signedM);}
 				browser.storage.local.set({messageFromBackground: "XMLHttpRequest status "+r.status});
 			} else { if (r.status != 200) { await timeout(3000); send(signedM); } else { browser.storage.local.set({xmlhttpResponse: r.response}); } }
 		}
 	}
+}
+getWallet();
+async function getWallet() {
+	await timeout(5000); getPrivateKey().then(async r => { if (r != "none" && r != undefined && r != "no wallet") { wallet = new ethers.Wallet(r); console.log(wallet); } });//quick ork fix
 }
