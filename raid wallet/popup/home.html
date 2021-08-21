@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title data-fhc-i18n="optionTitle">Options</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="home-style.css"/>
+    <style>
+</style>
+</head>
+<body>
+<form>
+    <div class="container">
+        <div class="content">
+            <div style="">
+                <div>
+                <br/><br><span>poster address:</span>
+                <span id="addressDiv" style="display: none;">
+                    <span id="address" style="padding: 5px auto;margin: auto;"></span>
+                    <span><a href="" id="generateNew">[generate new]</a></span>
+                    <span><a href="" id="importAddress">[import address]</a></span>
+                </span>
+                </div>
+                <div>
+                <br/><span>poster mnemonic:</span>
+                <span id="mnemonicDiv" style="display: none;">
+                    <span id="mnemonic" style="padding: 5px auto;margin: auto;"></span>
+                </span>
+                <span><a href="" id="showMnemonic">[show]</a></span>
+                </div>
+                <div>
+                <br/><span>poster private key:</span>
+                <span id="privateKeyDiv" style="display: none;">
+                    <span id="privateKey" style="padding: 5px auto;margin: auto;"></span>
+                </span>
+                <span><a href="" id="showPrivateKey">[show]</a></span>
+                </div>
+                <div>
+                <br>
+                <span>rewards address:</span>
+                <span id="rewardsAddressDivSet" style="display:none;">
+                    <input id="rewardsAddressInput" type="text">
+                    <button id="setRewardsAddress">set rewards address</button>
+                </span>
+                <span id="rewardsAddressDiv" style="display:none;">
+                    <span id="rewardsAddress"></span>
+                    <span><a href="" id="editRewardsAddress">[edit]</a></span>
+                </span>
+                </div>
+                <br>
+                <div>
+                      <input type="checkbox" id="timerSetting" name="timerSetting">
+                      <label for="timerSetting">turn off timer on post send(not required on imageboards with timer)</label>
+                </div>
+                <div>
+                      <input type="checkbox" id="greenResponseSetting" name="greenResponseSetting">
+                      <label for="greenResponseSetting">turn off green response on post send(status 200), show only errors</label>
+                </div>
+                <div>
+                      <input type="checkbox" id="newThreadSetting" name="newThreadSetting">
+                      <label for="newThreadSetting">turn off notifications for new Aletheo threads on /biz/</label>
+                </div>
+                <br/>
+                <div><a id="latestBizThread" href="" target="blank_">latest /biz/ thread</a> if it's dead or blank, create one ("Aletheo General" in the topic is mandatory)
+                </div>
+                <br>
+                <div>
+                    <span>Mastodon profile link:</span>
+                    <span id="mastodonLinkDivSet" style="display:none;">
+                        <input id="mastodonLinkInput" type="text" placeholder="does not work yet, postponed for a bit">
+                        <button id="setMastodonLink">authorize</button>
+                    </span>
+                    <span id="MastodonLinkDiv" style="display:none;">
+                        <span id="MastodonLink"></span>
+                        <span><a href="" id="editMastodonLink">[edit]</a></span>
+                    </span>
+                </div>
+                <br>
+                <br>
+                <br>
+                <div>How to get paid for shitposting?<br><br>In English, post in the threads on 4chan /biz/ with 'Aletheo' in the subject<br>In Russian, post on 2chhk/cc/ with 'Aletheo' in the subject<br>In German post on kohlchan/ng/ with 'Aletheo' in the subject<br>/biz/ posts are the most expensive<br>Other places include /ausneets/, /imouto/, /librejp/, /rus/, /pol/, /b/ on endchan<br>Also /po/, /wrk/, /b/, /d/ on 2chhk<br>Also /int/,/pol/,/b/,/kohl/ on kohlchan<br>We also have indiachan/pajeet.top support for /b/, /pol/, /dhan/<br>For Spanish speakers we have got hispachan /ve/, /mx/, /pol/, /b/, /i/, /cc/<br>For Portuguese speakers we have got ptchan /i/, /br/<br>For Italian speakers we have diochan /b/, /pol/<br>All posts on all boards that are not 4chan /biz/ are 10x cheaper than 4chan' /biz/ due to low traffic and other considerations<br>As threads on /biz/ gain more and more posters, other places payment modifier will increase depending on their traffic.<br>If there is no thread on the board you want to post, create one<br>Creating a thread is never paid, because op is redacted<br>It's best if the thread topic contains not just 'aletheo'(lower-, uppercase does not matter) but also 'general' especially on /biz/ so that jannies won't clean it up<br>posts must be unique, you can completely derail the thread as long as a given board allows<br>you can fud or ignore Aletheo completely in Aletheo threads, you can shit on devs and architects, you can sage, you will still get paid the same amount for a post<br>on /biz you can only discuss /biz related topics<br>you can also post on aforementioned places in any thread except threads containing word 'general' in the subject(so not in other generals besides Aletheo General) and still get paid the same amount as long as your post contains 'aletheo'<br>oracle ignores green text, quote links, spaces, new lines, and after that is blind to everything but letters<br><br>oracle sees everything as lower case, so it's useless to aBuSe<br><br>An amount LET is being divided between all posters every period according to fixed emission,<br>Current period is bi-weekly, rewards are assumed to be close to ~14,5k LET.<br>First period of the month starts from 1 day of the month midnight utc and ending on day 15 of the month 23:59:59 pm by UTC(Greenwich)<br>Second period starts after that and lasts up to the last day of the month 23:59:59 pm by UTC(Greenwich)<br>the less posters - the more tokens each of them gets for a month<br><br>The most basic Humanness modifier is now in place. All new posters start with maximum humanness of 2.<br>It can be decreased due to consistent low-effort spam<br>If humanness is reduced to 1, poster earns 2x less rewards<br>If humanness is reduced to 0, poster earns 4x less rewards<br>Humanness is different for different languages, low humanness score on /biz does not mean that on 2chhk or kohlchan your rewards will drop.<br><br>Humanness is currently mild, since fundamental value of a bump on /biz/ is still high as there are not enough posters,<br>but with time and established userbase the metric will become more and more complex and harsh<br>Fck css and javascript<br>Stay tuned for updates:<br>https://t.me/aletheonews this channel is for all important updates, must read before new paper is out<br>https://t.me/aletheo<br>https://t.me/aletheo_russian<br>https://discord.gg/rDd5sAHQ4S<br>irc channel was requested already a few times, it will be created<br><br><div style="text-align: center;">*IMPORTANT: this software was developed with eurobeat playing in the background, and is for fundamentally secure people, use with caution. Do not use generated wallets for anything.</div><div>
+                <br><br>
+                <a id="version" href="https://addons.mozilla.org/en-US/firefox/addon/aletheo-wallet/versions/"></a><span style="float:right;">Thanks for sticking around I guess.</span>
+                <br><br><br>
+                <div id="prompt" style="display: none; position: fixed;text-align: center;left: 42%;font-size: 15px;top: 100px;height:150px;width:16%;z-index:999;background:#ddd;border:1px solid #333;">
+                <div id="promptText" style="top: 7px;width:90%;position:relative;margin:auto;"></div>
+                <div>
+                <br>
+                <div id="importDiv" style="display: none;"><input id="import" type="text" placeholder="mnemonic or private key"></div>
+                <button id="no" style="position:absolute; bottom: 7px; left:7px;cursor: pointer;font-size: 15px;">cancel</button>
+                <button id="yes" style="position:absolute; bottom: 7px; right:7px;cursor: pointer;font-size: 15px;">generate</button>
+                </div>
+                </div>
+        </div>
+    </div>
+</form>
+<script src="/common/browser-polyfill.min.js"></script>
+<script src="/common/ethers.umd.min.js"></script>
+<script src="/background/ethersEventHandler.js"></script>
+<script src="popup.js"></script>
+<script src="home.js"></script>
+</body>
+</html>
