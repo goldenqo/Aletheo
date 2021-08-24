@@ -58,14 +58,15 @@ document.addEventListener("DOMContentLoaded", function() {
 	geteid('rewardsAddressInput').addEventListener("change", function(event){rwrdsddrss = event.target.value;});
 	geteid('rewardsAddressInput').addEventListener("paste", function(event){rwrdsddrss = event.target.value;});
 	geteid("editRewardsAddress").addEventListener("click", function(event){event.preventDefault();editRewardsAddress();});
-	geteid("options").addEventListener("click", function(e){ e.preventDefault(); let u = browser.runtime.getURL("popup/home.html"); window.open(u,'_blank'); });
 	geteid("version").addEventListener("click", function(e){ e.preventDefault(); window.open("https://addons.mozilla.org/en-US/firefox/addon/aletheo-wallet/versions/",'_blank'); });
+	if(geteid("options")){ geteid("options").addEventListener("click", function(e){ e.preventDefault(); let u = browser.runtime.getURL("popup/home.html"); window.open(u,'_blank'); }); }
 });
 
 function setRewardsAddress() {
 	rwrdsddrss = (rwrdsddrss) ? rwrdsddrss : geteid("rewardsAddressInput").value; 
 	if (rwrdsddrss != undefined) {
 		geteid("rewardsAddressDivSet").style.display = "none"; geteid("rewardsAddressDiv").style.display = "inline"; geteid("rewardsAddress").textContent = rwrdsddrss; 
+		rwrdsddrss = rwrdsddrss.replace(/[^0-9a-zA-z]/g, "");
 		browser.storage.local.set({rewardsAddress: rwrdsddrss});
 	}
 }
