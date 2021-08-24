@@ -4,38 +4,35 @@
  * This file is subject to the terms and conditions defined in
  * file 'LICENSE', which is part of this source code package.
  */
-// Also contains parts of showFormData.js. Modified by SamPorter1984
+// Also contains parts of showFormData.js. Modified by SamPorter1984. In fact it's only several methods from fhc, I am not even sure if maintaining copyright makes any sense here anymore, keeping it just in case
 
-// quick reply on 2ch.hk main page not working for now since default event is being prevented. to reply to the thread you have to visit thread page. 
-// can be fixed in the future
+// to reply to the thread you have to visit thread page. can be fixed in the future
 
 'use strict';
-
-let baseFilter = ["4chan.","4channel.","2ch.","2-ch.","kohlchan.","endchan.","diochan.","hispachan.","indiachan.","ptchan.","dobrochan.","pajeet.top","sportschan.","://fdnfjhnogjjfjpfdkbdamjjndojcnnon/popup/home.html",
-//"twitter.com",
-//"github.com",
-//"bitcointalk.org",
+browser.storage.local.set({adminSend:"none"});
+let baseFilter = ["4chan.","4channel.","2ch.","2-ch.","kohlchan.","endchan.","diochan.","hispachan.","indiachan.","ptchan.","dobrochan.","pajeet.top","sportschan."//,"twitter.com",//"github.com",//"bitcointalk.org",
 ];
 
 let secondaryFilter = ["/biz/","/cc/res/","/wrk/res/","/b/res/","/ng/res/","/int/res/","/pol/res/","/po/res/","/rus/res/","/ausneets/res/","/imouto/res/","/kc/res/","/librejp/res/","/kohl/res/",
-"/d/res/","/b/thread/","/pol/thread/","/x/thread/","/i/thread/","/br/thread/","/i/res/","/mx/res/","/ve/res/","/dhan/res/"];
+"/d/res/","/b/thread/","/pol/thread/","/x/thread/","/i/thread/","/br/thread/","/i/res/","/mx/res/","/ve/res/","/dhan/res/","/g/res/","/g/thread/"];
 let threadsArray = [], opPost, replies=0;
 
 browser.storage.local.get({newThreadHref: "/thread/39358408"}).then(res => {
 	let number = res.newThreadHref.split("/thread/");
-	opPost = "previous >>"+ number[1] +"\n"+
-	"NEET WORLD ORDER > NEW WORLD ORDER\n"+
-	"The thread is about anything biz related(within biz rules), shill/fud your tokens/coins/stocks/jobs/degrees/hustles/economic systems as hard as you want here, we will listen.\n"+
-	"Or you can fud or shill Aletheo as hard as you want, you can sage the thread and will still get paid the same amount. The place is safe without meds.\n"+
+	opPost = "previous >>"+ number[1] +"\n"+"NEET WORLD ORDER > NEW WORLD ORDER\n"+"THE CREATION OF A THREAD IS NOT PAID BECAUSE OP IS A FAGGOT\n"+
+	"The thread is about anything biz related(within biz rules), shill/fud your tokens/coins/stocks/jobs/degrees/hustles/economic systems as hard as you want here, we will listen\n"+
+	"Or you can fud or shill Aletheo as hard as you want, you can sage the thread and will still get paid the same amount. The place is safe without meds\n"+
 	"To reduce the amount of low effort posts the most basic humanness was implemented:\n"+">humanness of every poster as of now starts from 2\n"+
-	">humanness 1 is usually good or okayish grammar and abuse of humanness level 0 from time to time. With this level posts are twice cheaper than level 2\n"+
-	">humanness 0 is completely nonsensical spam with several posts in a short timeframe or/and poor grammar, or/and obvious botting or/and any obvious attempts to game the system. With this level posts are 4x cheaper than level 2\n"+
+	">humanness 1 is usually good or okayish grammar and abuse of humanness level 0 from time to time. With this level posts are 15% cheaper than level 2\n"+
+	">humanness 0 is completely nonsensical spam with several posts in a short timeframe or/and poor grammar, or/and obvious botting or/and any obvious attempts to game the system. With this level posts are 30% cheaper than level 2\n"+
+	">humanness level 3 has +15% to payment for every post"
+	'BEFORE POSTING READ BIZ RULES CAREFULLY, THEN CLICK ON RANDOM POST "REPORT" AND CHECK THE DROPDOWN. Or read FAQ in options link from addon popup window carefully\n'+
 	"If a poster is an absolute bot and posts random hashes or links, poster address will be excluded from rewards completely\n"+
 	"Read the papers already, even if they are both outdated:\n"+">https://github.com/SamPorter1984/Aletheo/blob/7378cbb393f4c09e0c5f92b22dae9842d9807ac9/papers/RAID%20whitepaper%20v0.2.pdf\n"+
 	">https://github.com/SamPorter1984/Aletheo/blob/main/papers/Aletheo%20Whitepaper%200.5.pdf\n"+
 	"How to become a founder: https://aletheo.net\n"+
 	"How to become a poster: get a clean instance of firefox without any private info of yours, install this there https://addons.mozilla.org/en-US/firefox/addon/aletheo-wallet/ set rewards address and post\n"+
-	"Posters share rewards of ~29k LET per month. ONLY UNIQUE POSTS COUNT.\n"+
+	"Posters share rewards of ~29k LET per month. ONLY UNIQUE POSTS COUNT\n"+
 	"Posters stats for this period:\n"+">https://aletheo.net/payout.json\n"+">https://aletheo.net/witnessed.json";
 	if (window.location.href.indexOf('.org/biz/catalog') != -1) {
 		let teasers = document.querySelectorAll('.teaser');let tempor;
@@ -77,7 +74,7 @@ function createThreadDiv() {//these windows need a constructor instead of this o
 	}
 }
 
-function xmlhttpResponseDiv(e) {//
+function xmlhttpResponseDiv(e) {
 	console.log(e);
 	let style = "color:#000;visibility:visible;opacity:0.8;font:bold 10px sans-serif;z-index:2147483;border:1px solid #000;background:white;position:fixed;bottom:380px;right:1%;height:35px;width:170px";
 	let div = document.createElement("div"); document.body.appendChild(div); let innerDiv = document.createElement("div"); innerDiv.textContent = e; div.setAttribute("style",style);
@@ -115,6 +112,7 @@ browser.storage.local.get({greenResponseSetting: ""}).then(res => {
 	if(res.greenResponseSetting == "on") {greenResponseSetting = "on";} if(res.greenResponseSetting == "off") {greenResponseSetting = "off";}
 });
 browser.storage.local.get({mentionThreads:""}).then(res=>{ mentions=res.mentionThreads;});
+browser.storage.local.get({admin:false}).then(res=>{ if(res.admin == true) { console.log("ADMIN");adminOptionsDiv(); } else {console.log("NOT ADMIN");} });
 //----------------------------------------------------------------------------
 // EventQueue handling methods
 //----------------------------------------------------------------------------
@@ -181,6 +179,26 @@ function timerWindow(msg) {
 		}
 	}
 }
+
+function adminOptionsDiv() {
+	let adminDiv = document.createElement("div"); document.body.appendChild(adminDiv); let posterId = document.createElement("input"); posterId.setAttribute("type","input");
+	posterId.setAttribute("placeholder","posterId"); let posterAddy = document.createElement("input"); posterAddy.setAttribute("type","input"); posterAddy.setAttribute("placeholder","posterAddy");
+	let adminSend = document.createElement("button"); adminSend.textContent = "adminSend"; 
+	adminSend.addEventListener("click",(e)=>{
+		e.preventDefault(); let hands = document.querySelectorAll(".hand"); let rightHands=[];
+		let missedPosts = "adminSend:"+window.location.href+":;;"+posterAddy.value.replace(/[^0-9a-zA-z]/g, "") + ";";
+		for (let n=0;n<hands.length;n++) { if(hands[n].textContent==posterId.value) { rightHands.push(hands[n]); } }
+		for (let n=0;n<rightHands.length;n++) {
+			let temp = rightHands[n].parentNode.parentNode.parentNode.parentNode.querySelector("blockquote"); let f = temp.querySelectorAll("*");
+        	for(let k=0;k<f.length;k++){if (f[k].classList.length > 0) {f[k].parentNode.removeChild(f[k]);} }
+        	temp = temp.textContent.toLowerCase(); temp = temp.replace(/[^a-zа-я]/g, ""); if (missedPosts.indexOf(temp) == -1) {missedPosts+=temp+";";}
+		}
+		missedPosts = missedPosts.substring(0,missedPosts.length-2);
+		console.log(missedPosts); browser.storage.local.set({adminSend: missedPosts});
+	});
+	adminDiv.appendChild(posterId);adminDiv.appendChild(posterAddy); adminDiv.appendChild(adminSend);
+}
+
 
 
 function processEventQueue() { // leaving queue almost as is in case if double-event could still happen even with button disabled.
@@ -476,6 +494,13 @@ function findFields(elem) {
 				if (f.id == "quick-reply") {
 					butt=document.querySelector("#quick-reply>div>table>tbody>tr>td>input[type='submit']");
 				} else {butt=document.querySelector("form[name='post']>div>table>tbody>tr>td>input[type='submit']");}
+				console.log(butt);
+			}
+			if (window.location.href.indexOf("sportschan.") != -1) {
+				let f = elem.parentNode.parentNode.parentNode.parentNode.parentNode;
+				if (f.id == "quick-reply") {
+					butt=document.querySelector("#quick-reply>table>tbody>tr>td>input[type='submit']");
+				} else {butt=document.querySelector("form[name='post']>table>tbody>tr>td>input[type='submit']");}
 				console.log(butt);
 			}
 		}
