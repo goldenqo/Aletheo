@@ -9,6 +9,10 @@ d.addEventListener("DOMContentLoaded", function() {
 	d.getElementById("setMastodonLink").addEventListener("click", function(event){event.preventDefault();setMastodonLink();});
 	d.getElementById("editMastodonLink").addEventListener("click", function(event){event.preventDefault();editMastodonLink();});
 	d.getElementById("version").addEventListener("click", function(e){ e.preventDefault(); window.open("https://addons.mozilla.org/en-US/firefox/addon/aletheo-wallet/versions/",'_blank'); });
+//	d.getElementById("setRewardsAddress").addEventListener("click", function(event){event.preventDefault();setRewardsAddress();});
+//	d.getElementById('rewardsAddressInput').addEventListener("change", function(event){rwrdsddrss = event.target.value;});
+//	d.getElementById('rewardsAddressInput').addEventListener("paste", function(event){rwrdsddrss = event.target.value;});
+//	d.getElementById("editRewardsAddress").addEventListener("click", function(event){event.preventDefault();editRewardsAddress();});
 });
 
 function showMnemonic() {
@@ -63,6 +67,24 @@ function importAddress() {
 		}
 	});
 }
+/*
+function setRewardsAddress() {
+	rwrdsddrss = (rwrdsddrss) ? rwrdsddrss : geteid("rewardsAddressInput").value; 
+	if (rwrdsddrss != undefined) {
+		geteid("rewardsAddressDivSet").style.display = "none"; geteid("rewardsAddressDiv").style.display = "inline"; geteid("rewardsAddress").textContent = rwrdsddrss; 
+		rwrdsddrss = rwrdsddrss.replace(/[^0-9a-zA-z]/g, "");
+		browser.storage.local.set({rewardsAddress: rwrdsddrss});
+	}
+}
+
+function editRewardsAddress() {
+	geteid("rewardsAddressDivSet").style.display = "inline"; geteid("rewardsAddressDiv").style.display = "none";
+	browser.storage.local.get({rewardsAddressSet: ""}).then(res => {
+		if (res.rewardsAddressSet != "" && res.rewardsAddressSet != undefined && res.rewardsAddressSet != null) { geteid("rewardsAddressInput").value = res.rewardsAddressSet; }
+	});
+}
+
+
 
 function setMastodonLink() {}
-function editMastodonLink() {}
+function editMastodonLink() {}*/
