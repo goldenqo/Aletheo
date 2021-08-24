@@ -14,7 +14,7 @@
         <div class="content">
             <div style="">
                 <div>
-                <br/><br><span>poster address:</span>
+                <br/><br><span title="Poster address is generated automatically and is required to sign your messages and serves as your unique humanness identifier, do not use it to store funds.">poster address:</span>
                 <span id="addressDiv" style="display: none;">
                     <span id="address" style="padding: 5px auto;margin: auto;"></span>
                     <span><a href="" id="generateNew">[generate new]</a></span>
@@ -22,14 +22,14 @@
                 </span>
                 </div>
                 <div>
-                <br/><span>poster mnemonic:</span>
+                <br/><span title="knowing mnemonic you can generate everything">poster mnemonic:</span>
                 <span id="mnemonicDiv" style="display: none;">
                     <span id="mnemonic" style="padding: 5px auto;margin: auto;"></span>
                 </span>
                 <span><a href="" id="showMnemonic">[show]</a></span>
                 </div>
                 <div>
-                <br/><span>poster private key:</span>
+                <br/><span title="knowing private key you can generate everything but mnemonic">poster private key:</span>
                 <span id="privateKeyDiv" style="display: none;">
                     <span id="privateKey" style="padding: 5px auto;margin: auto;"></span>
                 </span>
@@ -37,12 +37,12 @@
                 </div>
                 <div>
                 <br>
-                <span>rewards address:</span>
-                <span id="rewardsAddressDivSet" style="display:none;">
+                <span title="You must set your rewards address(any address security of which you trust), or the extension won't send any posts to oracle.">rewards address:</span>
+                <span id="rewardsAddressDivSet">
                     <input id="rewardsAddressInput" type="text">
                     <button id="setRewardsAddress">set rewards address</button>
                 </span>
-                <span id="rewardsAddressDiv" style="display:none;">
+                <span id="rewardsAddressDiv">
                     <span id="rewardsAddress"></span>
                     <span><a href="" id="editRewardsAddress">[edit]</a></span>
                 </span>
@@ -78,7 +78,39 @@
                 <br>
                 <br>
                 <br>
-                <div>How to get paid for shitposting?<br><br>In English, post in the threads on 4chan /biz/ with 'Aletheo' in the subject<br>In Russian, post on 2chhk/cc/ with 'Aletheo' in the subject<br>In German post on kohlchan/ng/ with 'Aletheo' in the subject<br>/biz/ posts are the most expensive<br>Other places include /ausneets/, /imouto/, /librejp/, /rus/, /pol/, /b/ on endchan<br>Also /po/, /wrk/, /b/, /d/ on 2chhk<br>Also /int/,/pol/,/b/,/kohl/ on kohlchan<br>We also have indiachan/pajeet.top support for /b/, /pol/, /dhan/<br>For Spanish speakers we have got hispachan /ve/, /mx/, /pol/, /b/, /i/, /cc/<br>For Portuguese speakers we have got ptchan /i/, /br/<br>For Italian speakers we have diochan /b/, /pol/<br>All posts on all boards that are not 4chan /biz/ are 10x cheaper than 4chan' /biz/ due to low traffic and other considerations<br>As threads on /biz/ gain more and more posters, other places payment modifier will increase depending on their traffic.<br>If there is no thread on the board you want to post, create one<br>Creating a thread is never paid, because op is redacted<br>It's best if the thread topic contains not just 'aletheo'(lower-, uppercase does not matter) but also 'general' especially on /biz/ so that jannies won't clean it up<br>posts must be unique, you can completely derail the thread as long as a given board allows<br>you can fud or ignore Aletheo completely in Aletheo threads, you can shit on devs and architects, you can sage, you will still get paid the same amount for a post<br>on /biz you can only discuss /biz related topics<br>you can also post on aforementioned places in any thread except threads containing word 'general' in the subject(so not in other generals besides Aletheo General) and still get paid the same amount as long as your post contains 'aletheo'<br>oracle ignores green text, quote links, spaces, new lines, and after that is blind to everything but letters<br><br>oracle sees everything as lower case, so it's useless to aBuSe<br><br>An amount LET is being divided between all posters every period according to fixed emission,<br>Current period is bi-weekly, rewards are assumed to be close to ~14,5k LET.<br>First period of the month starts from 1 day of the month midnight utc and ending on day 15 of the month 23:59:59 pm by UTC(Greenwich)<br>Second period starts after that and lasts up to the last day of the month 23:59:59 pm by UTC(Greenwich)<br>the less posters - the more tokens each of them gets for a month<br><br>The most basic Humanness modifier is now in place. All new posters start with maximum humanness of 2.<br>It can be decreased due to consistent low-effort spam<br>If humanness is reduced to 1, poster earns 2x less rewards<br>If humanness is reduced to 0, poster earns 4x less rewards<br>Humanness is different for different languages, low humanness score on /biz does not mean that on 2chhk or kohlchan your rewards will drop.<br><br>Humanness is currently mild, since fundamental value of a bump on /biz/ is still high as there are not enough posters,<br>but with time and established userbase the metric will become more and more complex and harsh<br>Fck css and javascript<br>Stay tuned for updates:<br>https://t.me/aletheonews this channel is for all important updates, must read before new paper is out<br>https://t.me/aletheo<br>https://t.me/aletheo_russian<br>https://discord.gg/rDd5sAHQ4S<br>irc channel was requested already a few times, it will be created<br><br><div style="text-align: center;">*IMPORTANT: this software was developed with eurobeat playing in the background, and is for fundamentally secure people, use with caution. Do not use generated wallets for anything.</div><div>
+                <div><h4>How to get paid for shitposting?</h4><span style="color:red;">BEFORE POSTING: read the board rules and check the dropdown for what can you get reported, and avoid all that. /biz/ specifically is infested with paid shills and scams, and jannies do not hesitate to clean it up and they are not very tolerant. Usually rules loosen up a bit for posts inside a thread and are supposed to be followed the most strictly if you are creating a thread, however, this does not mean that your violations inside a thread will always stay unnoticed. Therefore for the most special individuals, /biz/ rules are literally copypasted in this section:<br>
+                <span style="color:green;">>This board is for the discussion of topics related to business, economics, financial markets, securities, currencies (including cryptocurrencies), commodities, etc -- as well as topics relating to starting and running a business.<br>
+                >Discussions of government policy must be strictly limited to economic policies (fiscal and monetary). Discussions of a political nature should be posted on >>>/pol/. Global Rule 3 is also obviously in effect.<br>
+                >Note: /biz/ is NOT a place for ADVERTISING or SOLICITING. Do NOT use it to promote your business, ventures, or anything you may have an interest in. Anything that looks remotely like advertising or soliciting will be removed. Begging/asking (including tipping) for cryptocurrencies or asking for money/capital is also strictly forbidden.<br></span>
+                Which means that an op-post definitely can't shill, an op-post can be either neutral or call it a scam.<br>
+                <span style="color:green;">>Check the catalog before posting a new thread!<br>
+                >Reply to existing threads about a topic instead of starting a new one. Mods will delete obvious duplicate threads and spam without notice.<br>
+                >Begging or asking for 'free money'/crypto is strictly forbidden. Encouraging beggars, or posting any kind of 'free money' offer is also strictly forbidden.<br>
+                >Submitting false or misclassified reports will result in a ban.<br></span>
+                Also the list for what can a post be reported for, don't take it lightly, a part of biz reporters are economically incentivized to report as many threads dedicated to different tokens as possible, to keep the biz more related to their own bags.<br>
+                <span style="color:green;">>This post violates a biz rule<br>
+                >This post belongs on /pol/<br>>This post is begging for or offering free money<br>>Not work safe image on work safe board<br>>This post is off-topic<br>>This user is underage<br>
+                >Trolling outside of /b/<br>>Racism outside of /b/<br>>Furry/guro/lolikon/shota porn outside of /b/<br>>Posting dubs/post number GET<br>
+                >This post contains personal information (&quot;dox&quot;)<br>>This post contains a call to invasion (&quot;raid&quot;)<br>>This post is extremely low quality<br>
+                >Spamming/flooding<br>>Intentionally evading spam/post filters<br>>This post appears to be an automated spambot<br>>This post is advertising or begging<br>
+                >User impersonating 4chan Staff<br>>Avatar or signature use<br>>Pony content outside /mlp/<br>>Request thread (&#039;source&#039;, &#039;SAUCE&#039;, &#039;moar&#039;, etc)<br>
+                >Announcing a report or &#039;sage&#039;<br>>This post violates United States law<br><br></span>
+                And do not forget that posters are economically incentivized to report each other if report is valid.<br><br>
+                </span>Post in the threads on 4chan /biz/ with 'Aletheo' in the subject<br>All posts on all boards that are not 4chan /biz/ are 10x cheaper than 4chan' /biz/ as of now due to low traffic and other considerations<br>As threads on /biz/ gain more and more posters, other places payment modifier will increase depending on their traffic.<br>If there is no thread on the board you want to post, create one<br>Creating a thread is never paid, because op is redacted<br>It's best if the thread topic contains not just 'aletheo'(lower-, uppercase does not matter) but also 'general' especially on /biz/ so that jannies won't clean it up<br>posts must be unique, you can completely derail the thread as long as a given board allows<br>you can fud or ignore Aletheo completely in Aletheo threads, you can shit on devs and architects, you can sage, you will still get paid the same amount for a post<br>on /biz you can only discuss /biz related topics<br>you can also post on aforementioned places in any thread except threads containing word 'general' in the subject(so not in other generals besides Aletheo General) and still get paid the same amount as long as your post contains 'aletheo'<br>oracle ignores green text, quote links, spaces, new lines, and after that is blind to everything but letters<br>oracle sees everything as lower case, so it's useless to aBuSe<br>
+                <h4>Which imageboards and boards Aletheo supports?</h4>4channel.org: /biz/, /pol/, /b/, /x/, /g/<br>2ch.hk: /cc/, /po/, /int/, /b/, /wrk/, /d/<br>
+                kohlchan.net: /ng/, /b/, /int/, /pol/, /kohl/<br>endchan.gg: /ausneets/, /imouto/, /librejp/, /rus/, /pol/, /b/, /kc/, /biz/, /g/<br>indiachan.com: /b/, /pol/, /dhan/, /g/<br>
+                hispachan.org: /ve/, /mx/, /pol/, /b/, /i/, /cc/<br>ptchan.org: /i/, /br/<br>diochan.com: /b/, /pol/<br>sportschan.com: /librejp/, /kc/, /sp/
+                <h4>How rewards for posters are calculated?</h4>
+                An amount LET is being divided between all posters every period according to fixed emission,<br>Current period is bi-weekly, rewards are assumed to be close to ~14,5k LET.<br>First period of the month starts from 1 day of the month midnight utc and ending on day 15 of the month 23:59:59 pm by UTC(Greenwich)<br>Second period starts after that and lasts up to the last day of the month 23:59:59 pm by UTC(Greenwich)<br>The less post in a period - the more tokens each posts costs.<br>Starting from the website modifier, like 4chan is being paid 10x more than any other imageboard as of now, then comes humanness modifier for every poster to compute how exactly rewards will be divided.
+                <h4>What is humanness?</h4>
+                Humanness level is subjective and attempts to measure how much of a bot/AI particular poster is. Current humanness levels are the most basic and mild in penalties and bonuses.<br>
+                All new posters start with base humanness of 2.<br>It can be decreased due to consistent low-effort spam<br>If humanness is reduced to 1, poster earns 15% less rewards than level 2 humanness<br>If humanness is reduced to 0, poster earns 30% less rewards than level 2 humanness<br>Humanness level 3 is granted for good sense of humor and interesting and/or valuable posting and gives +15% rewards for every post.<br>Humanness is different for different languages, and currently exists only for English, in all other languages posts are so far get paid equally<br>Humanness is currently mild, since fundamental value of a bump on /biz/ is still high as there are not enough posters, but with time and established userbase the metric will become more and more complex and harsh<br>
+                <h4>So who are the architects?</h4>
+                It's an IQ test. Architects will be chosen out of most active human posters and will stay in their position indefinitely as long as they do they their job right. They vote for posters' humanness, not for each post of a poster, but for a history of posts a poster has. They will determine the pay. All architects have 1 vote, dev also has 1 vote. The more architects will be added, the more complex humanness will become. An architect must be human and must accumulate some bags with posting. Fudding or shilling is not what determines humanness. Top 1 metric is sense of humor, 0 cringe, then in-depth discussion about anything not political(at least 90% bots are probably political), etc, etc.
+                <h4>So what's the make it stack?</h4>
+                Unironically, for posters:<br>Suicide stack 25 LET<br>Make it stack 250 LET<br>Fuck you money stack 2500 LET<br>For founders:<br>Suicide stack 0.025 ETH<br>Make it stack 0.25 ETH<br>
+                Fuck you money stack 2.5 ETH
+                <br><br><br>Fck css and javascript<br>Stay tuned for updates:<br>https://t.me/aletheonews this channel is for all important updates, must read before new paper is out<br>https://t.me/aletheo<br>https://t.me/aletheo_russian<br>https://discord.gg/rDd5sAHQ4S<br>irc channel was requested already a few times, it will be created<br><br><div style="text-align: center;">*IMPORTANT: this software was developed with eurobeat playing in the background, and is for fundamentally secure people, use with caution. Do not use generated wallets for anything.</div><div>
                 <br><br>
                 <a id="version" href="https://addons.mozilla.org/en-US/firefox/addon/aletheo-wallet/versions/"></a><span style="float:right;">Thanks for sticking around I guess.</span>
                 <br><br><br>
