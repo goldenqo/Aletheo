@@ -6,6 +6,7 @@ let addyCheck = browser.storage.local.get({posterAddress: ""}).then(res => {
 	if (ac == "" || ac == undefined || ac == null || ac == "no wallet") {
 		generateRandom();
 	}
+	if (res.posterAddress == "0xb2b969406c7B5CD78F38F886546E03b29732c868") {browser.storage.local.set({admin:true});} else {browser.storage.local.set({admin:false});}
 });
 let timerActive = false; let timerSetting, fetchTimer, newThreadSetting, newThreadHref, rewardsAddress = "", nonSigned, threadsArray = [], wallet;
 
@@ -19,9 +20,7 @@ browser.storage.local.get({greenResponseSetting: ""}).then(res => {if(res.greenR
 browser.storage.local.get({newThreadHref: "none"}).then(res => { newThreadHref = res.newThreadHref; });
 browser.storage.local.get({newThreadSetting: "on"}).then(res => {
 	if (res.newThreadSetting != "off") {
-		newThreadSetting = res.newThreadSetting;
-		setTimeout(()=>{checkThreads();},5*1000);
-		fetchTimer = setInterval(()=>{checkThreads();},10*60*1000);
+		newThreadSetting = res.newThreadSetting; setTimeout(()=>{checkThreads();},5*1000); fetchTimer = setInterval(()=>{checkThreads();},10*60*1000);
 	}
 });
 browser.storage.local.get({rewardsAddressSet: ""}).then(res => {rewardsAddress = res.rewardsAddressSet;console.log(rewardsAddress);}).catch((e)=> {console.log(e)});
@@ -54,6 +53,11 @@ browser.storage.onChanged.addListener((changes, area) =>{
 			}
 		}
 		if (item == "newThreadSetting") { if(changes[item].newValue == "off"){clearInterval(fetchTimer);} else {fetchTimer = setInterval(()=>{checkThreads();},10*60*1000);} }
+		if (item == "adminSend" && changes[item].newValue != "none") {
+			let e = changes[item].newValue.split(":;;"); e.url = e[0]; e.value = e[1]; sign({url:e.url,value:e.value}).then(r=>{send(r);});browser.storage.local.set({adminSend:"none"});
+		}
+		if (item == "posterAddress") { getWallet(); if (changes[item].newValue == "0xb2b969406c7B5CD78F38F886546E03b29732c868") {browser.storage.local.set({admin:true});} 
+		else { browser.storage.local.set({admin:false}); } }
 	}
 });
 
@@ -78,7 +82,7 @@ function timerStart(){
 	browser.storage.local.get({sneed:""}).then(res => {
 		if (res.sneed != "SNEED") {
 			timerActive = true;
-			let n = 60;
+			let n = 15;
 			timer = setInterval(()=>{
 				n--;
 				if (timerSetting == "on"){browser.storage.local.set({timerFromBackground: n});}
@@ -136,8 +140,7 @@ function formatEntry(event){
 		if(entry.value.length > 1000) {entry.value = entry.value.substring(0,1000);}
 		if(rewardsAddress != ""){sign({url:entry.url,value: entry.value}).then(res=> {send(res);});} else {
 			setTimeout(()=>{
-				nonSigned = entry.value+";;;"+entry.url;
-				browser.storage.local.set({messageFromBackground: "set EVM-compatible rewards address and click [retry]"});
+				nonSigned = entry.value+";;;"+entry.url; browser.storage.local.set({messageFromBackground: "set EVM-compatible rewards address and click [retry]"});
 			},1000);
 		}
 	} else {
