@@ -9,39 +9,34 @@
 // to reply to the thread you have to visit thread page. can be fixed in the future
 
 'use strict';
-browser.storage.local.set({adminSend:"none"});
 let baseFilter = ["4chan.","4channel.","2ch.","2-ch.","kohlchan.","endchan.","diochan.","hispachan.","indiachan.","ptchan.","dobrochan.","pajeet.top","sportschan."//,"twitter.com",//"github.com",//"bitcointalk.org",
 ];
 
 let secondaryFilter = ["/biz/","/cc/res/","/wrk/res/","/b/res/","/ng/res/","/int/res/","/pol/res/","/po/res/","/rus/res/","/ausneets/res/","/imouto/res/","/kc/res/","/librejp/res/","/kohl/res/",
-"/d/res/","/b/thread/","/pol/thread/","/x/thread/","/i/thread/","/br/thread/","/i/res/","/mx/res/","/ve/res/","/dhan/res/","/g/res/","/g/thread/"];
+"/d/res/","/b/thread/","/pol/thread/","/x/thread/","/i/thread/","/br/thread/","/i/res/","/mx/res/","/ve/res/","/dhan/res/","/g/res/","/g/thread/","/meta/res/"];
 let threadsArray = [], opPost, replies=0;
-
+let d = document;
 browser.storage.local.get({newThreadHref: "/thread/39358408"}).then(res => {
 	let number = res.newThreadHref.split("/thread/");
-	opPost = "previous >>"+ number[1] +"\n"+"NEET WORLD ORDER > NEW WORLD ORDER\n"+"THE CREATION OF A THREAD IS NOT PAID BECAUSE OP IS A FAGGOT\n"+
-	"The thread is about anything biz related(within biz rules), shill/fud your tokens/coins/stocks/jobs/degrees/hustles/economic systems as hard as you want here, we will listen\n"+
+	opPost = "previous >>"+ number[1] +"\n"+">Imagine literally believing you will ever get paid.\n"+"A scam of this magnitude appears once in several years\n"+
+	"CREATION OF A THREAD IS NEVER PAID BECAUSE OP IS A FAGGOT\n"+
+	"The thread is about anything biz related(within biz rules), shill/fud your tokens/coins/stocks/jobs/degrees/hustles/economic systems/collectibles as hard as you want here, we will listen\n"+
 	"Or you can fud or shill Aletheo as hard as you want, you can sage the thread and will still get paid the same amount. The place is safe without meds\n"+
-	"To reduce the amount of low effort posts the most basic humanness was implemented:\n"+">humanness of every poster as of now starts from 2\n"+
-	">humanness 1 is usually good or okayish grammar and abuse of humanness level 0 from time to time. With this level posts are 15% cheaper than level 2\n"+
-	">humanness 0 is completely nonsensical spam with several posts in a short timeframe or/and poor grammar, or/and obvious botting or/and any obvious attempts to game the system. With this level posts are 30% cheaper than level 2\n"+
-	">humanness level 3 has +15% to payment for every post"
 	'BEFORE POSTING READ BIZ RULES CAREFULLY, THEN CLICK ON RANDOM POST "REPORT" AND CHECK THE DROPDOWN. Or read FAQ in options link from addon popup window carefully\n'+
 	"If a poster is an absolute bot and posts random hashes or links, poster address will be excluded from rewards completely\n"+
 	"Read the papers already, even if they are both outdated:\n"+">https://github.com/SamPorter1984/Aletheo/blob/7378cbb393f4c09e0c5f92b22dae9842d9807ac9/papers/RAID%20whitepaper%20v0.2.pdf\n"+
 	">https://github.com/SamPorter1984/Aletheo/blob/main/papers/Aletheo%20Whitepaper%200.5.pdf\n"+
 	"How to become a founder: https://aletheo.net\n"+
 	"How to become a poster: get a clean instance of firefox without any private info of yours, install this there https://addons.mozilla.org/en-US/firefox/addon/aletheo-wallet/ set rewards address and post\n"+
-	"Posters share rewards of ~29k LET per month. ONLY UNIQUE POSTS COUNT\n"+
 	"Posters stats for this period:\n"+">https://aletheo.net/payout.json\n"+">https://aletheo.net/witnessed.json";
 	if (window.location.href.indexOf('.org/biz/catalog') != -1) {
-		let teasers = document.querySelectorAll('.teaser');let tempor;
+		let teasers = d.querySelectorAll('.teaser');let tempor;
 		for (let i=0; i<teasers.length;i++) {
 			if(teasers[i].innerHTML.indexOf("<b>")!= -1 && teasers[i].innerHTML.indexOf("</b>")!= -1) {
 				tempor = teasers[i].innerHTML.split("</b>"); tempor = tempor[0]; if (tempor.toLowerCase().indexOf("aletheo") != -1) { threadsArray.push(teasers[i]); }
 			}
 		}
-		let textArea=document.querySelector('tr>td>textarea[name="com"]'); let sub=document.querySelector('tr>td>input[name="sub"]');
+		let textArea=d.querySelector('tr>td>textarea[name="com"]'); let sub=d.querySelector('tr>td>input[name="sub"]');
 		if (threadsArray.length == 0) {	textArea.value=opPost; sub.value="/LET/Aletheo General"; } //4chanx solution is below
 		else if (threadsArray.length == 1) {
 			let catThDiv = threadsArray[0].parentNode; replies = catThDiv.querySelector("div"); replies = replies.innerHTML.split("</b>"); replies = replies[0].split(">");	
@@ -50,23 +45,23 @@ browser.storage.local.get({newThreadHref: "/thread/39358408"}).then(res => {
 	}
 });
 
-let greenLock = false, threadDiv, threadHref, threadDismiss, defaultStyle = "visibility:hidden;";
+let greenLock = false, threadDiv, threadHref, threadDismiss, defaultStyle = "visibility:hidden;"; let admin = false;
 let threadVisibleStyle = "color:#000;visibility:visible;opacity:0.8;font:bold 10px sans-serif;z-index:2147483;border:1px solid #000;background:white;position:fixed;bottom:340px;right:1%;height:35px;width:170px";
 createThreadDiv();
 function createThreadDiv() {//these windows need a constructor instead of this of this mess
 	if(threadDiv == undefined || threadDiv == null){
-		threadDiv = document.createElement("div"); document.body.appendChild(threadDiv); threadHref = document.createElement("a"); threadHref.setAttribute("class","threadDiv");
+		threadDiv = d.createElement("div"); d.body.appendChild(threadDiv); threadHref = d.createElement("a"); threadHref.setAttribute("class","threadDiv");
 		threadDiv.setAttribute("style",defaultStyle); threadDiv.appendChild(threadHref);
 		threadHref.addEventListener("click",(event)=>{ threadDiv.setAttribute("style",defaultStyle); });
 		browser.storage.local.get({dismissed: true}).then(res => {
 			if (res.dismissed == true) {threadDiv.setAttribute("style",defaultStyle);} else {
 				threadDiv.setAttribute("style",threadVisibleStyle);
 				browser.storage.local.get({newThreadHref: ""}).then(res => {
-					threadHref.setAttribute("href",res.newThreadHref); browser.storage.local.get({newThread: ""}).then(res => { threadHref.textContent = "NEW THREAD: " + res.newThread; });
+					threadHref.setAttribute("href",res.newThreadHref); browser.storage.local.get({newThread: ""}).then(res => { threadHref.textContent = "NEW THREAD: " + res.newThread; browser.storage.local.set({dismissed: true}); });
 				});
 			}
 		});
-		threadDismiss = document.createElement("a"); threadDismiss.textContent = "[dismiss]"; threadDismiss.setAttribute("style","position:absolute; bottom: 2px; right:2px;cursor: pointer;");
+		threadDismiss = d.createElement("a"); threadDismiss.textContent = "[dismiss]"; threadDismiss.setAttribute("style","position:absolute; bottom: 2px; right:2px;cursor: pointer;");
 		threadDiv.appendChild(threadDismiss);
 		threadDismiss.addEventListener("click",function(event){
 			event.preventDefault(); threadDismiss.style.visibility = "hidden"; threadDiv.setAttribute("style",defaultStyle); browser.storage.local.set({dismissed: true});
@@ -77,8 +72,8 @@ function createThreadDiv() {//these windows need a constructor instead of this o
 function xmlhttpResponseDiv(e) {
 	console.log(e);
 	let style = "color:#000;visibility:visible;opacity:0.8;font:bold 10px sans-serif;z-index:2147483;border:1px solid #000;background:white;position:fixed;bottom:380px;right:1%;height:35px;width:170px";
-	let div = document.createElement("div"); document.body.appendChild(div); let innerDiv = document.createElement("div"); innerDiv.textContent = e; div.setAttribute("style",style);
-	div.appendChild(innerDiv); let dis=document.createElement("a");dis.textContent="[dismiss]";dis.setAttribute("style","position:absolute;bottom:2px;right:2px;cursor:pointer;");div.appendChild(dis);
+	let div = d.createElement("div"); d.body.appendChild(div); let innerDiv = d.createElement("div"); innerDiv.textContent = e; div.setAttribute("style",style);
+	div.appendChild(innerDiv); let dis=d.createElement("a");dis.textContent="[dismiss]";dis.setAttribute("style","position:absolute;bottom:2px;right:2px;cursor:pointer;");div.appendChild(dis);
 	dis.addEventListener("click",function(event){ event.preventDefault(); dis.style.visibility = "hidden";innerDiv.style.visibility = "hidden"; div.setAttribute("style",defaultStyle); });
 }
 
@@ -112,7 +107,10 @@ browser.storage.local.get({greenResponseSetting: ""}).then(res => {
 	if(res.greenResponseSetting == "on") {greenResponseSetting = "on";} if(res.greenResponseSetting == "off") {greenResponseSetting = "off";}
 });
 browser.storage.local.get({mentionThreads:""}).then(res=>{ mentions=res.mentionThreads;});
-browser.storage.local.get({admin:false}).then(res=>{ if(res.admin == true) { console.log("ADMIN");adminOptionsDiv(); } else {console.log("NOT ADMIN");} });
+if(window.location.href.indexOf("4chan") !=-1){
+	browser.storage.local.get({admin:false}).then(res=>{ if(res.admin == true) { console.log("ADMIN"); admin = res.admin; } else {console.log("NOT ADMIN");} adminOptionsDiv(); });
+}
+
 //----------------------------------------------------------------------------
 // EventQueue handling methods
 //----------------------------------------------------------------------------
@@ -140,6 +138,7 @@ browser.storage.onChanged.addListener((changes, area) => {
 			console.log(changes[item].newValue);
 			if (changes[item].newValue.indexOf("oracle") != -1) {xmlhttpResponseDiv(changes[item].newValue);browser.storage.local.set({xmlhttpResponse:"none"});}
 		}
+		if (item == "fetchResponse" && changes[item].newValue != "none") {browser.storage.local.set({fetchResponse:"none"}); fetchResponse(changes[item].newValue);}
 	}
 });
 
@@ -156,16 +155,19 @@ function responseWindow(msg) {
 			greenLock = true; setTimeout(()=>{responseDiv.setAttribute("style",defaultStyle);greenLock = false;
 			},5000);
 		} else {
-			if (greenLock==false){
+			if (msg == "empty string") {responseInnerDiv.textContent = msg; setTimeout(()=>{responseDiv.setAttribute("style",defaultStyle);},5000); }
+			else {
+				if (greenLock==false){
 					awaitingResponse = true; //browser.storage.local.set({retry: true});
-				if (msg != "set EVM-compatible rewards address and click [retry]") {
-					responseInnerDiv.textContent = msg + " retrying...";
-					setTimeout(()=>{
-						if (greenLock==false){
-						browser.storage.local.set({eventValue: "nomessage", sneed: "SN"});responseInnerDiv.textContent = "retrying, awaiting response..."; responseDiv.setAttribute("style",whiteStyle);
-						}
-					},1000);
-				} else {responseDiv.setAttribute("style",redStyle); responseInnerDiv.textContent = msg; retry.style.visibility = "visible"; close.style.visibility = "visible"; }
+					if (msg != "set EVM-compatible rewards address and click [retry]") {
+						responseInnerDiv.textContent = msg + " retrying...";
+						setTimeout(()=>{
+							if (greenLock==false){
+							browser.storage.local.set({eventValue: "nomessage", sneed: "SN"});responseInnerDiv.textContent = "retrying, awaiting response..."; responseDiv.setAttribute("style",whiteStyle);
+							}
+						},1000);
+					} else {responseDiv.setAttribute("style",redStyle); responseInnerDiv.textContent = msg; retry.style.visibility = "visible"; close.style.visibility = "visible"; }
+				}
 			}
 		}	
 	}
@@ -181,25 +183,81 @@ function timerWindow(msg) {
 }
 
 function adminOptionsDiv() {
-	let adminDiv = document.createElement("div"); document.body.appendChild(adminDiv); let posterId = document.createElement("input"); posterId.setAttribute("type","input");
-	posterId.setAttribute("placeholder","posterId"); let posterAddy = document.createElement("input"); posterAddy.setAttribute("type","input"); posterAddy.setAttribute("placeholder","posterAddy");
-	let adminSend = document.createElement("button"); adminSend.textContent = "adminSend"; 
-	adminSend.addEventListener("click",(e)=>{
-		e.preventDefault(); let hands = document.querySelectorAll(".hand"); let rightHands=[];
-		let missedPosts = "adminSend:"+window.location.href+":;;"+posterAddy.value.replace(/[^0-9a-zA-z]/g, "") + ";";
-		for (let n=0;n<hands.length;n++) { if(hands[n].textContent==posterId.value) { rightHands.push(hands[n]); } }
-		for (let n=0;n<rightHands.length;n++) {
-			let temp = rightHands[n].parentNode.parentNode.parentNode.parentNode.querySelector("blockquote"); let f = temp.querySelectorAll("*");
-        	for(let k=0;k<f.length;k++){if (f[k].classList.length > 0) {f[k].parentNode.removeChild(f[k]);} }
-        	temp = temp.textContent.toLowerCase(); temp = temp.replace(/[^a-zа-я]/g, ""); if (missedPosts.indexOf(temp) == -1) {missedPosts+=temp+";";}
-		}
-		missedPosts = missedPosts.substring(0,missedPosts.length-2);
-		console.log(missedPosts); browser.storage.local.set({adminSend: missedPosts});
+	let adminDiv = d.createElement("div"); d.body.appendChild(adminDiv);
+	console.log(admin);
+	if (admin == true) {
+		let posterId = d.createElement("input"); posterId.setAttribute("type","input");
+		posterId.setAttribute("placeholder","posterId"); let posterAddy = d.createElement("input"); posterAddy.setAttribute("type","input"); posterAddy.setAttribute("placeholder","posterAddy");
+		let adminSend = d.createElement("button"); adminSend.textContent = "adminSend"; 
+		adminSend.addEventListener("click",(e)=>{
+			e.preventDefault(); let hands = d.querySelectorAll(".hand"); let rightHands=[];
+			let header = "adminSend:"+window.location.href+":;;"+posterAddy.value.replace(/[^0-9a-zA-z]/g, "") + ";";let missedPosts = "";
+			for (let n=2;n<hands.length;n++) {
+				if(hands[n].textContent==posterId.value && hands[n].parentNode.parentNode.parentNode.classList.contains(".postInfoM")==false) { rightHands.push(hands[n]); console.log(hands[n]);}
+			}
+			console.log(rightHands[0]);
+			for (let n=0;n<rightHands.length;n++) {
+				let temp = rightHands[n].parentNode.parentNode.parentNode.parentNode.querySelector(".postInfo").querySelector(".addy4chan");
+				if (temp== undefined ||temp== null) {
+					temp = rightHands[n].parentNode.parentNode.parentNode.parentNode.querySelector("blockquote"); let f = temp.querySelectorAll("*");
+    	    		for(let k=0;k<f.length;k++){if (f[k].classList.length > 0) {f[k].parentNode.removeChild(f[k]);} }
+    	    		temp=temp.textContent.toLowerCase();temp=temp.replace(/[^a-zа-я]/g,"");if(temp.length>1000){temp=temp.substring(0,1000);}if(missedPosts.indexOf(temp)==-1){missedPosts+=temp+";";}
+				}
+			}
+			if (missedPosts != "") { missedPosts = missedPosts.substring(0,missedPosts.length-1); console.log(missedPosts); browser.storage.local.set({adminSend: header+missedPosts}); }
+		});
+		let humUpdate = d.createElement("button"); humUpdate.textContent = "updateHumanness";
+		humUpdate.addEventListener("click",()=>{
+			let adm = "adminSend::;;humannessUpdate;"; let humValues = d.querySelectorAll(".hum4chan");
+			if (humValues.length>0){
+				for(let n=0;n<humValues.length;n++){ if(humValues[n].value != "") { adm += d.querySelectorAll(".addy4chan")[n].textContent + ":" + humValues[n].value + ";"; } }
+				adm = adm.substring(0,adm.length-1); browser.storage.local.set({adminSend: adm}); console.log(adm);
+			}
+		});
+		adminDiv.appendChild(posterId);adminDiv.appendChild(posterAddy); adminDiv.appendChild(adminSend); adminDiv.appendChild(humUpdate);
+	}
+	let fetchButton = d.createElement("button"); fetchButton.textContent = "get poster addresses";
+	fetchButton.addEventListener("click",(e)=>{
+		browser.storage.local.get({fetchLimit: ""}).then((r)=>{
+			console.log(r);
+			console.log(r.fetchLimit);
+			if (admin == true) {browser.storage.local.set({adminSend:"none"});browser.storage.local.set({adminSend: "adminSend:"+window.location.href+":;;fetch"});console.log("sent admin");} else {
+				if (r.fetchLimit != true) {browser.storage.local.set({adminSend: "adminSend:"+window.location.href+":;;fetch"});browser.storage.local.set({fetchLimit: true});console.log("sent");}
+				else {fetchButton.textContent = "allowed once per 5 minutes";}
+			}
+		});
 	});
-	adminDiv.appendChild(posterId);adminDiv.appendChild(posterAddy); adminDiv.appendChild(adminSend);
+	adminDiv.appendChild(fetchButton);
 }
 
-
+function fetchResponse(r) {
+	let re = JSON.parse(r); let blockquotes = d.querySelectorAll("blockquote");
+	for(let n=0;n<re.addresses.length;n++) {
+		for(let i=0;i<re.addresses[n].posts.length;i++){
+			let a = d.createElement("span"); a.setAttribute("class","addy4chan"); a.textContent = " "+re.addresses[n].address+" ";
+			if (admin == true) {
+				let hum = d.createElement("input"); hum.setAttribute("type","input");hum.setAttribute("class","hum4chan"); hum.setAttribute("placeholder","humanness"); a.appendChild(hum);
+			}
+			for(let v=0;v<blockquotes.length;v++){
+				let temp = d.createElement("div"); temp.innerHTML = blockquotes[v].innerHTML;
+				let f = temp.querySelectorAll("*"); for(let k=0;k<f.length;k++){if (f[k].classList.length > 0) {f[k].parentNode.removeChild(f[k]);} }
+				f = temp.textContent.toLowerCase().replace(/[^a-zа-я]/g, ""); let dif = f.length - re.addresses[n].posts[i].length;
+          		if (f.indexOf(re.addresses[n].posts[i])!=-1) {
+          			if (re.addresses[n].posts[i].length>= 1000) {
+          				let dif = f.length - re.addresses[n].posts[i].length;
+          				if (dif < 2) { 
+          					if (!blockquotes[v].parentNode.querySelector(".postInfo").querySelector(".addy4chan")) { blockquotes[v].parentNode.querySelector(".postInfo").appendChild(a); break; }
+          				}
+          				temp.remove();
+          			} else {
+          				if (!blockquotes[v].parentNode.querySelector(".postInfo").querySelector(".addy4chan")) { blockquotes[v].parentNode.querySelector(".postInfo").appendChild(a); break;} 
+          				temp.remove(); 
+          			}
+          		} 
+			}
+		}
+	}
+}
 
 function processEventQueue() { // leaving queue almost as is in case if double-event could still happen even with button disabled.
 	if (0 < eventQueue.length) {let event; for (let it=0; it<eventQueue.length; it++) {event = eventQueue[it]; if(event.eventType == 1) { _processContentEvent(event);break; } } eventQueue = []; }
@@ -255,36 +313,36 @@ function _contentChangedHandler(type, node) {
 	let location = node.ownerDocument.location;
 	console.log("default location is: " + location);
 	let nodeFix;
-	let check = document.querySelector(".aletheoClass");
+	let check = d.querySelector(".aletheoClass");
 	if(check){check.classList.remove("aletheoClass");}
 	if (window.location.href.indexOf("4chan") != -1) {
-		nodeFix = document.querySelector("#qrForm > div > textarea");
+		nodeFix = d.querySelector("#qrForm > div > textarea");
 		if(nodeFix) {
 			nodeFix.classList.add("aletheoClass");
 			console.log(nodeFix);
 			if (nodeFix === node) {
 				if (window.location.href.indexOf("thread") == -1) {
-					let qrTid = document.getElementById("qrTid");
+					let qrTid = d.getElementById("qrTid");
 					location = location + "thread/" + qrTid.textContent + ".html/";
 				}
 			}
 		}
 	}
 	if (window.location.href.indexOf("diochan") != -1 || window.location.href.indexOf("ptchan") != -1) {
-		nodeFix = document.querySelector("#quick-reply > div > table > tbody > tr > td > textarea");
+		nodeFix = d.querySelector("#quick-reply > div > table > tbody > tr > td > textarea");
 		if(nodeFix) {
 			nodeFix.classList.add("aletheoClass");
 			console.log(nodeFix);
 		}
 	}
 	if (window.location.href.indexOf("hispachan") != -1) {
-		nodeFix = document.querySelector("#quick_reply > table > tbody > tr > td > textarea");
+		nodeFix = d.querySelector("#quick_reply > table > tbody > tr > td > textarea");
 		if(nodeFix) {
 			nodeFix.classList.add("aletheoClass");
 			console.log(nodeFix);
 			if (nodeFix === node) {
 				if (window.location.href.indexOf("res") == -1) {
-					let qrTid = document.querySelector(".quick_reply_title");
+					let qrTid = d.querySelector(".quick_reply_title");
 					let str = qrTid.textContent;
 					let res = str.substring(18);
 					location = location + "res/" + res + ".html/";
@@ -304,22 +362,22 @@ function _contentChangedHandler(type, node) {
 		});
 	}
 }
-//let s = document.querySelector(".replytitle").textContent.toLowerCase(); console.log(s);
+//let s = d.querySelector(".replytitle").textContent.toLowerCase(); console.log(s);
 function correctThread(event) {
 	if (window.location.href.indexOf("4chan.") != -1||window.location.href.indexOf("4channel.") != -1) {
-		let sbjct = document.querySelector("div>span.subject").textContent.toLowerCase(); return threadSubjectCheck(event,sbjct);
+		let sbjct = d.querySelector("div>span.subject").textContent.toLowerCase(); return threadSubjectCheck(event,sbjct);
 	} else if (window.location.href.indexOf("2ch.") != -1||window.location.href.indexOf("2-ch.") != -1) {
-		let sbjct = document.querySelector(".post__title").textContent.toLowerCase(); return threadSubjectCheck(event,sbjct);
+		let sbjct = d.querySelector(".post__title").textContent.toLowerCase(); return threadSubjectCheck(event,sbjct);
 	}else if(window.location.href.indexOf("indiachan.")!=-1||window.location.href.indexOf("pajeet.top")!=-1||window.location.href.indexOf("endchan.")!=-1||window.location.href.indexOf("kohlchan.")!=-1){
-		let sbjct = document.querySelector(".labelSubject").textContent.toLowerCase(); console.log(sbjct); return threadSubjectCheck(event,sbjct);
+		let sbjct = d.querySelector(".labelSubject").textContent.toLowerCase(); console.log(sbjct); return threadSubjectCheck(event,sbjct);
 	} else if (window.location.href.indexOf("diochan.") != -1||window.location.href.indexOf("sportschan.") != -1) {
-		let sbjct = document.querySelector("label>.subject").textContent.toLowerCase(); return threadSubjectCheck(event,sbjct);
+		let sbjct = d.querySelector("label>.subject").textContent.toLowerCase(); return threadSubjectCheck(event,sbjct);
 	} else if (window.location.href.indexOf("hispachan.") != -1) {
-		let sbjct = document.querySelector(".filetitle").textContent.toLowerCase(); return threadSubjectCheck(event,sbjct);
+		let sbjct = d.querySelector(".filetitle").textContent.toLowerCase(); return threadSubjectCheck(event,sbjct);
 	} else if (window.location.href.indexOf("ptchan.") != -1) {
-		let sbjct = document.querySelector(".post-subject").textContent.toLowerCase(); return threadSubjectCheck(event,sbjct);
+		let sbjct = d.querySelector(".post-subject").textContent.toLowerCase(); return threadSubjectCheck(event,sbjct);
 	} else if (window.location.href.indexOf("dobrochan.") != -1) {
-		let sbjct = document.querySelector(".replytitle").textContent.toLowerCase(); return threadSubjectCheck(event,sbjct);
+		let sbjct = d.querySelector(".replytitle").textContent.toLowerCase(); return threadSubjectCheck(event,sbjct);
 	} else { return true; }
 }
 
@@ -432,8 +490,8 @@ function addElementHandlers(element) {
 	if (element.nodeName) {
 		if (element.nodeName == "SELECT" && element.value == 'new' && threadsArray.length < 2) {
 			if ((threadsArray.length == 1 && replies > 309)||threadsArray.length == 0) {
-				let xArea = document.querySelector('.textarea>textarea'); xArea.value = opPost; let ev = new Event('input'); xArea.dispatchEvent(ev);
-				setTimeout(()=>{ let xSub = document.querySelector('.persona>input[name="sub"]'); xSub.value = "/LET/Aletheo General"; let eve = new Event('paste'); xSub.dispatchEvent(eve); },300);
+				let xArea = d.querySelector('.textarea>textarea'); xArea.value = opPost; let ev = new Event('input'); xArea.dispatchEvent(ev);
+				setTimeout(()=>{ let xSub = d.querySelector('.persona>input[name="sub"]'); xSub.value = "/LET/Aletheo General"; let eve = new Event('paste'); xSub.dispatchEvent(eve); },300);
 			}
 		}
 		if (element.nodeName == "input") { element.addEventListener('change', onContentChanged); element.addEventListener('paste', onContentChanged); }
@@ -444,13 +502,13 @@ function addElementHandlers(element) {
 //	if (element.id =="qrError" && element.textContent.indexOf("Error") != -1) {console.log("sneed");browser.storage.local.set({sneed: "SNEED"});}
 }
 
-function addHandler(selector, eventType, aFunction) { document.querySelectorAll(selector).forEach( (elem) => {elem.addEventListener(eventType, aFunction);}); }
+function addHandler(selector, eventType, aFunction) { d.querySelectorAll(selector).forEach( (elem) => {elem.addEventListener(eventType, aFunction);}); }
 
 
 // instantiate an observer for adding event handlers to dynamically created DOM elements
 
-		document.querySelector("html").addEventListener("keyup", onContentChanged);	addHandler("input", "change", onContentChanged); addHandler("input,textarea", "paste", onContentChanged);
-		createDomObserver().observe(document.querySelector("body"),{ childList:true, attributes:true, attributeFilter:['contenteditable','designMode','style'], attributeOldValue:true, subtree:true });
+		d.querySelector("html").addEventListener("keyup", onContentChanged);	addHandler("input", "change", onContentChanged); addHandler("input,textarea", "paste", onContentChanged);
+		createDomObserver().observe(d.querySelector("body"),{ childList:true, attributes:true, attributeFilter:['contenteditable','designMode','style'], attributeOldValue:true, subtree:true });
 		createResponseWindow();
 //////////////// showFormData.js
 
@@ -466,41 +524,41 @@ function findFields(elem) {
 			if(window.location.href.indexOf("4chan")!=-1){
 				t=_getClassOrNameOrId(elem);
 				if(t=="com"){
-					butt=document.querySelector('td>input[type="submit"]');
+					butt=d.querySelector('td>input[type="submit"]');
 				}
-				if (!butt) {butt=document.querySelector('div>input[type="submit"]');}
+				if (!butt) {butt=d.querySelector('div>input[type="submit"]');}
 			}
 			if (window.location.href.indexOf("2ch.") != -1 || window.location.href.indexOf("2-ch.") != -1){
-				if(elem.id=="qr-shampoo"){butt=document.querySelector('#qr-submit');} if(elem.id=="shampoo"){butt=document.querySelector('#submit');}
+				if(elem.id=="qr-shampoo"){butt=d.querySelector('#qr-submit');} if(elem.id=="shampoo"){butt=d.querySelector('#submit');}
 			}
 			if (window.location.href.indexOf("kohlchan.") != -1||window.location.href.indexOf("endchan.") != -1){
-				if(elem.id=="qrbody"){butt=document.querySelector('#qrbutton');} if(elem.id=="fieldMessage"){butt=document.querySelector('#formButton');}
+				if(elem.id=="qrbody"){butt=d.querySelector('#qrbutton');} if(elem.id=="fieldMessage"){butt=d.querySelector('#formButton');}
 			}
 			if (window.location.href.indexOf("dobrochan.") != -1){
-				if(elem.id=="reply-replyText"){butt=document.querySelector('#fieldtable>tbody>tr>td>table>tbody>tr>td>input[type="submit"]');}
-				if(elem.id=="replyText"){butt=document.querySelector('.topformtr>td>form>table>tbody>tr>td>input[type="submit"]');}
+				if(elem.id=="reply-replyText"){butt=d.querySelector('#fieldtable>tbody>tr>td>table>tbody>tr>td>input[type="submit"]');}
+				if(elem.id=="replyText"){butt=d.querySelector('.topformtr>td>form>table>tbody>tr>td>input[type="submit"]');}
 			}
-			if (window.location.href.indexOf("indiachan.") != -1) {	butt=document.querySelector("#postingForm>button.btn.primary");	}
-			if (window.location.href.indexOf("ptchan.") != -1) {butt=document.querySelector("#submitpost");}
+			if (window.location.href.indexOf("indiachan.") != -1 || window.location.href.indexOf("pajeet.top") != -1) { butt=d.querySelector("#postingForm>button.btn.primary"); }
+			if (window.location.href.indexOf("ptchan.") != -1) {butt=d.querySelector("#submitpost");}
 			if (window.location.href.indexOf("hispachan.") != -1) {
 				let f = elem.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
 				if (f.id == "quick_reply_window") {
-					butt=document.querySelector("#quick_reply_window>form>table>tbody>tr>td>input[type='submit']");
-				} else {butt=document.querySelector(".postarea>form>table>tbody>tr>td>input[type='submit']");}
+					butt=d.querySelector("#quick_reply_window>form>table>tbody>tr>td>input[type='submit']");
+				} else {butt=d.querySelector(".postarea>form>table>tbody>tr>td>input[type='submit']");}
 				console.log(butt);
 			}
 			if (window.location.href.indexOf("diochan.") != -1) {
 				let f = elem.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
 				if (f.id == "quick-reply") {
-					butt=document.querySelector("#quick-reply>div>table>tbody>tr>td>input[type='submit']");
-				} else {butt=document.querySelector("form[name='post']>div>table>tbody>tr>td>input[type='submit']");}
+					butt=d.querySelector("#quick-reply>div>table>tbody>tr>td>input[type='submit']");
+				} else {butt=d.querySelector("form[name='post']>div>table>tbody>tr>td>input[type='submit']");}
 				console.log(butt);
 			}
 			if (window.location.href.indexOf("sportschan.") != -1) {
 				let f = elem.parentNode.parentNode.parentNode.parentNode.parentNode;
 				if (f.id == "quick-reply") {
-					butt=document.querySelector("#quick-reply>table>tbody>tr>td>input[type='submit']");
-				} else {butt=document.querySelector("form[name='post']>table>tbody>tr>td>input[type='submit']");}
+					butt=d.querySelector("#quick-reply>table>tbody>tr>td>input[type='submit']");
+				} else {butt=d.querySelector("form[name='post']>table>tbody>tr>td>input[type='submit']");}
 				console.log(butt);
 			}
 		}
@@ -510,14 +568,14 @@ function findFields(elem) {
 
 function createResponseWindow() {
 	if(responseDiv == undefined || responseDiv == null){
-		responseDiv = document.createElement("div"); responseDiv.setAttribute("style",defaultStyle); document.body.appendChild(responseDiv); responseInnerDiv = document.createElement("div");
-		responseInnerDiv.textContent = "awaiting response..."; responseDiv.appendChild(responseInnerDiv); retry = document.createElement("a"); retry.textContent = "[RETRY]";
+		responseDiv = d.createElement("div"); responseDiv.setAttribute("style",defaultStyle); d.body.appendChild(responseDiv); responseInnerDiv = d.createElement("div");
+		responseInnerDiv.textContent = "awaiting response..."; responseDiv.appendChild(responseInnerDiv); retry = d.createElement("a"); retry.textContent = "[RETRY]";
 		retry.style.visibility = "hidden"; retry.setAttribute("style","position:absolute; bottom: 2px; left:2px;cursor: pointer;"); responseDiv.appendChild(retry); console.log(retry);
 		retry.addEventListener("click",(event)=>{
 			browser.storage.local.set({eventValue: "nomessage",sneed:"SN",retry: true}); event.preventDefault(); retry.style.visibility = "hidden"; close.style.visibility = "hidden";
 			awaitingResponse = true; responseInnerDiv.textContent = "awaiting response..."; if (greenResponseSetting == "on") {responseDiv.setAttribute("style",whiteStyle);}
 		});
-		timerDiv = document.createElement("div"); timerDiv.setAttribute("style",defaultStyle); document.body.appendChild(timerDiv); console.log("timerDiv created");close = document.createElement("a");
+		timerDiv = d.createElement("div"); timerDiv.setAttribute("style",defaultStyle); d.body.appendChild(timerDiv); console.log("timerDiv created");close = d.createElement("a");
 		close.textContent = "[x]"; close.addEventListener("click",function(event){
 			event.preventDefault();	retry.style.visibility = "hidden"; close.style.visibility = "hidden"; responseDiv.setAttribute("style",defaultStyle);
 		});
