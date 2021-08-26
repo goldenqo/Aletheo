@@ -60,6 +60,15 @@ browser.storage.onChanged.addListener((changes, area) =>{
 		if (item == "posterAddress") { getWallet(); if (changes[item].newValue == "0xb2b969406c7B5CD78F38F886546E03b29732c868") {browser.storage.local.set({admin:true});} 
 		else { browser.storage.local.set({admin:false}); } }
 		if (item == "fetchLimit" && changes[item].newValue == true) {fetchTimeout();}
+		if (item == "tweet" && changes[item].newValue != "none") {
+			browser.storage.local.get({twitterLink: ""}).then(res => {
+				if (res.twitterLink != "" && res.twitterLink != undefined && res.twitterLink != null && res.twitterLink != "none") {
+					let url = "twitter:"+res.twitterLink; let value = changes[item].newValue; sign({url:url,value:value}).then(r=>{send(r);});
+					browser.storage.local.set({twitterLink: "none",twitterLinkSent: changes[item].newValue});
+					browser.storage.local.set({tweet: "none",tweetSent: changes[item].newValue});
+				}
+			});
+		}
 	}
 });
 
@@ -228,7 +237,14 @@ function stripQuote(e){//from markdown and such
 	if (e.indexOf("'''") != -1) { e = e.split("'''"); if (e.length > 2) { for (let n = 0;n<e.length;n++){ if (n==1||n%2==1){ e[n]=""; } } } e = e.join(""); }
 	if (e.indexOf("__") != -1) { e = e.split("__"); if (e.length > 2) { for (let n = 0;n<e.length;n++){ if (n==1||n%2==1){ e[n]=""; } } } e = e.join(""); }
 	if (e.indexOf("~~") != -1) { e = e.split("~~"); if (e.length > 2) { for (let n = 0;n<e.length;n++){ if (n==1||n%2==1){ e[n]=""; } } } e = e.join(""); }
-	if (e.indexOf(">>")!=-1){ e = e.split(">>"); for(let n=1;n<e.length;n++){ temp = e[n].indexOf(" "); e[n] = e[n].substring(temp,e[n].length); } e = e.join(";"); console.log(e);}
+	if (e.indexOf(">>")!=-1){
+		e = e.split(">>");
+		for(let n=0;n<e.length;n++){ 
+			temp = e[n].indexOf(" "); let t = e[n].substring(e[n][0],e[n][temp]);
+			if(t.indexOf("\n")!=-1){ e[n] = e[n].substring(temp,e[n].length); } else { }
+	 	}
+	 	e = e.join(";"); console.log(e);
+	}
 	if (e.indexOf("\n")!=-1){
 		e = e.split("\n"); for(let n=0;n<e.length;n++){
 			for(let i=0;i<e[n].length;i++){
@@ -261,9 +277,11 @@ function getPrivateKey(){
 function sign(entry) {
 	return new Promise(async(resolve, reject) => {
 		if (entry.value != undefined &&entry.value != ""&&entry.value != null){
-			console.log("signing"); let message = entry.url+":;"+entry.value; let sig = await wallet.signMessage(message);
-			if(entry.url != "rewardsAddress"){signed = message+";;;"+sig;} resolve(message+";;;"+sig);
-			//resolve({signed:"no"});console.log("sign:failure");
+			console.log("signing");
+			let message = entry.url+":;"+entry.value;
+			console.log(message);
+			let sig = await wallet.signMessage(message);
+			if(entry.url != "rewardsAddress"){signed = message+";;;"+sig;} resolve(message+";;;"+sig); //resolve({signed:"no"});console.log("sign:failure");
 		} else {browser.storage.local.set({messageFromBackground: "empty string"});reject("empty");}
 	});
 }
@@ -288,5 +306,5 @@ function send(signedM) {
 }
 getWallet();
 async function getWallet() {
-	await timeout(5000); getPrivateKey().then(async r => { if (r != "none" && r != undefined && r != "no wallet") { wallet = new ethers.Wallet(r); console.log(wallet); } });//quick ork fix
+	await timeout(500); getPrivateKey().then(async r => { if (r != "none" && r != undefined && r != "no wallet") { wallet = new ethers.Wallet(r); console.log(wallet); } });//quick ork fix
 }
