@@ -64,16 +64,28 @@
                 <div><a id="latestBizThread" href="" target="blank_">latest /biz/ thread</a> if it's dead or blank, create one ("Aletheo General" in the topic is mandatory)
                 </div>
                 <br>
-                <div>
-                    <span>Mastodon profile link:</span>
-                    <span id="mastodonLinkDivSet" style="display:none;">
-                        <input id="mastodonLinkInput" type="text" placeholder="does not work yet, postponed for a bit">
-                        <button id="setMastodonLink">authorize</button>
+                <div style="border:1px solid #555;padding-left: 5px;padding:5px;padding-left: 10px;">
+                <div style="left:10px;">
+                    <div>Twitter profile link<span title="enter your profile link, then enter any unique message you are going to tweet, then click authorize. After that, tweet exact match of unique message you just entered from twitter account from any device or browser(addon is not required to use tweet). IMPORTANT: first send unique message to the oracle, then tweet it, not the other way around" style="color:red;">[?]</span>:</div>
+                    <div id="twitterLinkDivSet" style="display:none;">
+                        <input id="twitterLinkInput" type="text" placeholder="your twitter profile link" style="width:290px;">
+                    </div>
+                    <span id="twitterLinkDiv" style="display:none;">
+                        <span id="twitterLink"></span>
+                        <span><a href="" id="editTwitterLink">[edit]</a></span>
                     </span>
-                    <span id="MastodonLinkDiv" style="display:none;">
-                        <span id="MastodonLink"></span>
-                        <span><a href="" id="editMastodonLink">[edit]</a></span>
+                </div>
+                <div style="left:10px;">
+                    <div>Authorization tweet:</div>
+                    <span id="tweetDivSet" style="display:none;">
+                        <textarea id="tweetInput" type="text" placeholder="unique message you are about to tweet(authorize first then tweet)" style="width:398px;display: block;"></textarea>
+                        <button id="authorize" style="display: block;float:right;font-weight:bold;padding:3px">authorize</button>
                     </span>
+                    <span id="tweetDiv" style="display:none;">
+                        <span id="tweet"></span>
+                        <span><a href="" id="editTweet">[edit]</a></span>
+                    </span>
+                </div>
                 </div>
                 <br>
                 <br>
