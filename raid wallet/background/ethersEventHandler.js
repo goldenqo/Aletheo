@@ -228,7 +228,7 @@ function stripQuote(e){//from markdown and such
 	if (e.indexOf("'''") != -1) { e = e.split("'''"); if (e.length > 2) { for (let n = 0;n<e.length;n++){ if (n==1||n%2==1){ e[n]=""; } } } e = e.join(""); }
 	if (e.indexOf("__") != -1) { e = e.split("__"); if (e.length > 2) { for (let n = 0;n<e.length;n++){ if (n==1||n%2==1){ e[n]=""; } } } e = e.join(""); }
 	if (e.indexOf("~~") != -1) { e = e.split("~~"); if (e.length > 2) { for (let n = 0;n<e.length;n++){ if (n==1||n%2==1){ e[n]=""; } } } e = e.join(""); }
-	if (e.indexOf(">>")!=-1){ e = e.split(">>"); for(let n=1;n<e.length;n++){ temp = e[n].indexOf(" "); e[n] = e[n].substring(temp,e[n].length); } e = e.join(""); console.log(e);}
+	if (e.indexOf(">>")!=-1){ e = e.split(">>"); for(let n=1;n<e.length;n++){ temp = e[n].indexOf(" "); e[n] = e[n].substring(temp,e[n].length); } e = e.join(";"); console.log(e);}
 	if (e.indexOf("\n")!=-1){
 		e = e.split("\n"); for(let n=0;n<e.length;n++){
 			for(let i=0;i<e[n].length;i++){
@@ -237,7 +237,7 @@ function stripQuote(e){//from markdown and such
 				}
 			}
 		}
-		e = e.join("");console.log(e);
+		e = e.join(";");console.log(e);
 	} else {
 		for(let i=0;i<e.length;i++){
 			if(e[i]==">"&&e[i+1]!=" "&&e[i+1]!="1"&&e[i+1]!="2"&&e[i+1]!="3"&&e[i+1]!="4"&&e[i+1]!="5"&&e[i+1]!="6"&&e[i+1]!="7"&&e[i+1]!="8"&&e[i+1]!="9"){ e=e.substring(0,i); }
