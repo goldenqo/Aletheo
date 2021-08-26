@@ -1,18 +1,30 @@
 'use strict';
-let d = document; let genbool = false; let impbool = false;
-d.addEventListener("DOMContentLoaded", function() {
-	d.getElementById("mastodonLinkDivSet").style.display = "inline"; d.getElementById("version").textContent = "current version: "+browser.runtime.getManifest().version + " ";
-	d.getElementById("showMnemonic").addEventListener("click", function(event){event.preventDefault();showMnemonic();});
-	d.getElementById("showPrivateKey").addEventListener("click", function(event){event.preventDefault();showPrivateKey();});
-	d.getElementById("generateNew").addEventListener("click", function(event){event.preventDefault();generateNew();});
-	d.getElementById("importAddress").addEventListener("click", function(event){event.preventDefault();importAddress();});
-	d.getElementById("setMastodonLink").addEventListener("click", function(event){event.preventDefault();setMastodonLink();});
-	d.getElementById("editMastodonLink").addEventListener("click", function(event){event.preventDefault();editMastodonLink();});
-	d.getElementById("version").addEventListener("click", function(e){ e.preventDefault(); window.open("https://addons.mozilla.org/en-US/firefox/addon/aletheo-wallet/versions/",'_blank'); });
-//	d.getElementById("setRewardsAddress").addEventListener("click", function(event){event.preventDefault();setRewardsAddress();});
-//	d.getElementById('rewardsAddressInput').addEventListener("change", function(event){rwrdsddrss = event.target.value;});
-//	d.getElementById('rewardsAddressInput').addEventListener("paste", function(event){rwrdsddrss = event.target.value;});
-//	d.getElementById("editRewardsAddress").addEventListener("click", function(event){event.preventDefault();editRewardsAddress();});
+let d = document; let genbool = false; let impbool = false; let twitterLink = ""; let tweet = "";
+d.addEventListener("DOMContentLoaded", ()=> {
+	browser.storage.local.get({twitterLinkSent: ""}).then(res => {
+		if (res.twitterLinkSent != "" && res.twitterLinkSent != undefined && res.twitterLinkSent != null) {
+			d.getElementById("twitterLink").textContent = res.twitterLinkSent; geteid("twitterLinkDivSet").style.display = "none"; geteid("twitterLinkDiv").style.display = "inline";
+		}
+	});
+	browser.storage.local.get({tweetSent: ""}).then(res => {
+		if (res.tweetSent != "" && res.tweetSent != undefined && res.tweetSent != null) {
+			d.getElementById("tweet").textContent = res.tweetSent; geteid("tweetDivSet").style.display = "none"; geteid("tweetDiv").style.display = "inline";
+		}
+	});
+	d.getElementById("twitterLinkDivSet").style.display = "inline"; d.getElementById("tweetDivSet").style.display = "inline";
+	d.getElementById("version").textContent = "current version: "+browser.runtime.getManifest().version + " ";
+	d.getElementById("showMnemonic").addEventListener("click", (e)=>{e.preventDefault();showMnemonic();});
+	d.getElementById("showPrivateKey").addEventListener("click", (e)=>{e.preventDefault();showPrivateKey();});
+	d.getElementById("generateNew").addEventListener("click", (e)=>{e.preventDefault();generateNew();});
+	d.getElementById("importAddress").addEventListener("click", (e)=>{e.preventDefault();importAddress();});
+	d.getElementById("authorize").addEventListener("click", (e)=>{e.preventDefault();setTwitterLink();});
+	d.getElementById("editTwitterLink").addEventListener("click", (e)=>{e.preventDefault();editTwitterLink();});
+	d.getElementById("editTweet").addEventListener("click", (e)=>{e.preventDefault();editTwitterLink();});
+	d.getElementById('twitterLinkInput').addEventListener("change", (e)=>{twitterLink = e.target.value;});
+	d.getElementById('twitterLinkInput').addEventListener("paste", (e)=>{twitterLink = e.target.value;});
+	d.getElementById('tweetInput').addEventListener("change", (e)=>{tweet = e.target.value;});
+	d.getElementById('tweetInput').addEventListener("paste", (e)=>{tweet = e.target.value;});
+	d.getElementById("version").addEventListener("click", (e)=>{ e.preventDefault(); window.open("https://addons.mozilla.org/en-US/firefox/addon/aletheo-wallet/versions/",'_blank'); });
 });
 
 function showMnemonic() {
@@ -53,7 +65,7 @@ function importAddress() {
 	d.getElementById("no").addEventListener("click",e =>{ e.preventDefault();impbool = false;d.getElementById("prompt").style.display = "none";d.getElementById("importDiv").style.display = "none"; });
 	d.getElementById("yes").addEventListener("click",e =>{
 		if(impbool) {
-			e.preventDefault(); let pw = undefined;
+			if (imp[0]==" ") {imp=imp.substring(1,imp.length);}	if (imp[imp.length-1]==" ") {imp=imp.substring(0,imp.length-1);} e.preventDefault(); let pw = undefined;
 			if (ethers.utils.isValidMnemonic(imp)) {pw = ethers.Wallet.fromMnemonic(imp);}
 			try { pw = new ethers.Wallet(imp); } catch {}
 			if (pw) {
@@ -67,24 +79,23 @@ function importAddress() {
 		}
 	});
 }
-/*
-function setRewardsAddress() {
-	rwrdsddrss = (rwrdsddrss) ? rwrdsddrss : geteid("rewardsAddressInput").value; 
-	if (rwrdsddrss != undefined) {
-		geteid("rewardsAddressDivSet").style.display = "none"; geteid("rewardsAddressDiv").style.display = "inline"; geteid("rewardsAddress").textContent = rwrdsddrss; 
-		rwrdsddrss = rwrdsddrss.replace(/[^0-9a-zA-z]/g, "");
-		browser.storage.local.set({rewardsAddress: rwrdsddrss});
+
+function setTwitterLink() {
+	twitterLink = (twitterLink) ? twitterLink : d.getElementById("twitterLinkInput").value;
+	tweet = (tweet) ? tweet : d.getElementById("tweetInput").value;
+	if (twitterLink != undefined && tweet != undefined) {
+		d.getElementById("twitterLinkDivSet").style.display = "none"; d.getElementById("twitterLinkDiv").style.display = "inline"; twitterLink = twitterLink.replace(/[ ]/g, "");
+		d.getElementById("twitterLink").textContent = twitterLink; browser.storage.local.set({twitterLink: twitterLink});
+		d.getElementById("tweetDivSet").style.display = "none"; d.getElementById("tweetDiv").style.display = "inline";
+		d.getElementById("tweet").textContent = tweet; browser.storage.local.set({tweet: tweet});
 	}
 }
 
-function editRewardsAddress() {
-	geteid("rewardsAddressDivSet").style.display = "inline"; geteid("rewardsAddressDiv").style.display = "none";
-	browser.storage.local.get({rewardsAddressSet: ""}).then(res => {
-		if (res.rewardsAddressSet != "" && res.rewardsAddressSet != undefined && res.rewardsAddressSet != null) { geteid("rewardsAddressInput").value = res.rewardsAddressSet; }
+function editTwitterLink() {
+	d.getElementById("twitterLinkDivSet").style.display = "inline"; d.getElementById("twitterLinkDiv").style.display = "none";
+	d.getElementById("tweetDivSet").style.display = "inline"; d.getElementById("tweetDiv").style.display = "none";
+	browser.storage.local.get({twitterLinkSent: ""}).then(res => {
+		if (res.twitterLinkSent != "" && res.twitterLinkSent != undefined && res.twitterLinkSent != null) { d.getElementById("twitterLinkInput").value = res.twitterLinkSent; }
 	});
+	browser.storage.local.get({tweetSent: ""}).then(res => { if (res.tweetSent != "" && res.tweetSent != undefined && res.tweetSent != null) { d.getElementById("tweetInput").value=res.tweetSent; } });
 }
-
-
-
-function setMastodonLink() {}
-function editMastodonLink() {}*/
