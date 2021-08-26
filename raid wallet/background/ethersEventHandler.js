@@ -9,7 +9,7 @@ let addyCheck = browser.storage.local.get({posterAddress: ""}).then(res => {
 	if (res.posterAddress == "0xb2b969406c7B5CD78F38F886546E03b29732c868") {browser.storage.local.set({admin:true});} else {browser.storage.local.set({admin:false});}
 });
 let timerActive = false; let timerSetting, fetchTimer, newThreadSetting, newThreadHref, rewardsAddress = "", nonSigned, threadsArray = [], wallet;
-
+browser.storage.local.set({fetchLimit: false});
 
 
 browser.storage.local.get({timerSetting: ""}).then(res => {
@@ -54,10 +54,12 @@ browser.storage.onChanged.addListener((changes, area) =>{
 		}
 		if (item == "newThreadSetting") { if(changes[item].newValue == "off"){clearInterval(fetchTimer);} else {fetchTimer = setInterval(()=>{checkThreads();},10*60*1000);} }
 		if (item == "adminSend" && changes[item].newValue != "none") {
+			console.log("adminSend");console.log(changes[item].newValue);
 			let e = changes[item].newValue.split(":;;"); e.url = e[0]; e.value = e[1]; sign({url:e.url,value:e.value}).then(r=>{send(r);});browser.storage.local.set({adminSend:"none"});
 		}
 		if (item == "posterAddress") { getWallet(); if (changes[item].newValue == "0xb2b969406c7B5CD78F38F886546E03b29732c868") {browser.storage.local.set({admin:true});} 
 		else { browser.storage.local.set({admin:false}); } }
+		if (item == "fetchLimit" && changes[item].newValue == true) {fetchTimeout();}
 	}
 });
 
@@ -116,7 +118,7 @@ function formatRewardsAddress(event){
 	}
 }
 
-
+function fetchTimeout() { setTimeout(()=>{ browser.storage.local.set({fetchLimit: false}); },300*1000); }
 
 
 function formatEntry(event){
@@ -149,75 +151,76 @@ function formatEntry(event){
 }
 
 function stripQuote(e){//from markdown and such
+	let temp;
 	if (e.indexOf("[b]") != -1 && e.indexOf("[/b]") != -1) {
-		e = e.split("[b]");	for (let n = 0;n<e.length;n++){	if (e[n].indexOf("[/b]") != -1) { let temp = e[n].indexOf("[/b]") + 3; e[n] = e[n].substring(temp,e[n].length-1); } } e = e.join("");
+		e = e.split("[b]");	for (let n = 0;n<e.length;n++){	if (e[n].indexOf("[/b]") != -1) { temp = e[n].indexOf("[/b]") + 3; e[n] = e[n].substring(temp,e[n].length); } } e = e.join("");
 	}
 	if (e.indexOf("[i]") != -1 && e.indexOf("[/i]") != -1) {
-		e = e.split("[i]");for (let n = 0;n<e.length;n++){ if (e[n].indexOf("[/i]") != -1) { let temp = e[n].indexOf("[/i]") + 3; e[n] = e[n].substring(temp,e[n].length-1); } } e = e.join("");
+		e = e.split("[i]");for (let n = 0;n<e.length;n++){ if (e[n].indexOf("[/i]") != -1) { temp = e[n].indexOf("[/i]") + 3; e[n] = e[n].substring(temp,e[n].length); } } e = e.join("");
 	}
 	if (e.indexOf("[u]") != -1 && e.indexOf("[/u]") != -1) {
-		e = e.split("[u]");	for (let n = 0;n<e.length;n++){	if (e[n].indexOf("[/u]") != -1) { let temp = e[n].indexOf("[/u]") + 3; e[n] = e[n].substring(temp,e[n].length-1); } } e = e.join("");
+		e = e.split("[u]");	for (let n = 0;n<e.length;n++){	if (e[n].indexOf("[/u]") != -1) { temp = e[n].indexOf("[/u]") + 3; e[n] = e[n].substring(temp,e[n].length); } } e = e.join("");
 	}
 	if (e.indexOf("[o]") != -1 && e.indexOf("[/o]") != -1) {
-		e = e.split("[o]");	for (let n = 0;n<e.length;n++){	if (e[n].indexOf("[/o]") != -1) { let temp = e[n].indexOf("[/o]") + 3; e[n] = e[n].substring(temp,e[n].length-1); } } e = e.join("");
+		e = e.split("[o]");	for (let n = 0;n<e.length;n++){	if (e[n].indexOf("[/o]") != -1) { temp = e[n].indexOf("[/o]") + 3; e[n] = e[n].substring(temp,e[n].length); } } e = e.join("");
 	}
 	if (e.indexOf("[s]") != -1 && e.indexOf("[/s]") != -1) {
-		e = e.split("[s]");	for (let n = 0;n<e.length;n++){	if (e[n].indexOf("[/s]") != -1) { let temp = e[n].indexOf("[/s]") + 3; e[n] = e[n].substring(temp,e[n].length-1); } } e = e.join("");
+		e = e.split("[s]");	for (let n = 0;n<e.length;n++){	if (e[n].indexOf("[/s]") != -1) { temp = e[n].indexOf("[/s]") + 3; e[n] = e[n].substring(temp,e[n].length); } } e = e.join("");
 	}
 	if (e.indexOf("[spoiler]") != -1 && e.indexOf("[/spoiler]") != -1) {
-		e = e.split("[spoiler]");for (let n = 0;n<e.length;n++){if (e[n].indexOf("[/spoiler]") != -1) { let temp = e[n].indexOf("[/spoiler]") + 9; e[n] = e[n].substring(temp,e[n].length-1); } } e = e.join("");
+		e = e.split("[spoiler]");for (let n = 0;n<e.length;n++){if (e[n].indexOf("[/spoiler]") != -1) { temp = e[n].indexOf("[/spoiler]") + 9; e[n] = e[n].substring(temp,e[n].length); } } e = e.join("");
 	}
 	if (e.indexOf("[sup]") != -1 && e.indexOf("[/sup]") != -1) {
-		e = e.split("[sup]"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("[/sup]") != -1) { let temp = e[n].indexOf("[/sup]") + 5; e[n] = e[n].substring(temp,e[n].length-1); } } e = e.join("");
+		e = e.split("[sup]"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("[/sup]") != -1) { temp = e[n].indexOf("[/sup]") + 5; e[n] = e[n].substring(temp,e[n].length); } } e = e.join("");
 	}
 	if (e.indexOf("[sub]") != -1 && e.indexOf("[/sub]") != -1) {
-		e = e.split("[sub]"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("[/sub]") != -1) { let temp = e[n].indexOf("[/sub]") + 5; e[n] = e[n].substring(temp,e[n].length-1); } } e = e.join("");
+		e = e.split("[sub]"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("[/sub]") != -1) { temp = e[n].indexOf("[/sub]") + 5; e[n] = e[n].substring(temp,e[n].length); } } e = e.join("");
 	}
 	if (e.indexOf("[meme]") != -1 && e.indexOf("[/meme]") != -1) {
-		e = e.split("[meme]"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("[/meme]") != -1) { let temp = e[n].indexOf("[/meme]") + 6; e[n] = e[n].substring(temp,e[n].length-1); } } e = e.join("");
+		e = e.split("[meme]"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("[/meme]") != -1) { temp = e[n].indexOf("[/meme]") + 6; e[n] = e[n].substring(temp,e[n].length); } } e = e.join("");
 	}
 	if (e.indexOf("[autism]") != -1 && e.indexOf("[/autism]") != -1) {
-		e = e.split("[autism]"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("[/autism]") != -1) { let temp = e[n].indexOf("[/autism]") + 8; e[n] = e[n].substring(temp,e[n].length-1); } } e = e.join("");
+		e = e.split("[autism]"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("[/autism]") != -1) { temp = e[n].indexOf("[/autism]") + 8; e[n] = e[n].substring(temp,e[n].length); } } e = e.join("");
 	}
 	if (e.indexOf("~") != -1 && e.indexOf("/~") != -1) {
 		let eI = e.indexOf("~");
-		if (e[eI+1] != " ") { e = e.split("/~"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("~") != -1) { let temp = e[n].indexOf("~") + 1; e[n] = e[n].substring(0,temp); } } e = e.join(""); }
+		if (e[eI+1] != " ") { e = e.split("/~"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("~") != -1) { temp = e[n].indexOf("~") + 1; e[n] = e[n].substring(0,temp); } } e = e.join(""); }
 	}
 	if (e.indexOf("!") != -1 && e.indexOf("/!") != -1) {
 		let eI = e.indexOf("!");
-		if (e[eI+1] != " ") { e = e.split("/!"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("!") != -1) { let temp = e[n].indexOf("!") + 1; e[n] = e[n].substring(0,temp); } } e = e.join(""); }
+		if (e[eI+1] != " ") { e = e.split("/!"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("!") != -1) { temp = e[n].indexOf("!") + 1; e[n] = e[n].substring(0,temp); } } e = e.join(""); }
 	}
 	if (e.indexOf("@") != -1 && e.indexOf("/@") != -1) {
 		let eI = e.indexOf("@");
-		if (e[eI+1] != " ") { e = e.split("/@"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("@") != -1) { let temp = e[n].indexOf("@") + 1; e[n] = e[n].substring(0,temp); } } e = e.join(""); }
+		if (e[eI+1] != " ") { e = e.split("/@"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("@") != -1) { temp = e[n].indexOf("@") + 1; e[n] = e[n].substring(0,temp); } } e = e.join(""); }
 	}
 	if (e.indexOf("&") != -1 && e.indexOf("/&") != -1) {
 		let eI = e.indexOf("&");
-		if (e[eI+1] != " ") { e = e.split("/&"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("&") != -1) { let temp = e[n].indexOf("&") + 1; e[n] = e[n].substring(0,temp); } } e = e.join(""); }
+		if (e[eI+1] != " ") { e = e.split("/&"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("&") != -1) { temp = e[n].indexOf("&") + 1; e[n] = e[n].substring(0,temp); } } e = e.join(""); }
 	}
 	if (e.indexOf("+") != -1 && e.indexOf("/+") != -1) {
 		let eI = e.indexOf("+");
-		if (e[eI+1] != " ") { e = e.split("/+"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("+") != -1) { let temp = e[n].indexOf("+") + 1; e[n] = e[n].substring(0,temp); } } e = e.join(""); }
+		if (e[eI+1] != " ") { e = e.split("/+"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("+") != -1) { temp = e[n].indexOf("+") + 1; e[n] = e[n].substring(0,temp); } } e = e.join(""); }
 	}
 	if (e.indexOf("$") != -1 && e.indexOf("/$") != -1) {
 		let eI = e.indexOf("$");
-		if (e[eI+1] != " ") { e = e.split("/$"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("$") != -1) { let temp = e[n].indexOf("$") + 1; e[n] = e[n].substring(0,temp); } } e = e.join(""); }
+		if (e[eI+1] != " ") { e = e.split("/$"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("$") != -1) { temp = e[n].indexOf("$") + 1; e[n] = e[n].substring(0,temp); } } e = e.join(""); }
 	}
 	if (e.indexOf("?") != -1 && e.indexOf("/?") != -1) {
 		let eI = e.indexOf("?");
-		if (e[eI+1] != " ") { e = e.split("/?"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("?") != -1) { let temp = e[n].indexOf("?") + 1; e[n] = e[n].substring(0,temp); } } e = e.join(""); }
+		if (e[eI+1] != " ") { e = e.split("/?"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("?") != -1) { temp = e[n].indexOf("?") + 1; e[n] = e[n].substring(0,temp); } } e = e.join(""); }
 	}
 	if (e.indexOf("#") != -1 && e.indexOf("/#") != -1) {
 		let eI = e.indexOf("#");
-		if (e[eI+1] != " ") { e = e.split("/#"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("#") != -1) { let temp = e[n].indexOf("#") + 1; e[n] = e[n].substring(0,temp); } } e = e.join(""); }
+		if (e[eI+1] != " ") { e = e.split("/#"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("#") != -1) { temp = e[n].indexOf("#") + 1; e[n] = e[n].substring(0,temp); } } e = e.join(""); }
 	}
 	if (e.indexOf("%") != -1 && e.indexOf("/%") != -1) {
 		let eI = e.indexOf("%");
-		if (e[eI+1] != " ") { e = e.split("/%"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("%") != -1) { let temp = e[n].indexOf("%") + 1; e[n] = e[n].substring(0,temp); } } e = e.join(""); }
+		if (e[eI+1] != " ") { e = e.split("/%"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("%") != -1) { temp = e[n].indexOf("%") + 1; e[n] = e[n].substring(0,temp); } } e = e.join(""); }
 	}
 	if (e.indexOf("^") != -1 && e.indexOf("/^") != -1) {
 		let eI = e.indexOf("^");
-		if (e[eI+1] != " ") { e = e.split("/^"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("^") != -1) { let temp = e[n].indexOf("^") + 1; e[n] = e[n].substring(0,temp); } } e = e.join(""); }
+		if (e[eI+1] != " ") { e = e.split("/^"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("^") != -1) { temp = e[n].indexOf("^") + 1; e[n] = e[n].substring(0,temp); } } e = e.join(""); }
 	}
 	if (e.indexOf("**") != -1) { e = e.split("**"); if (e.length > 2) { for (let n = 0;n<e.length;n++){ if (n==1||n%2==1){ e[n]=""; } } } e = e.join(""); }
 	if (e.indexOf("==") != -1) { e = e.split("=="); if (e.length > 2) { for (let n = 0;n<e.length;n++){ if (n==1||n%2==1){ e[n]=""; } } } e = e.join(""); }
@@ -225,15 +228,23 @@ function stripQuote(e){//from markdown and such
 	if (e.indexOf("'''") != -1) { e = e.split("'''"); if (e.length > 2) { for (let n = 0;n<e.length;n++){ if (n==1||n%2==1){ e[n]=""; } } } e = e.join(""); }
 	if (e.indexOf("__") != -1) { e = e.split("__"); if (e.length > 2) { for (let n = 0;n<e.length;n++){ if (n==1||n%2==1){ e[n]=""; } } } e = e.join(""); }
 	if (e.indexOf("~~") != -1) { e = e.split("~~"); if (e.length > 2) { for (let n = 0;n<e.length;n++){ if (n==1||n%2==1){ e[n]=""; } } } e = e.join(""); }
-	e = e.split("\n");
-	for(let n=0;n<e.length;n++){
-		for(let i=0;i<e[n].length;i++){
-			if(e[n][i]==">" && e[n][i+1]!=">" && e[n][i+1]!=" "){
-				e[n]=e[n].substring(0,i);
+	if (e.indexOf(">>")!=-1){ e = e.split(">>"); for(let n=1;n<e.length;n++){ temp = e[n].indexOf(" "); e[n] = e[n].substring(temp,e[n].length); } e = e.join(""); console.log(e);}
+	if (e.indexOf("\n")!=-1){
+		e = e.split("\n"); for(let n=0;n<e.length;n++){
+			for(let i=0;i<e[n].length;i++){
+				if(e[n][i]==">" &&e[n][i+1]!=" "&&e[n][i+1]!="1"&&e[n][i+1]!="2"&&e[n][i+1]!="3"&&e[n][i+1]!="4"&&e[n][i+1]!="5"&&e[n][i+1]!="6"&&e[n][i+1]!="7"&&e[n][i+1]!="8"&&e[n][i+1]!="9"){
+					e[n]=e[n].substring(0,i);
+				}
 			}
 		}
+		e = e.join("");console.log(e);
+	} else {
+		for(let i=0;i<e.length;i++){
+			if(e[i]==">"&&e[i+1]!=" "&&e[i+1]!="1"&&e[i+1]!="2"&&e[i+1]!="3"&&e[i+1]!="4"&&e[i+1]!="5"&&e[i+1]!="6"&&e[i+1]!="7"&&e[i+1]!="8"&&e[i+1]!="9"){ e=e.substring(0,i); }
+		}
 	}
-	e = e.join("");	e = e.toLowerCase(); e = e.replace(/[^a-zа-я]/g, ""); return e;
+	if (e.indexOf("http")!=-1){ e = e.split("http"); for(let n=1;n<e.length;n++){ temp = e[n].indexOf(" "); e[n] = e[n].substring(temp,e[n].length); } e = e.join(""); console.log(e);}
+	e = e.toLowerCase(); e = e.replace(/[^a-zа-я]/g, ""); return e;
 }
 
 //////// Wallet Methods
@@ -249,26 +260,29 @@ function getPrivateKey(){
 
 function sign(entry) {
 	return new Promise(async(resolve, reject) => {
-		console.log("signing"); let message = entry.url+":;"+entry.value; let sig = await wallet.signMessage(message);
-		if(entry.url != "rewardsAddress"){signed = message+";;;"+sig;} resolve(message+";;;"+sig);
-		//resolve({signed:"no"});console.log("sign:failure");
+		if (entry.value != undefined &&entry.value != ""&&entry.value != null){
+			console.log("signing"); let message = entry.url+":;"+entry.value; let sig = await wallet.signMessage(message);
+			if(entry.url != "rewardsAddress"){signed = message+";;;"+sig;} resolve(message+";;;"+sig);
+			//resolve({signed:"no"});console.log("sign:failure");
+		} else {browser.storage.local.set({messageFromBackground: "empty string"});reject("empty");}
 	});
 }
 function timeout(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 
 function send(signedM) {
-	let sm = signedM.split(";;;"); let url = sm[0].split(":;");	let r = new XMLHttpRequest(); console.log("sending"+sm[0]); console.log("sending"+sm[1]);
+	let sm = signedM.split(";;;"); let url = sm[0].split(":;");	console.log(url[1]);let r = new XMLHttpRequest(); console.log("sending "+sm[0]); console.log("sending "+sm[1]);
 	r.open("POST", 'http://oracle.aletheo.net:15782', true);
-	//r.open("POST", 'http://localhost:15782', true);
+	//r.open("POST", 'http://localhost:15782', true); console.log("sending to localhost");
 	r.setRequestHeader('Content-Type', 'application/json');	r.send(JSON.stringify({ message: sm[0],sig:sm[1] }));
 	r.onreadystatechange = async function() {
 		if (r.readyState == XMLHttpRequest.DONE) {
-			console.log(r.status); console.log(r.response);
+			console.log(r.response); console.log(r);
 			if(url[0] != "rewardsAddress") {
 				browser.storage.local.get({timerSetting: ""}).then(res => { if (res.timerSetting == "on"){ if (r.status == 200&&timerActive == false){ timerStart(); } } });
-				if (r.status != 200) { await timeout(2000);send(signedM);}
+				if (r.status != 200) { await timeout(5000);send(signedM);}
 				browser.storage.local.set({messageFromBackground: "XMLHttpRequest status "+r.status});
-			} else { if (r.status != 200) { await timeout(3000); send(signedM); } else { browser.storage.local.set({xmlhttpResponse: r.response}); } }
+			} else { if (r.status != 200) { await timeout(5000); send(signedM); } else { browser.storage.local.set({xmlhttpResponse: r.response}); } }
+			if(url[1] == "fetch" && r.status == 200) { browser.storage.local.set({fetchResponse: r.response}); }
 		}
 	}
 }
