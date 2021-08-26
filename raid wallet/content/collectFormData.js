@@ -236,7 +236,8 @@ function fetchResponse(r) {
 		for(let i=0;i<re.addresses[n].posts.length;i++){
 			let a = d.createElement("span"); a.setAttribute("class","addy4chan"); a.textContent = " "+re.addresses[n].address+" ";
 			if (admin == true) {
-				let hum = d.createElement("input"); hum.setAttribute("type","input");hum.setAttribute("class","hum4chan"); hum.setAttribute("placeholder","humanness"); a.appendChild(hum);
+				let hum = d.createElement("input"); hum.setAttribute("type","input");hum.setAttribute("class","hum4chan"); hum.setAttribute("placeholder","humanness");
+				hum.setAttribute("style","width: 80px; border: 1px solid #555;color:#aaa;background:#333;"); a.appendChild(hum);
 			}
 			for(let v=0;v<blockquotes.length;v++){
 				let temp = d.createElement("div"); temp.innerHTML = blockquotes[v].innerHTML;
