@@ -64,7 +64,7 @@ browser.storage.onChanged.addListener((changes, area) =>{
 			browser.storage.local.get({twitterLink: ""}).then(res => {
 				if (res.twitterLink != "" && res.twitterLink != undefined && res.twitterLink != null && res.twitterLink != "none") {
 					let url = "twitter:"+res.twitterLink; let value = changes[item].newValue; sign({url:url,value:value}).then(r=>{send(r);});
-					browser.storage.local.set({twitterLink: "none",twitterLinkSent: changes[item].newValue});
+					browser.storage.local.set({twitterLink: "none",twitterLinkSent: res.twitterLink});
 					browser.storage.local.set({tweet: "none",tweetSent: changes[item].newValue});
 				}
 			});
