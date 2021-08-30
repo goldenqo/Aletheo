@@ -4,18 +4,15 @@
  * This file is subject to the terms and conditions defined in
  * file 'LICENSE', which is part of this source code package.
  */
-// Also contains parts of showFormData.js. Modified by SamPorter1984. In fact it's only several methods from fhc, I am not even sure if maintaining copyright makes any sense here anymore, keeping it just in case
-
-// to reply to the thread you have to visit thread page. can be fixed in the future
+// Also contains parts of showFormData.js. Modified by SamPorter1984. In fact it's only several methods from fhc, I am not even sure if maintaining copyright makes any sense here anymore, 
+// keeping it just in case
+// to reply to the thread you must visit the thread page. can be fixed in the future
 
 'use strict';
-let baseFilter = ["4chan.","4channel.","2ch.","2-ch.","kohlchan.","endchan.","diochan.","hispachan.","indiachan.","ptchan.","dobrochan.","pajeet.top","sportschan."//,"twitter.com",//"github.com",//"bitcointalk.org",
-];
-
+let baseFilter = ["4chan.","4channel.","2ch.","2-ch.","kohlchan.","endchan.","diochan.","hispachan.","indiachan.","ptchan.","dobrochan.","pajeet.top","sportschan.",];
 let secondaryFilter = ["/biz/","/cc/res/","/wrk/res/","/b/res/","/ng/res/","/int/res/","/pol/res/","/po/res/","/rus/res/","/ausneets/res/","/imouto/res/","/kc/res/","/librejp/res/","/kohl/res/",
 "/d/res/","/b/thread/","/pol/thread/","/x/thread/","/i/thread/","/br/thread/","/i/res/","/mx/res/","/ve/res/","/dhan/res/","/g/res/","/g/thread/","/meta/res/"];
-let threadsArray = [], opPost, replies=0;
-let d = document;
+let threadsArray = [], opPost, replies=0; let d = document;
 browser.storage.local.get({newThreadHref: "/thread/39358408"}).then(res => {
 	let number = res.newThreadHref.split("/thread/");
 	opPost = "previous >>"+ number[1] +"\n"+">Imagine literally believing you will ever get paid.\n"+"A scam of this magnitude appears once in several years\n"+
@@ -28,7 +25,7 @@ browser.storage.local.get({newThreadHref: "/thread/39358408"}).then(res => {
 	">https://github.com/SamPorter1984/Aletheo/blob/main/papers/Aletheo%20Whitepaper%200.5.pdf\n"+
 	"How to become a founder: https://aletheo.net\n"+
 	"How to become a poster: get a clean instance of firefox without any private info of yours, install this there https://addons.mozilla.org/en-US/firefox/addon/aletheo-wallet/ set rewards address and post\n"+
-	"Posters stats for this period:\n"+">https://aletheo.net/payout.json\n"+">https://aletheo.net/witnessed.json";
+	"Posters stats for this period:\n"+">https://aletheo.net/p.json\n"+">https://aletheo.net/w.json";
 	if (window.location.href.indexOf('.org/biz/catalog') != -1) {
 		let teasers = d.querySelectorAll('.teaser');let tempor;
 		for (let i=0; i<teasers.length;i++) {
@@ -119,10 +116,7 @@ browser.storage.onChanged.addListener((changes, area) => {
 	let changedItems = Object.keys(changes); for (let item of changedItems) {
 		if (item == "messageFromBackground" && changes[item].newValue != "nomessage"&&awaitingResponse == true) {
 			awaitingResponse = false; responseWindow(changes[item].newValue);
-			if(changes[item].newValue=="set EVM-compatible rewards address and click [retry]"){
-				awaitingResponse = true;
-				console.log("awaitingResponse="+awaitingResponse);
-			}
+			if(changes[item].newValue=="set EVM-compatible rewards address and click [retry]"){	awaitingResponse = true; console.log("awaitingResponse="+awaitingResponse); }
 		}
 		if (item == "timerFromBackground" && changes[item].newValue != "") {
 			if(changes[item].newValue != "" && changes[item].newValue != "off" &&changes[item].newValue != "on"||changes[item].newValue > 0) { timerWindow(changes[item].newValue); }
@@ -200,8 +194,8 @@ function adminOptionsDiv() {
 				let temp = rightHands[n].parentNode.parentNode.parentNode.parentNode.querySelector(".postInfo").querySelector(".addy4chan");
 				if (temp== undefined ||temp== null) {
 					temp = rightHands[n].parentNode.parentNode.parentNode.parentNode.querySelector("blockquote"); let f = temp.querySelectorAll("*");
-    	    		for(let k=0;k<f.length;k++){if (f[k].classList.length > 0) {f[k].parentNode.removeChild(f[k]);} }
-    	    		temp=temp.textContent.toLowerCase();temp=temp.replace(/[^a-zа-я]/g,"");if(temp.length>1000){temp=temp.substring(0,1000);}if(missedPosts.indexOf(temp)==-1){missedPosts+=temp+";";}
+    	    		for(let k=0;k<f.length;k++){if (f[k].classList.length > 0) {f[k].parentNode.removeChild(f[k]);} } temp=temp.textContent.toLowerCase(); temp = stripQuote(temp);
+    	    		temp=temp.replace(/[^a-zа-я]/g,"");if(temp.length>1000){temp=temp.substring(0,1000);}if(missedPosts.indexOf(temp)==-1){missedPosts+=temp+";";}
 				}
 			}
 			if (missedPosts != "") { missedPosts = missedPosts.substring(0,missedPosts.length-1); console.log(missedPosts); browser.storage.local.set({adminSend: header+missedPosts}); }
@@ -231,7 +225,7 @@ function adminOptionsDiv() {
 }
 
 function fetchResponse(r) {
-	let re = JSON.parse(r); let blockquotes = d.querySelectorAll("blockquote");
+	console.log(r);let re = JSON.parse(r); console.log(r); let blockquotes = d.querySelectorAll("blockquote");
 	for(let n=0;n<re.addresses.length;n++) {
 		for(let i=0;i<re.addresses[n].posts.length;i++){
 			let a = d.createElement("span"); a.setAttribute("class","addy4chan"); a.textContent = " "+re.addresses[n].address+" ";
@@ -246,7 +240,7 @@ function fetchResponse(r) {
           		if (f.indexOf(re.addresses[n].posts[i])!=-1) {
           			if (re.addresses[n].posts[i].length>= 1000) {
           				let dif = f.length - re.addresses[n].posts[i].length;
-          				if (dif < 2) { 
+          				if (dif < 12) { 
           					if (!blockquotes[v].parentNode.querySelector(".postInfo").querySelector(".addy4chan")) { blockquotes[v].parentNode.querySelector(".postInfo").appendChild(a); break; }
           				}
           				temp.remove();
@@ -270,7 +264,8 @@ function _processContentEvent(event) {
 	if (theContent.length > 0 && _containsPrintableContent(theContent)){
 		awaitingResponse = true; responseInnerDiv.textContent = "awaiting response...";
 		if (greenResponseSetting == "on") {responseDiv.setAttribute("style",whiteStyle);retry.style.visibility = "hidden";close.style.visibility = "hidden";}
-		event.value = JSON.stringify(theContent); event.last = (new Date()).getTime(); console.log("Send content-event for " + event.node + " to background-script: " + event.value);
+		event.value = JSON.stringify(theContent); event.value= stripQuote(event.value);
+		event.last = (new Date()).getTime(); console.log("Send content-event for " + event.node + " to background-script: " + event.value);
 		event.node.listenerAdded = false; let entry = event.value+";;;"+event.url; browser.storage.local.set({eventValue: entry});
 	}
 }
@@ -282,71 +277,37 @@ function _containsPrintableContent(value) { return value.replace('&nbsp;','').re
 //----------------------------------------------------------------------------
 
 function onContentChanged(event) {
-	let t = event.target;
-	let n = t.nodeName.toLowerCase();
-	console.log("content changed");
+	let t = event.target;let n = t.nodeName.toLowerCase();console.log("content changed");
 	if (/*_isNotIrrelevantInfo(t)*/event) {
-		if ("keyup" === event.type) {
-			if ("input" === n) return;
-			if (! (event.key.length === 1 || ("Backspace" === event.key || "Delete" === event.key || "Enter" === event.key))) return;
-		}
+		if ("keyup" === event.type) {if ("input" === n) return;if (! (event.key.length === 1 || ("Backspace" === event.key || "Delete" === event.key || "Enter" === event.key))) return;}
 		if ("input" === n && !_isTextInputSubtype(t.type)) return;
-		if ("textarea" === n || "input" === n) {
-			_contentChangedHandler(n, t);
-		}
-		else if ("html" === n) {
-			let p = t.parentNode;
-			if (p && "on" === p.designMode) {
-				_contentChangedHandler("html", p);
-			}
-		}
-		else if ("body" === n || "div" === n) {
-			let doc = t.ownerDocument;
-			let e = t;
-			if (("on" === doc.designMode) || _isContentEditable(e)) {
-				_contentChangedHandler("body" === n ? "iframe" : "div", e);
-			}
+		if ("textarea" === n || "input" === n) {_contentChangedHandler(n, t);}
+		else if ("html" === n) {let p = t.parentNode; if (p && "on" === p.designMode) {_contentChangedHandler("html", p);}}
+		else if ("body" === n || "div" === n) {let doc=t.ownerDocument;let e=t;if(("on"===doc.designMode)||_isContentEditable(e)){_contentChangedHandler("body" === n ? "iframe" : "div", e);}
 		}
 	}
 }
 
 function _contentChangedHandler(type, node) {
-	let location = node.ownerDocument.location;
-	console.log("default location is: " + location);
-	let nodeFix;
-	let check = d.querySelector(".aletheoClass");
+	let location = node.ownerDocument.location; console.log("default location is: " + location); let nodeFix; let check = d.querySelector(".aletheoClass");
 	if(check){check.classList.remove("aletheoClass");}
 	if (window.location.href.indexOf("4chan") != -1) {
 		nodeFix = d.querySelector("#qrForm > div > textarea");
 		if(nodeFix) {
-			nodeFix.classList.add("aletheoClass");
-			console.log(nodeFix);
-			if (nodeFix === node) {
-				if (window.location.href.indexOf("thread") == -1) {
-					let qrTid = d.getElementById("qrTid");
-					location = location + "thread/" + qrTid.textContent + ".html/";
-				}
-			}
+			nodeFix.classList.add("aletheoClass"); console.log(nodeFix);
+			if (nodeFix === node) {if (window.location.href.indexOf("thread") == -1) { let qrTid = d.getElementById("qrTid"); location = location + "thread/" + qrTid.textContent + ".html/"; }}
 		}
 	}
 	if (window.location.href.indexOf("diochan") != -1 || window.location.href.indexOf("ptchan") != -1) {
-		nodeFix = d.querySelector("#quick-reply > div > table > tbody > tr > td > textarea");
-		if(nodeFix) {
-			nodeFix.classList.add("aletheoClass");
-			console.log(nodeFix);
-		}
+		nodeFix = d.querySelector("#quick-reply > div > table > tbody > tr > td > textarea"); if(nodeFix) {nodeFix.classList.add("aletheoClass"); console.log(nodeFix);}
 	}
 	if (window.location.href.indexOf("hispachan") != -1) {
 		nodeFix = d.querySelector("#quick_reply > table > tbody > tr > td > textarea");
 		if(nodeFix) {
-			nodeFix.classList.add("aletheoClass");
-			console.log(nodeFix);
+			nodeFix.classList.add("aletheoClass"); console.log(nodeFix);
 			if (nodeFix === node) {
 				if (window.location.href.indexOf("res") == -1) {
-					let qrTid = d.querySelector(".quick_reply_title");
-					let str = qrTid.textContent;
-					let res = str.substring(18);
-					location = location + "res/" + res + ".html/";
+					let qrTid = d.querySelector(".quick_reply_title"); let str = qrTid.textContent; let res = str.substring(18); location = location + "res/" + res + ".html/";
 				}
 			}
 		}
@@ -365,31 +326,21 @@ function _contentChangedHandler(type, node) {
 }
 //let s = d.querySelector(".replytitle").textContent.toLowerCase(); console.log(s);
 function correctThread(event) {
-	if (window.location.href.indexOf("4chan.") != -1||window.location.href.indexOf("4channel.") != -1) {
-		let sbjct = d.querySelector("div>span.subject").textContent.toLowerCase(); return threadSubjectCheck(event,sbjct);
-	} else if (window.location.href.indexOf("2ch.") != -1||window.location.href.indexOf("2-ch.") != -1) {
-		let sbjct = d.querySelector(".post__title").textContent.toLowerCase(); return threadSubjectCheck(event,sbjct);
-	}else if(window.location.href.indexOf("indiachan.")!=-1||window.location.href.indexOf("pajeet.top")!=-1||window.location.href.indexOf("endchan.")!=-1||window.location.href.indexOf("kohlchan.")!=-1){
-		let sbjct = d.querySelector(".labelSubject").textContent.toLowerCase(); console.log(sbjct); return threadSubjectCheck(event,sbjct);
-	} else if (window.location.href.indexOf("diochan.") != -1||window.location.href.indexOf("sportschan.") != -1) {
-		let sbjct = d.querySelector("label>.subject").textContent.toLowerCase(); return threadSubjectCheck(event,sbjct);
-	} else if (window.location.href.indexOf("hispachan.") != -1) {
-		let sbjct = d.querySelector(".filetitle").textContent.toLowerCase(); return threadSubjectCheck(event,sbjct);
-	} else if (window.location.href.indexOf("ptchan.") != -1) {
-		let sbjct = d.querySelector(".post-subject").textContent.toLowerCase(); return threadSubjectCheck(event,sbjct);
-	} else if (window.location.href.indexOf("dobrochan.") != -1) {
-		let sbjct = d.querySelector(".replytitle").textContent.toLowerCase(); return threadSubjectCheck(event,sbjct);
-	} else { return true; }
+	if (window.location.href.indexOf("4chan.") != -1||window.location.href.indexOf("4channel.") != -1) {let s = d.querySelector("div>span.subject").textContent.toLowerCase(); return threadSubjectCheck(event,s);}
+	else if (window.location.href.indexOf("2ch.") != -1||window.location.href.indexOf("2-ch.") != -1) {let s = d.querySelector(".post__title").textContent.toLowerCase(); return threadSubjectCheck(event,s);}
+	else if(window.location.href.indexOf("indiachan.")!=-1||window.location.href.indexOf("pajeet.top")!=-1||window.location.href.indexOf("endchan.")!=-1||window.location.href.indexOf("kohlchan.")!=-1){let s = d.querySelector(".labelSubject").textContent.toLowerCase(); console.log(s); return threadSubjectCheck(event,s);}
+	else if(window.location.href.indexOf("diochan.")!=-1||window.location.href.indexOf("sportschan.")!=-1){let s = d.querySelector("label>.subject").textContent.toLowerCase(); return threadSubjectCheck(event,s);}
+	else if (window.location.href.indexOf("hispachan.") != -1) { let s = d.querySelector(".filetitle").textContent.toLowerCase(); return threadSubjectCheck(event,s);}
+	else if (window.location.href.indexOf("ptchan.") != -1) { let s = d.querySelector(".post-subject").textContent.toLowerCase(); return threadSubjectCheck(event,s);}
+	else if (window.location.href.indexOf("dobrochan.") != -1) { let s = d.querySelector(".replytitle").textContent.toLowerCase(); return threadSubjectCheck(event,s);} else { return true; }
 }
 
-function threadSubjectCheck(event,sbjct) {
-	if (!sbjct){sbjct="";} 
-	if (sbjct.indexOf("aletheo") != -1) { return true; } else {
-		let mI = _getContent(event).toLowerCase();
-		mI = mI.indexOf("aletheo");
-		if (mI != -1 && sbjct.indexOf("general") == -1) {
-			console.log("not a general and mention");
-			let str = window.location.href;	mI = str.indexOf("#"); if (mI != -1) {str=str.substring(0, mI);} str=str.split("/");str=str[3]+str[4]+str[5];
+function threadSubjectCheck(event,s) {
+	if (!s){s="";} 
+	if (s.indexOf("aletheo") != -1) { return true; } else {
+		let mI = _getContent(event).toLowerCase(); mI = mI.indexOf("aletheo");
+		if (mI!=-1&&s.indexOf("/smg/")==-1&&s.indexOf("/gme/")==-1&&s.indexOf("/cmmg/")==-1&&s.indexOf("/pmg/")==-1) {
+			let str = window.location.href; mI = str.indexOf("#"); if (mI != -1) {str=str.substring(0, mI);} str=str.split("/");str=str[3]+str[4]+str[5];
 			if (mentions.indexOf(str)==-1) {
 				try{ mentions = mentions.split(";"); mentions.push(str); mentions.join(';'); } catch{mentions=mentions + str +";";}browser.storage.local.set({mentionThreads: mentions});
 			}
@@ -415,9 +366,7 @@ function _getContent(event) {
 	let theContent = "";
 	try {
 		switch(event.type) {
-			case "textarea":case "input":theContent = event.node.value;break;
-			case "html":theContent = event.node.body.textContent;break;
-			case "div":case "iframe":theContent = event.node.textContent;break;
+			case "textarea":case "input":theContent=event.node.value;break;case "html":theContent=event.node.body.textContent;break;case "div":case "iframe":theContent=event.node.textContent;break;
 		}
 	} catch(e) {}// possible "can't access dead object" TypeError, DOM object destroyed
 	return theContent;
@@ -425,9 +374,7 @@ function _getContent(event) {
 
 function _getId(element) { return (element.id) ? element.id : ((element.name) ? element.name : ""); }
 
-function _getClassOrNameOrId(element) {
-	return element.classList.contains('aletheoClass') ? "aletheoClass" : (element.name && element.name.length > 0) ? element.name : element.id;
-}
+function _getClassOrNameOrId(element) {return element.classList.contains('aletheoClass')?"aletheoClass":(element.name&&element.name.length>0)?element.name:element.id;}
 
 function _getFormId(element) {
 	let insideForm = false; let parentElm = element;
@@ -523,11 +470,7 @@ function findFields(elem) {
 	if (_isNotIrrelevantInfo(elem)) {
 		if (_isTextInputSubtype(elem.type) && _isDisplayed(elem)) {
 			if(window.location.href.indexOf("4chan")!=-1){
-				t=_getClassOrNameOrId(elem);
-				if(t=="com"){
-					butt=d.querySelector('td>input[type="submit"]');
-				}
-				if (!butt) {butt=d.querySelector('div>input[type="submit"]');}
+				t=_getClassOrNameOrId(elem); if(t=="com"){butt=d.querySelector('td>input[type="submit"]');}if (!butt) {butt=d.querySelector('div>input[type="submit"]');}
 			}
 			if (window.location.href.indexOf("2ch.") != -1 || window.location.href.indexOf("2-ch.") != -1){
 				if(elem.id=="qr-shampoo"){butt=d.querySelector('#qr-submit');} if(elem.id=="shampoo"){butt=d.querySelector('#submit');}
@@ -543,24 +486,18 @@ function findFields(elem) {
 			if (window.location.href.indexOf("ptchan.") != -1) {butt=d.querySelector("#submitpost");}
 			if (window.location.href.indexOf("hispachan.") != -1) {
 				let f = elem.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
-				if (f.id == "quick_reply_window") {
-					butt=d.querySelector("#quick_reply_window>form>table>tbody>tr>td>input[type='submit']");
-				} else {butt=d.querySelector(".postarea>form>table>tbody>tr>td>input[type='submit']");}
-				console.log(butt);
+				if (f.id == "quick_reply_window") { butt=d.querySelector("#quick_reply_window>form>table>tbody>tr>td>input[type='submit']");}
+				else {butt=d.querySelector(".postarea>form>table>tbody>tr>td>input[type='submit']");} console.log(butt);
 			}
 			if (window.location.href.indexOf("diochan.") != -1) {
 				let f = elem.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
-				if (f.id == "quick-reply") {
-					butt=d.querySelector("#quick-reply>div>table>tbody>tr>td>input[type='submit']");
-				} else {butt=d.querySelector("form[name='post']>div>table>tbody>tr>td>input[type='submit']");}
-				console.log(butt);
+				if (f.id == "quick-reply") {butt=d.querySelector("#quick-reply>div>table>tbody>tr>td>input[type='submit']");}
+				else {butt=d.querySelector("form[name='post']>div>table>tbody>tr>td>input[type='submit']");} console.log(butt);
 			}
 			if (window.location.href.indexOf("sportschan.") != -1) {
 				let f = elem.parentNode.parentNode.parentNode.parentNode.parentNode;
-				if (f.id == "quick-reply") {
-					butt=d.querySelector("#quick-reply>table>tbody>tr>td>input[type='submit']");
-				} else {butt=d.querySelector("form[name='post']>table>tbody>tr>td>input[type='submit']");}
-				console.log(butt);
+				if (f.id == "quick-reply") {butt=d.querySelector("#quick-reply>table>tbody>tr>td>input[type='submit']");}
+				else {butt=d.querySelector("form[name='post']>table>tbody>tr>td>input[type='submit']");} console.log(butt);
 			}
 		}
 		return butt;
@@ -582,6 +519,109 @@ function createResponseWindow() {
 		});
 		close.setAttribute("style","position:absolute; bottom: 2px; right:2px;cursor: pointer; visibility:hidden;"); responseDiv.appendChild(close);
 	}
+}
+
+function stripQuote(e){//from markdown and such
+	let temp;
+	if(window.location.href.indexOf("4chan")==-1){
+		if (e.indexOf("[b]") != -1 && e.indexOf("[/b]") != -1) {
+			e = e.split("[b]");	for (let n = 0;n<e.length;n++){	if (e[n].indexOf("[/b]") != -1) { temp = e[n].indexOf("[/b]") + 3; e[n] = e[n].substring(temp,e[n].length); } } e = e.join("");
+		}
+		if (e.indexOf("[i]") != -1 && e.indexOf("[/i]") != -1) {
+			e = e.split("[i]");for (let n = 0;n<e.length;n++){ if (e[n].indexOf("[/i]") != -1) { temp = e[n].indexOf("[/i]") + 3; e[n] = e[n].substring(temp,e[n].length); } } e = e.join("");
+		}
+		if (e.indexOf("[u]") != -1 && e.indexOf("[/u]") != -1) {
+			e = e.split("[u]");	for (let n = 0;n<e.length;n++){	if (e[n].indexOf("[/u]") != -1) { temp = e[n].indexOf("[/u]") + 3; e[n] = e[n].substring(temp,e[n].length); } } e = e.join("");
+		}
+		if (e.indexOf("[o]") != -1 && e.indexOf("[/o]") != -1) {
+			e = e.split("[o]");	for (let n = 0;n<e.length;n++){	if (e[n].indexOf("[/o]") != -1) { temp = e[n].indexOf("[/o]") + 3; e[n] = e[n].substring(temp,e[n].length); } } e = e.join("");
+		}
+		if (e.indexOf("[s]") != -1 && e.indexOf("[/s]") != -1) {
+			e = e.split("[s]");	for (let n = 0;n<e.length;n++){	if (e[n].indexOf("[/s]") != -1) { temp = e[n].indexOf("[/s]") + 3; e[n] = e[n].substring(temp,e[n].length); } } e = e.join("");
+		}
+		if (e.indexOf("[spoiler]") != -1 && e.indexOf("[/spoiler]") != -1) {
+			e = e.split("[spoiler]");for (let n = 0;n<e.length;n++){if (e[n].indexOf("[/spoiler]") != -1) { temp = e[n].indexOf("[/spoiler]") + 9; e[n] = e[n].substring(temp,e[n].length); } } e = e.join("");
+		}
+		if (e.indexOf("[sup]") != -1 && e.indexOf("[/sup]") != -1) {
+			e = e.split("[sup]"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("[/sup]") != -1) { temp = e[n].indexOf("[/sup]") + 5; e[n] = e[n].substring(temp,e[n].length); } } e = e.join("");
+		}
+		if (e.indexOf("[sub]") != -1 && e.indexOf("[/sub]") != -1) {
+			e = e.split("[sub]"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("[/sub]") != -1) { temp = e[n].indexOf("[/sub]") + 5; e[n] = e[n].substring(temp,e[n].length); } } e = e.join("");
+		}
+		if (e.indexOf("[meme]") != -1 && e.indexOf("[/meme]") != -1) {
+			e = e.split("[meme]"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("[/meme]") != -1) { temp = e[n].indexOf("[/meme]") + 6; e[n] = e[n].substring(temp,e[n].length); } } e = e.join("");
+		}
+		if (e.indexOf("[autism]") != -1 && e.indexOf("[/autism]") != -1) {
+			e = e.split("[autism]"); for (let n = 0;n<e.length;n++){ if (e[n].indexOf("[/autism]") != -1) { temp = e[n].indexOf("[/autism]") + 8; e[n] = e[n].substring(temp,e[n].length); } } e = e.join("");
+		}
+		if (e.indexOf("~") != -1 && e.indexOf("/~") != -1) {
+			let eI=e.indexOf("~");if(e[eI+1]!=" "){e=e.split("/~");for(let n=0;n<e.length;n++){if(e[n].indexOf("~")!=-1){temp=e[n].indexOf("~")+1;e[n]=e[n].substring(0,temp);}}e=e.join("");}
+		}
+		if (e.indexOf("!") != -1 && e.indexOf("/!") != -1) {
+			let eI=e.indexOf("!");if(e[eI+1]!=" "){e=e.split("/!");for(let n=0;n<e.length;n++){if(e[n].indexOf("!")!=-1){temp=e[n].indexOf("!")+1;e[n]=e[n].substring(0,temp);}}e=e.join("");}
+		}
+		if (e.indexOf("@") != -1 && e.indexOf("/@") != -1) {
+			let eI=e.indexOf("@");if(e[eI+1]!=" "){e=e.split("/@");for(let n=0;n<e.length;n++){if(e[n].indexOf("@")!=-1){temp=e[n].indexOf("@")+1;e[n]=e[n].substring(0,temp);}}e=e.join("");}
+		}
+		if (e.indexOf("&") != -1 && e.indexOf("/&") != -1) {
+			let eI=e.indexOf("&");if(e[eI+1]!=" "){e=e.split("/&");for(let n=0;n<e.length;n++){if(e[n].indexOf("&")!=-1){temp=e[n].indexOf("&")+1;e[n]=e[n].substring(0,temp);}}e=e.join("");}
+		}
+		if (e.indexOf("+") != -1 && e.indexOf("/+") != -1) {
+			let eI=e.indexOf("+");if(e[eI+1]!=" "){e=e.split("/+");for(let n=0;n<e.length;n++){if(e[n].indexOf("+")!=-1){temp=e[n].indexOf("+")+1;e[n]=e[n].substring(0,temp);}}e=e.join("");}
+		}
+		if (e.indexOf("$") != -1 && e.indexOf("/$") != -1) {
+			let eI=e.indexOf("$");if(e[eI+1]!=" "){e=e.split("/$");for(let n=0;n<e.length;n++){if(e[n].indexOf("$")!=-1){temp=e[n].indexOf("$")+1;e[n]=e[n].substring(0,temp);}}e=e.join("");}
+		}
+		if (e.indexOf("?") != -1 && e.indexOf("/?") != -1) {
+			let eI=e.indexOf("?");if(e[eI+1]!=" "){e=e.split("/?");for(let n=0;n<e.length;n++){if(e[n].indexOf("?")!=-1){temp=e[n].indexOf("?")+1;e[n]=e[n].substring(0,temp);}}e=e.join("");}
+		}
+		if (e.indexOf("#") != -1 && e.indexOf("/#") != -1) {
+			let eI=e.indexOf("#");if(e[eI+1]!=" "){e=e.split("/#");for(let n=0;n<e.length;n++){if(e[n].indexOf("#")!=-1){temp=e[n].indexOf("#")+1;e[n]=e[n].substring(0,temp);}}e=e.join("");}
+		}
+		if (e.indexOf("%") != -1 && e.indexOf("/%") != -1) {
+			let eI=e.indexOf("%");if(e[eI+1]!=" "){e=e.split("/%");for(let n=0;n<e.length;n++){if(e[n].indexOf("%")!=-1){temp=e[n].indexOf("%")+1;e[n]=e[n].substring(0,temp);}}e=e.join("");}
+		}
+		if (e.indexOf("^") != -1 && e.indexOf("/^") != -1) {
+			let eI=e.indexOf("^");if(e[eI+1]!=" "){e=e.split("/^");for(let n=0;n<e.length;n++){if(e[n].indexOf("^")!=-1){temp=e[n].indexOf("^")+1;e[n]=e[n].substring(0,temp);}}e=e.join("");}
+		}
+		if (e.indexOf("**") != -1) { e = e.split("**"); if (e.length > 2) { for (let n = 0;n<e.length;n++){ if (n==1||n%2==1){ e[n]=""; } } } e = e.join(""); }
+		if (e.indexOf("==") != -1) { e = e.split("=="); if (e.length > 2) { for (let n = 0;n<e.length;n++){ if (n==1||n%2==1){ e[n]=""; } } } e = e.join(""); }
+		if (e.indexOf("''") != -1) { e = e.split("''"); if (e.length > 2) { for (let n = 0;n<e.length;n++){ if (n==1||n%2==1){ e[n]=""; } } } e = e.join(""); }
+		if (e.indexOf("'''") != -1) { e = e.split("'''"); if (e.length > 2) { for (let n = 0;n<e.length;n++){ if (n==1||n%2==1){ e[n]=""; } } } e = e.join(""); }
+		if (e.indexOf("__") != -1) { e = e.split("__"); if (e.length > 2) { for (let n = 0;n<e.length;n++){ if (n==1||n%2==1){ e[n]=""; } } } e = e.join(""); }
+		if (e.indexOf("~~") != -1) { e = e.split("~~"); if (e.length > 2) { for (let n = 0;n<e.length;n++){ if (n==1||n%2==1){ e[n]=""; } } } e = e.join(""); }
+	}
+	if (e.indexOf("\n")!=-1){
+		e = e.split("\n");
+		for(let n=0;n<e.length;n++){
+			for(let i=0;i<e[n].length;i++){
+				if(e[n][i]==">"&&e[n][i+1]!=">"&&e[n][i+1]!="1"&&e[n][i+1]!="2"&&e[n][i+1]!="3"&&e[n][i+1]!="4"&&e[n][i+1]!="5"&&e[n][i+1]!="6"&&e[n][i+1]!="7"&&e[n][i+1]!="8"&&e[n][i+1]!="9"){
+					e[n]=e[n].substring(0,i);
+				}
+			}
+		}
+		e = e.join("\n");console.log(e);
+	} else {
+		for(let i=0;i<e.length;i++){
+			if(e[i]==">"&&e[i+1]!=">"&&e[i+1]!="1"&&e[i+1]!="2"&&e[i+1]!="3"&&e[i+1]!="4"&&e[i+1]!="5"&&e[i+1]!="6"&&e[i+1]!="7"&&e[i+1]!="8"&&e[i+1]!="9"){ e=e.substring(0,i); }
+		}
+	}
+	if (e.indexOf(">>")!=-1){
+		e = e.split(">>");for(let n=0;n<e.length;n++){if (e[n].indexOf(" ")>e[n].indexOf("\n")){if(e[n].indexOf("\n")!=-1){temp = e[n].indexOf("\n")+1;}else{temp = e[n].indexOf(" ");}}
+		else if(e[n].indexOf(" ")<e[n].indexOf("\n")) {if(e[n].indexOf(" ")!=-1){temp = e[n].indexOf(" ");}else{temp = e[n].indexOf("\n")+1;}}
+		else{temp = e[n][e[n].length-1];} e[n] = e[n].substring(0,temp);} if(temp<=e[n].length){e[n] = e[n].substring(temp,e[n].length);} else {temp=e[n].length;} e = e.join(";"); console.log(e);
+	}
+	if (e.indexOf("http")!=-1){ 
+		e = e.split("http");
+		for(let n=1;n<e.length;n++){
+			if (e[n].indexOf(" ")>e[n].indexOf("\n")){if(e[n].indexOf("\n")!=-1){temp = e[n].indexOf("\n")+1;}else{temp = e[n].indexOf(" ");}} 
+			else if(e[n].indexOf(" ")<e[n].indexOf("\n")){if(e[n].indexOf(" ")!=-1){temp = e[n].indexOf(" ");}else{temp = e[n].indexOf("\n")+1;}}
+			else {temp=e[0];} if(temp<=e[n].length){e[n] = e[n].substring(temp,e[n].length);} else {temp=e[n].length;e[n] = e[n].substring(temp,e[n].length);} 
+		}
+		e = e.join(""); console.log(e);	
+	}
+	if (e.indexOf("\n")!=-1){e = e.split("\n");e = e.join("");}
+	e = e.toLowerCase(); e = e.replace(/[^a-zа-я]/g, ""); return e;
 }
 
 			}
