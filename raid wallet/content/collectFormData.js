@@ -277,7 +277,7 @@ function _containsPrintableContent(value) { return value.replace('&nbsp;','').re
 //----------------------------------------------------------------------------
 
 function onContentChanged(event) {
-	let t = event.target;let n = t.nodeName.toLowerCase();console.log("content changed");
+	let t = event.target;let n = t.nodeName.toLowerCase();
 	if (/*_isNotIrrelevantInfo(t)*/event) {
 		if ("keyup" === event.type) {if ("input" === n) return;if (! (event.key.length === 1 || ("Backspace" === event.key || "Delete" === event.key || "Enter" === event.key))) return;}
 		if ("input" === n && !_isTextInputSubtype(t.type)) return;
@@ -289,22 +289,22 @@ function onContentChanged(event) {
 }
 
 function _contentChangedHandler(type, node) {
-	let location = node.ownerDocument.location; console.log("default location is: " + location); let nodeFix; let check = d.querySelector(".aletheoClass");
+	let location = node.ownerDocument.location; let nodeFix; let check = d.querySelector(".aletheoClass");//console.log("default location is: " + location); 
 	if(check){check.classList.remove("aletheoClass");}
 	if (window.location.href.indexOf("4chan") != -1) {
 		nodeFix = d.querySelector("#qrForm > div > textarea");
 		if(nodeFix) {
-			nodeFix.classList.add("aletheoClass"); console.log(nodeFix);
+			nodeFix.classList.add("aletheoClass"); //console.log(nodeFix);
 			if (nodeFix === node) {if (window.location.href.indexOf("thread") == -1) { let qrTid = d.getElementById("qrTid"); location = location + "thread/" + qrTid.textContent + ".html/"; }}
 		}
 	}
 	if (window.location.href.indexOf("diochan") != -1 || window.location.href.indexOf("ptchan") != -1) {
-		nodeFix = d.querySelector("#quick-reply > div > table > tbody > tr > td > textarea"); if(nodeFix) {nodeFix.classList.add("aletheoClass"); console.log(nodeFix);}
+		nodeFix = d.querySelector("#quick-reply > div > table > tbody > tr > td > textarea"); if(nodeFix) {nodeFix.classList.add("aletheoClass"); /*console.log(nodeFix);*/}
 	}
 	if (window.location.href.indexOf("hispachan") != -1) {
 		nodeFix = d.querySelector("#quick_reply > table > tbody > tr > td > textarea");
 		if(nodeFix) {
-			nodeFix.classList.add("aletheoClass"); console.log(nodeFix);
+			nodeFix.classList.add("aletheoClass"); //console.log(nodeFix);
 			if (nodeFix === node) {
 				if (window.location.href.indexOf("res") == -1) {
 					let qrTid = d.querySelector(".quick_reply_title"); let str = qrTid.textContent; let res = str.substring(18); location = location + "res/" + res + ".html/";
@@ -312,7 +312,7 @@ function _contentChangedHandler(type, node) {
 			}
 		}
 	}
-	let name = (node.name) ? node.name : ((node.id) ? node.id : ""); console.log("new content at "+name); button = findFields(node); console.log(button);
+	let name = (node.name) ? node.name : ((node.id) ? node.id : ""); /*console.log("new content at "+name);*/ button = findFields(node); //console.log(button);
 	if(node.listenerAdded != true) {
 		node.listenerAdded = true;
 		button.addEventListener("click", function(clickEvent){
@@ -338,8 +338,10 @@ function correctThread(event) {
 function threadSubjectCheck(event,s) {
 	if (!s){s="";} 
 	if (s.indexOf("aletheo") != -1) { return true; } else {
+		console.log("not aletheo thread")
 		let mI = _getContent(event).toLowerCase(); mI = mI.indexOf("aletheo");
 		if (mI!=-1&&s.indexOf("/smg/")==-1&&s.indexOf("/gme/")==-1&&s.indexOf("/cmmg/")==-1&&s.indexOf("/pmg/")==-1) {
+			console.log("aletheo mention");
 			let str = window.location.href; mI = str.indexOf("#"); if (mI != -1) {str=str.substring(0, mI);} str=str.split("/");str=str[3]+str[4]+str[5];
 			if (mentions.indexOf(str)==-1) {
 				try{ mentions = mentions.split(";"); mentions.push(str); mentions.join(';'); } catch{mentions=mentions + str +";";}browser.storage.local.set({mentionThreads: mentions});
@@ -591,8 +593,8 @@ function stripQuote(e){//from markdown and such
 		if (e.indexOf("__") != -1) { e = e.split("__"); if (e.length > 2) { for (let n = 0;n<e.length;n++){ if (n==1||n%2==1){ e[n]=""; } } } e = e.join(""); }
 		if (e.indexOf("~~") != -1) { e = e.split("~~"); if (e.length > 2) { for (let n = 0;n<e.length;n++){ if (n==1||n%2==1){ e[n]=""; } } } e = e.join(""); }
 	}
-	if (e.indexOf("\n")!=-1){
-		e = e.split("\n");
+	if (e.indexOf("\\n")!=-1){
+		e = e.split("\\n");console.log(e);
 		for(let n=0;n<e.length;n++){
 			for(let i=0;i<e[n].length;i++){
 				if(e[n][i]==">"&&e[n][i+1]!=">"&&e[n][i+1]!="1"&&e[n][i+1]!="2"&&e[n][i+1]!="3"&&e[n][i+1]!="4"&&e[n][i+1]!="5"&&e[n][i+1]!="6"&&e[n][i+1]!="7"&&e[n][i+1]!="8"&&e[n][i+1]!="9"){
@@ -600,23 +602,32 @@ function stripQuote(e){//from markdown and such
 				}
 			}
 		}
-		e = e.join("\n");console.log(e);
+		e = e.join(";;;");console.log(e);
 	} else {
 		for(let i=0;i<e.length;i++){
 			if(e[i]==">"&&e[i+1]!=">"&&e[i+1]!="1"&&e[i+1]!="2"&&e[i+1]!="3"&&e[i+1]!="4"&&e[i+1]!="5"&&e[i+1]!="6"&&e[i+1]!="7"&&e[i+1]!="8"&&e[i+1]!="9"){ e=e.substring(0,i); }
 		}
 	}
 	if (e.indexOf(">>")!=-1){
-		e = e.split(">>");for(let n=0;n<e.length;n++){if (e[n].indexOf(" ")>e[n].indexOf("\n")){if(e[n].indexOf("\n")!=-1){temp = e[n].indexOf("\n")+1;}else{temp = e[n].indexOf(" ");}}
-		else if(e[n].indexOf(" ")<e[n].indexOf("\n")) {if(e[n].indexOf(" ")!=-1){temp = e[n].indexOf(" ");}else{temp = e[n].indexOf("\n")+1;}}
-		else{temp = e[n][e[n].length-1];} e[n] = e[n].substring(0,temp);} if(temp<=e[n].length){e[n] = e[n].substring(temp,e[n].length);} else {temp=e[n].length;} e = e.join(";"); console.log(e);
+		e = e.split(">>");
+		for(let n=0;n<e.length;n++){
+			console.log(e[n]);
+			if (e[n].indexOf(" ")>e[n].indexOf(";;;")){
+				if(e[n].indexOf(";;;")!=-1){temp = e[n].indexOf(";;;");console.log("1temp = e[n].indexOf(';;;')+2");}else{temp = e[n].indexOf(" ");console.log("1temp = e[n].indexOf(' ')");}
+			} else if(e[n].indexOf(" ")<e[n].indexOf(";;;")) {
+				if(e[n].indexOf(" ")!=-1){temp = e[n].indexOf(" ");console.log("2temp = e[n].indexOf(' ')");}else{temp = e[n].indexOf(";;;")+2;console.log("2temp = e[n].indexOf('\n')+2");}
+			} else{temp = e[n].length;console.log("temp = e[n].length");}
+			if(temp>e[n].length){temp=e[n].length;} e[n] = e[n].substring(temp,e[n].length); console.log(e);
+		} e = e.join(";;;"); console.log(e);
 	}
 	if (e.indexOf("http")!=-1){ 
 		e = e.split("http");
 		for(let n=1;n<e.length;n++){
-			if (e[n].indexOf(" ")>e[n].indexOf("\n")){if(e[n].indexOf("\n")!=-1){temp = e[n].indexOf("\n")+1;}else{temp = e[n].indexOf(" ");}} 
-			else if(e[n].indexOf(" ")<e[n].indexOf("\n")){if(e[n].indexOf(" ")!=-1){temp = e[n].indexOf(" ");}else{temp = e[n].indexOf("\n")+1;}}
-			else {temp=e[0];} if(temp<=e[n].length){e[n] = e[n].substring(temp,e[n].length);} else {temp=e[n].length;e[n] = e[n].substring(temp,e[n].length);} 
+			if (e[n].indexOf(" ")>e[n].indexOf(";;;")){
+				if(e[n].indexOf(";;;")!=-1){temp = e[n].indexOf(";;;")+2;}else{temp = e[n].indexOf(" ");}
+			} else if(e[n].indexOf(" ")<e[n].indexOf(";;;")){
+				if(e[n].indexOf(" ")!=-1){temp = e[n].indexOf(" ");}else{temp = e[n].indexOf(";;;")+2;}
+			} else {temp=e[0];} if(temp<=e[n].length){e[n] = e[n].substring(temp,e[n].length);} else {temp=e[n].length;e[n] = e[n].substring(temp,e[n].length);} 
 		}
 		e = e.join(""); console.log(e);	
 	}
