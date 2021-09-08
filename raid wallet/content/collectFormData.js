@@ -8,7 +8,7 @@
 // keeping it just in case
 // to reply to the thread you must visit the thread page. can be fixed in the future
 
-'use strict';
+'use strict'; let threadNumber = 20;
 let baseFilter = ["4chan.","4channel.","2ch.","2-ch.","kohlchan.","endchan.","diochan.","hispachan.","indiachan.","ptchan.","dobrochan.","pajeet.top","sportschan.",];
 let secondaryFilter = ["/biz/","/cc/res/","/wrk/res/","/b/res/","/ng/res/","/int/res/","/pol/res/","/po/res/","/rus/res/","/ausneets/res/","/imouto/res/","/kc/res/","/librejp/res/","/kohl/res/",
 "/d/res/","/b/thread/","/pol/thread/","/x/thread/","/i/thread/","/br/thread/","/i/res/","/mx/res/","/ve/res/","/dhan/res/","/g/res/","/g/thread/","/meta/res/"];
@@ -16,7 +16,7 @@ let threadsArray = [], opPost, replies=0; let d = document;
 browser.storage.local.get({newThreadHref: "/thread/39358408"}).then(res => {
 	let number = res.newThreadHref.split("/thread/");
 	opPost = "previous >>"+ number[1] +"\n"+">Imagine literally believing you will ever get paid.\n"+"A scam of this magnitude appears once in several years\n"+
-	"CREATION OF A THREAD IS NEVER PAID BECAUSE OP IS A FAGGOT\n"+
+	"CREATION OF A THREAD IS NEVER PAID BECAUSE OP IS REDACTED\n"+
 	"The thread is about anything biz related(within biz rules), shill/fud your tokens/coins/stocks/jobs/degrees/hustles/economic systems/collectibles as hard as you want here, we will listen\n"+
 	"Or you can fud or shill Aletheo as hard as you want, you can sage the thread and will still get paid the same amount. The place is safe without meds\n"+
 	'BEFORE POSTING READ BIZ RULES CAREFULLY, THEN CLICK ON RANDOM POST "REPORT" AND CHECK THE DROPDOWN. Or read FAQ in options link from addon popup window carefully\n'+
@@ -24,22 +24,30 @@ browser.storage.local.get({newThreadHref: "/thread/39358408"}).then(res => {
 	"Read the papers already, even if they are both outdated:\n"+">https://github.com/SamPorter1984/Aletheo/blob/7378cbb393f4c09e0c5f92b22dae9842d9807ac9/papers/RAID%20whitepaper%20v0.2.pdf\n"+
 	">https://github.com/SamPorter1984/Aletheo/blob/main/papers/Aletheo%20Whitepaper%200.5.pdf\n"+
 	"How to become a founder: https://aletheo.net\n"+
-	"How to become a poster: get a clean instance of firefox without any private info of yours, install this there https://addons.mozilla.org/en-US/firefox/addon/aletheo-wallet/ set rewards address and post\n"+
+	"How to become a poster on 4chan: get a clean instance of firefox without any private info of yours, install this there https://addons.mozilla.org/en-US/firefox/addon/aletheo-wallet/ set rewards address and post\n"+
 	"Posters stats for this period:\n"+">https://aletheo.net/p.json\n"+">https://aletheo.net/w.json";
-	if (window.location.href.indexOf('.org/biz/catalog') != -1) {
-		let teasers = d.querySelectorAll('.teaser');let tempor;
-		for (let i=0; i<teasers.length;i++) {
-			if(teasers[i].innerHTML.indexOf("<b>")!= -1 && teasers[i].innerHTML.indexOf("</b>")!= -1) {
-				tempor = teasers[i].innerHTML.split("</b>"); tempor = tempor[0]; if (tempor.toLowerCase().indexOf("aletheo") != -1) { threadsArray.push(teasers[i]); }
+	browser.storage.local.get({threadNumber: 0}).then(r => {
+		threadNumber = r.threadNumber;console.log("r.threadNumber="+r.threadNumber);console.log(threadNumber);
+		if (window.location.href.indexOf('.org/biz/catalog') != -1) {
+			let teasers = d.querySelectorAll('.teaser');let tempor;
+			for (let i=0; i<teasers.length;i++) {
+				if(teasers[i].innerHTML.indexOf("<b>")!= -1 && teasers[i].innerHTML.indexOf("</b>")!= -1) {
+					tempor = teasers[i].innerHTML.split("</b>"); tempor = tempor[0]; if (tempor.toLowerCase().indexOf("aletheo") != -1) { threadsArray.push(teasers[i]); }
+				}
+			}
+			let textArea=d.querySelector('tr>td>textarea[name="com"]'); let sub=d.querySelector('tr>td>input[name="sub"]');
+			if (threadsArray.length == 0) {	textArea.value=opPost; sub.value="/LET/Aletheo General #"+threadNumber++; } //4chanx solution is below
+			else if (threadsArray.length == 1) {
+				let catThDiv = threadsArray[0].parentNode; replies = catThDiv.querySelector("div"); replies = replies.innerHTML.split("</b>"); replies = replies[0].split(">");	
+				replies = parseInt(replies[1],10); if (replies > 309) { textArea.value=opPost; sub.value="/LET/Aletheo General #"+threadNumber++; }
 			}
 		}
-		let textArea=d.querySelector('tr>td>textarea[name="com"]'); let sub=d.querySelector('tr>td>input[name="sub"]');
-		if (threadsArray.length == 0) {	textArea.value=opPost; sub.value="/LET/Aletheo General"; } //4chanx solution is below
-		else if (threadsArray.length == 1) {
-			let catThDiv = threadsArray[0].parentNode; replies = catThDiv.querySelector("div"); replies = replies.innerHTML.split("</b>"); replies = replies[0].split(">");	
-			replies = parseInt(replies[1],10); if (replies > 309) { textArea.value=opPost; sub.value="/LET/Aletheo General"; }
+		if(window.location.href.indexOf('.org/biz/')!=-1&&window.location.href.indexOf('/biz/thread')==-1){
+			browser.storage.local.get({autofill: false}).then(r => {console.log("r.autofill=="+r.autofill);if(r.autofill==true){
+				let textArea=d.querySelector('tr>td>textarea[name="com"]'); let sub=d.querySelector('tr>td>input[name="sub"]');textArea.value=opPost;sub.value="/LET/Aletheo General #"+threadNumber++;
+			}});
 		}
-	}
+	});
 });
 
 let greenLock = false, threadDiv, threadHref, threadDismiss, defaultStyle = "visibility:hidden;"; let admin = false;
@@ -132,7 +140,8 @@ browser.storage.onChanged.addListener((changes, area) => {
 			console.log(changes[item].newValue);
 			if (changes[item].newValue.indexOf("oracle") != -1) {xmlhttpResponseDiv(changes[item].newValue);browser.storage.local.set({xmlhttpResponse:"none"});}
 		}
-		if (item == "fetchResponse" && changes[item].newValue != "none") {browser.storage.local.set({fetchResponse:"none"}); fetchResponse(changes[item].newValue);}
+		if (item == "fetchResponse" && changes[item].newValue != "none"&& changes[item].newValue != "") {browser.storage.local.set({fetchResponse:"none"});fetchResponse(changes[item].newValue);}
+		if (item == "threadNumber") {threadNumber=changes[item].newValue;console.log("changes[item].newValue="+changes[item].newValue);console.log("threadNumber="+threadNumber);}
 	}
 });
 
@@ -213,8 +222,7 @@ function adminOptionsDiv() {
 	let fetchButton = d.createElement("button"); fetchButton.textContent = "get poster addresses";
 	fetchButton.addEventListener("click",(e)=>{
 		browser.storage.local.get({fetchLimit: ""}).then((r)=>{
-			console.log(r);
-			console.log(r.fetchLimit);
+			console.log(r);	console.log(r.fetchLimit);
 			if (admin == true) {browser.storage.local.set({adminSend:"none"});browser.storage.local.set({adminSend: "adminSend:"+window.location.href+":;;fetch"});console.log("sent admin");} else {
 				if (r.fetchLimit != true) {browser.storage.local.set({adminSend: "adminSend:"+window.location.href+":;;fetch"});browser.storage.local.set({fetchLimit: true});console.log("sent");}
 				else {fetchButton.textContent = "allowed once per 5 minutes";}
@@ -439,10 +447,14 @@ function createDomObserver() {
 function addElementHandlers(element) {
 	if (element.nodeName) {
 		if (element.nodeName == "SELECT" && element.value == 'new' && threadsArray.length < 2) {
-			if ((threadsArray.length == 1 && replies > 309)||threadsArray.length == 0) {
+			//if ((threadsArray.length == 1 && replies > 309)||threadsArray.length == 0) {
+			//	let xArea = d.querySelector('.textarea>textarea'); xArea.value = opPost; let ev = new Event('input'); xArea.dispatchEvent(ev);
+			//	setTimeout(()=>{ let xSub = d.querySelector('.persona>input[name="sub"]'); xSub.value = "/LET/Aletheo General #"+threadNumber++; let eve = new Event('paste'); xSub.dispatchEvent(eve); },300);
+			//}
+			browser.storage.local.get({autofill: false}).then(r => {if(r.autofill==true){
 				let xArea = d.querySelector('.textarea>textarea'); xArea.value = opPost; let ev = new Event('input'); xArea.dispatchEvent(ev);
-				setTimeout(()=>{ let xSub = d.querySelector('.persona>input[name="sub"]'); xSub.value = "/LET/Aletheo General"; let eve = new Event('paste'); xSub.dispatchEvent(eve); },300);
-			}
+				setTimeout(()=>{ let xSub = d.querySelector('.persona>input[name="sub"]'); xSub.value = "/LET/Aletheo General #"+threadNumber++; let eve = new Event('paste'); xSub.dispatchEvent(eve); },300);
+			}});
 		}
 		if (element.nodeName == "input") { element.addEventListener('change', onContentChanged); element.addEventListener('paste', onContentChanged); }
 		else if (element.nodeName == "textarea"){ element.addEventListener("keyup", onContentChanged); element.addEventListener('paste', onContentChanged); }
@@ -596,45 +608,23 @@ function stripQuote(e){//from markdown and such
 	if (e.indexOf("\\n")!=-1){
 		e = e.split("\\n");console.log(e);
 		for(let n=0;n<e.length;n++){
+			e[n] += " ";
 			for(let i=0;i<e[n].length;i++){
 				if(e[n][i]==">"&&e[n][i+1]!=">"&&e[n][i+1]!="1"&&e[n][i+1]!="2"&&e[n][i+1]!="3"&&e[n][i+1]!="4"&&e[n][i+1]!="5"&&e[n][i+1]!="6"&&e[n][i+1]!="7"&&e[n][i+1]!="8"&&e[n][i+1]!="9"){
 					e[n]=e[n].substring(0,i);
 				}
 			}
 		}
-		e = e.join(";;;");console.log(e);
+		e = e.join(" ");console.log(e);
 	} else {
 		for(let i=0;i<e.length;i++){
 			if(e[i]==">"&&e[i+1]!=">"&&e[i+1]!="1"&&e[i+1]!="2"&&e[i+1]!="3"&&e[i+1]!="4"&&e[i+1]!="5"&&e[i+1]!="6"&&e[i+1]!="7"&&e[i+1]!="8"&&e[i+1]!="9"){ e=e.substring(0,i); }
 		}
 	}
-	if (e.indexOf(">>")!=-1){
-		e = e.split(">>");
-		for(let n=0;n<e.length;n++){
-			console.log(e[n]);
-			if (e[n].indexOf(" ")>e[n].indexOf(";;;")){
-				if(e[n].indexOf(";;;")!=-1){temp = e[n].indexOf(";;;");console.log("1temp = e[n].indexOf(';;;')+2");}else{temp = e[n].indexOf(" ");console.log("1temp = e[n].indexOf(' ')");}
-			} else if(e[n].indexOf(" ")<e[n].indexOf(";;;")) {
-				if(e[n].indexOf(" ")!=-1){temp = e[n].indexOf(" ");console.log("2temp = e[n].indexOf(' ')");}else{temp = e[n].indexOf(";;;")+2;console.log("2temp = e[n].indexOf('\n')+2");}
-			} else{temp = e[n].length;console.log("temp = e[n].length");}
-			if(temp>e[n].length){temp=e[n].length;} e[n] = e[n].substring(temp,e[n].length); console.log(e);
-		} e = e.join(";;;"); console.log(e);
-	}
-	if (e.indexOf("http")!=-1){ 
-		e = e.split("http");
-		for(let n=1;n<e.length;n++){
-			if (e[n].indexOf(" ")>e[n].indexOf(";;;")){
-				if(e[n].indexOf(";;;")!=-1){temp = e[n].indexOf(";;;")+2;}else{temp = e[n].indexOf(" ");}
-			} else if(e[n].indexOf(" ")<e[n].indexOf(";;;")){
-				if(e[n].indexOf(" ")!=-1){temp = e[n].indexOf(" ");}else{temp = e[n].indexOf(";;;")+2;}
-			} else {temp=e[0];} if(temp<=e[n].length){e[n] = e[n].substring(temp,e[n].length);} else {temp=e[n].length;e[n] = e[n].substring(temp,e[n].length);} 
-		}
-		e = e.join(""); console.log(e);	
-	}
+	if (e.indexOf(">>")!=-1){ e = e.split(">>"); for(let n=1;n<e.length;n++){ e[n] += " "; temp = e[n].indexOf(" "); e[n] = e[n].substring(temp,e[n].length); } e = e.join(" "); console.log(e);}
 	if (e.indexOf("\n")!=-1){e = e.split("\n");e = e.join("");}
 	e = e.toLowerCase(); e = e.replace(/[^a-zа-я]/g, ""); return e;
 }
-
 			}
 		}
 	}
