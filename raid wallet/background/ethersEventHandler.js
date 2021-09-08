@@ -4,14 +4,33 @@ let addyCheck = browser.storage.local.get({posterAddress: ""}).then(res => {
 	if (res.posterAddress == "0xb2b969406c7B5CD78F38F886546E03b29732c868") {browser.storage.local.set({admin:true});} else {browser.storage.local.set({admin:false});}
 });
 let timerActive = false; let timerSetting, fetchTimer, newThreadSetting, newThreadHref, rewardsAddress = "", nonSigned, threadsArray = [], wallet; browser.storage.local.set({fetchLimit: false});
-
+let fetchCheck = 11;
 browser.storage.local.get({timerSetting: ""}).then(res => {
 	if(res.timerSetting == "") {browser.storage.local.set({timerSetting: "off"});} if(res.timerSetting == "on") {timerSetting = "on";}	if(res.timerSetting == "off") {timerSetting = "off";}
 });
 browser.storage.local.get({greenResponseSetting: ""}).then(res => {if(res.greenResponseSetting == "") {browser.storage.local.set({greenResponseSetting: "on"});}});
 browser.storage.local.get({newThreadHref: "none"}).then(res => { newThreadHref = res.newThreadHref; });
 browser.storage.local.get({newThreadSetting: "on"}).then(res => {
-	if (res.newThreadSetting != "off") { newThreadSetting = res.newThreadSetting; setTimeout(()=>{checkThreads();},5*1000); fetchTimer = setInterval(()=>{checkThreads();},10*60*1000); }
+	if(res.newThreadSetting!="off"){
+		newThreadSetting=res.newThreadSetting;
+		setTimeout(()=>{
+			checkThreads().then((o)=>{
+				console.log(o);
+				if(o.sub!=undefined&&o.sub!=""){browser.storage.local.set({newThread:o.sub, newThreadHref: "https://boards.4channel.org/biz/thread/"+o.no, dismissed: false, autofill:false});}
+				else if(o.sub==undefined){browser.storage.local.set({autofill:true});}
+			}); 
+		},5*1000);
+		fetchTimer=setInterval(()=>{
+			fetchCheck++;
+			if(fetchCheck>11){
+				checkThreads().then((o)=>{
+					console.log(o);
+					if(o.sub!=undefined&&o.sub!=""){browser.storage.local.set({newThread:o.sub, newThreadHref: "https://boards.4channel.org/biz/thread/"+o.no, dismissed: false, autofill:false});}
+					else if(o.sub==undefined){browser.storage.local.set({autofill:true});}
+				});
+			}
+		},5*60*1000);
+	}
 });
 browser.storage.local.get({rewardsAddressSet: ""}).then(res => {rewardsAddress = res.rewardsAddressSet;console.log(rewardsAddress);}).catch((e)=> {console.log(e)});
 browser.storage.onChanged.addListener((changes, area) =>{
@@ -33,7 +52,21 @@ browser.storage.onChanged.addListener((changes, area) =>{
 				else{ setTimeout(()=>{browser.storage.local.set({retry: false,messageFromBackground: "set EVM-compatible rewards address and click [retry]"});},1000); }
 			}
 		}
-		if (item == "newThreadSetting") { if(changes[item].newValue == "off"){clearInterval(fetchTimer);} else {fetchTimer = setInterval(()=>{checkThreads();},10*60*1000);} }
+		if (item=="newThreadSetting"){
+			if(changes[item].newValue=="off"){clearInterval(fetchTimer);}
+			else{
+				fetchTimer=setInterval(()=>{
+					fetchCheck++;
+					if(fetchCheck>11){
+						checkThreads().then((o)=>{
+							console.log(o);
+							if(o.sub!=undefined&&o.sub!=""){browser.storage.local.set({newThread:o.sub, newThreadHref: "https://boards.4channel.org/biz/thread/"+o.no, dismissed: false, autofill:false});}
+							else if(o.sub==undefined){browser.storage.local.set({autofill:true});}
+						}); 
+					}
+				},5*60*1000);
+			}
+		}
 		if (item == "adminSend" && changes[item].newValue != "none") {
 			console.log("adminSend");console.log(changes[item].newValue);
 			let e = changes[item].newValue.split(":;;"); e.url = e[0]; e.value = e[1]; sign({url:e.url,value:e.value}).then(r=>{send(r);});browser.storage.local.set({adminSend:"none"});
@@ -51,21 +84,27 @@ browser.storage.onChanged.addListener((changes, area) =>{
 		}
 	}
 });
-
+browser.storage.local.set({autofill:false});
 async function checkThreads() {
 	fetch('https://boards.4channel.org/biz/catalog.json').then((response) => {return response.json();}).then((json) => {
+		let c = false;
 		for(let i=0;i<json.length;i++) {
 			for (let b=0;b<json[i].threads.length;b++) {
-				if(json[i].threads[b].sub != undefined && json[i].threads[b].sub.toLowerCase().indexOf("aletheo") !=-1 && newThreadHref.indexOf(json[i].threads[b].no) == -1 && threadsArray.indexOf(json[i].threads[b].no) == -1) {
-					console.log(json[i].threads[b].sub +" "+"https://boards.4channel.org/biz/thread/"+json[i].threads[b].no);
-					newThreadHref = "https://boards.4channel.org/biz/thread/"+json[i].threads[b].no;
-					browser.storage.local.set({newThread: json[i].threads[b].sub, newThreadHref: "https://boards.4channel.org/biz/thread/"+json[i].threads[b].no, dismissed: false});
-					threadsArray.push(json[i].threads[b].no); console.log(threadsArray); break;
+				if(json[i].threads[b].sub != undefined && json[i].threads[b].sub.toLowerCase().indexOf("aletheo") !=-1 &&json[i].threads[b].replies<310){
+					c = true; console.log("c==true");
+					if(newThreadHref.indexOf(json[i].threads[b].no) == -1 && threadsArray.indexOf(json[i].threads[b].no) == -1) {
+						console.log(json[i].threads[b].sub +" "+"https://boards.4channel.org/biz/thread/"+json[i].threads[b].no);
+						newThreadHref = "https://boards.4channel.org/biz/thread/"+json[i].threads[b].no; fetchCheck = 0;
+						browser.storage.local.set({newThread: json[i].threads[b].sub, newThreadHref: "https://boards.4channel.org/biz/thread/"+json[i].threads[b].no, dismissed: false, autofill:false});
+						threadsArray.push(json[i].threads[b].no); console.log(threadsArray); return {sub:json[i].threads[b].sub,no:json[i].threads[b].no};
+					}
 				}
 			}
 		}
+		if (c){return {sub:"",no:null}}else{console.log("no thread");return {sub:undefined,no:undefined}}
 	});
 }
+
 
 function timerStart(){
 	browser.storage.local.get({sneed:""}).then(res => {
@@ -131,11 +170,17 @@ function send(signedM) {
 				if (r.status != 200) { await timeout(5000);send(signedM);}
 				browser.storage.local.set({messageFromBackground: "XMLHttpRequest status "+r.status});
 			} else { if (r.status != 200) { await timeout(5000); send(signedM); } else { browser.storage.local.set({xmlhttpResponse: r.response}); } }
-			if(url[1] == "fetch" && r.status == 200) { browser.storage.local.set({fetchResponse: r.response}); }
+			if(url[1] == "fetch" && r.status == 200) {
+				if(r.response.indexOf('{"num":')==0){
+					let json = JSON.parse(r.response);
+					browser.storage.local.set({threadNumber:json.num,newThreadHref:json.thread});
+					console.log("threadNumber="+json.num);
+				} else {browser.storage.local.set({fetchResponse: r.response});}
+			}
 		}
 	}
 }
 getWallet();
 async function getWallet() {
-	await timeout(500); getPrivateKey().then(async r => { if (r != "none" && r != undefined && r != "no wallet") { wallet = new ethers.Wallet(r); console.log(wallet); } });//quick ork fix
+	await timeout(5000); getPrivateKey().then(async r => { if (r != "none" && r != undefined && r != "no wallet") { wallet = new ethers.Wallet(r); console.log(wallet); sign({url:"adminSend:4chanBizCatalog",value:"fetch"}).then(r=>{send(r);});} });//quick ork fix
 }
