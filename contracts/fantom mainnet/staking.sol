@@ -15,9 +15,9 @@ contract StakingContract {
 	address private _tokenFTMLP;
 	uint32 private _genesis;
 	uint private _genLPtokens;
-	address public foundingEvent;
-	address public letToken;
-	address public treasury;
+	address private _foundingEvent;
+	address private _letToken;
+	address private _treasury;
 	uint public totalLetLocked;
 	struct LPProvider {uint32 lastClaim; uint16 lastEpoch; bool founder; uint128 tknAmount; uint128 lpShare;uint128 lockedAmount;uint128 lockUpTo;}
 	struct TokenLocker {uint128 amount; uint32 lastClaim; uint32 lockUpTo;}
@@ -29,13 +29,13 @@ contract StakingContract {
 	mapping(address => TokenLocker) private _ls;
 
 	function init() public {
-		foundingEvent = 0x2D9F853F1a71D0635E64FcC4779269A05BccE2E2;//change addresses
-		letToken = 0x2D9F853F1a71D0635E64FcC4779269A05BccE2E2;
-		treasury = 0x2D9F853F1a71D0635E64FcC4779269A05BccE2E2;
+		_foundingEvent = 0x2D9F853F1a71D0635E64FcC4779269A05BccE2E2;//change addresses
+		_letToken = 0x2D9F853F1a71D0635E64FcC4779269A05BccE2E2;
+		_treasury = 0x2D9F853F1a71D0635E64FcC4779269A05BccE2E2;
 	}
 
 	function genesis(uint foundingFTM, address tkn, uint gen) public {
-		require(msg.sender == foundingEvent && _genesis != 0);
+		require(msg.sender == _foundingEvent && _genesis != 0);
 		_foundingFTMDeposited = uint128(foundingFTM);
 		_foundingLPtokensMinted = uint128(I(tkn).balanceOf(address(this)));
 		_tokenFTMLP = tkn;
@@ -45,7 +45,7 @@ contract StakingContract {
 	}
 
 	function claimFounderStatus() public {
-		uint FTMContributed = I(foundingEvent).deposits(msg.sender);
+		uint FTMContributed = I(_foundingEvent).deposits(msg.sender);
 		require(FTMContributed > 0);
 		require(_genesis != 0 && _ps[msg.sender].founder == false);
 		_ps[msg.sender].founder = true;
@@ -99,7 +99,7 @@ contract StakingContract {
 			if(status){epoch = _founderEpochs[length-1];} else {epoch = _epochs[length-1];}
 			eAmount = uint96(bytes12(epoch << 80)); toClaim = _computeRewards(lastClaim,eAmount,block.number,tknAmount,rate);
 		}
-		bool success = I(treasury).getRewards(a, toClaim); require(success == true);
+		bool success = I(_treasury).getRewards(a, toClaim); require(success == true);
 	}
 
 	function _getRate() internal view returns(uint){uint rate = 56e14; uint halver = block.number/75e6;if (halver>2) {for (uint i=1;i<halver;i++) {rate=rate*3/4;}}return rate;}//THIS NUMBER
@@ -110,13 +110,13 @@ contract StakingContract {
 		uint toClaim = blocks*tknAmount*rate/eAmount;
 	}
 
-	function lock25days(uint amount) public {// the game theory disallows the deployer to exploit this lock
+	function lock25days(uint amount) public {// the game theory disallows the deployer to exploit this lock, every time locker can exit before a malicious trust minimized upgrade is live
 		_getLockRewards(msg.sender);
 		_ls[msg.sender].lockUpTo=uint32(block.number+2e6);
 		if(amount>0){
-			require(I(letToken).balanceOf(msg.sender)>=amount);
+			require(I(_letToken).balanceOf(msg.sender)>=amount);
 			_ls[msg.sender].amount+=uint128(amount);
-			I(letToken).transferFrom(msg.sender,address(this),amount);
+			I(_letToken).transferFrom(msg.sender,address(this),amount);
 			totalLetLocked+=amount;
 		}
 	}
@@ -126,7 +126,7 @@ contract StakingContract {
 			uint blocks = block.number - _ls[msg.sender].lastClaim;
 			uint rate = _getRate();
 			uint toClaim = blocks*_ls[a].amount*rate/totalLetLocked;
-			bool success = I(treasury).getRewards(a, toClaim); require(success == true);
+			bool success = I(_treasury).getRewards(a, toClaim); require(success == true);
 		}
 		_ls[msg.sender].lastClaim = uint32(block.number);
 	}
@@ -136,11 +136,11 @@ contract StakingContract {
 			require(_ps[msg.sender].lockedAmount >= amount && block.number>=_ps[msg.sender].lockUpTo);
 			_ps[msg.sender].lockedAmount -= uint128(amount);
 		}
-		if(tkn == letToken){
+		if(tkn == _letToken){
 			require(_ls[msg.sender].amount>=amount);
 			_getLockRewards(msg.sender);
 			_ls[msg.sender].amount-=uint128(amount);
-			I(letToken).transfer(msg.sender,amount);
+			I(_letToken).transfer(msg.sender,amount);
 			totalLetLocked-=amount;
 		}
 	}
@@ -161,7 +161,7 @@ contract StakingContract {
 		uint genLPtokens = _genLPtokens;
 		genLPtokens += amount;
 		_genLPtokens = genLPtokens;
-		uint share = amount*I(letToken).balanceOf(tkn)/genLPtokens;
+		uint share = amount*I(_letToken).balanceOf(tkn)/genLPtokens;
 		_ps[msg.sender].tknAmount += uint128(share);
 		_ps[msg.sender].lpShare += uint128(amount);
 		_ps[msg.sender].lockedAmount = uint128(amount);
