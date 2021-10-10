@@ -78,6 +78,6 @@ contract Treasury {
 		require(block.number>genesisBlock+3e6);
 		uint withd =  9e24 - I(letToken).balanceOf(address(this));// balanceOf(treasury)
 		uint allowed = (block.number - genesisBlock- 3e6)*28e14 - withd;//3 million blocks delay, only 10% of all emission
-		if (allowed>=420e18){airdrops[msg.sender]=false;I(letToken).transfer(msg.sender, 42e18);}
+		if (allowed>=420e18){airdrops[msg.sender]=false;I(letToken).transfer(msg.sender, 420e18);}
 	}
 }
