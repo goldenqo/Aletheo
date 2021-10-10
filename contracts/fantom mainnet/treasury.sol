@@ -53,7 +53,8 @@ contract Treasury {
 // these checks leave less room for deployer to be malicious. it's basically useless to plug-in malicious logic, because it's impossible to claim a lot maliciously, it's still within emission limits
 	function getRewards(address a,uint amount) external{ //for posters, staking and oracles
 		uint genesisBlock = I(founding).genesisBlock();//founding
-		require(genesisBlock != 0 && msg.sender == 0x93bF14C7Cf7250b09D78D4EadFD79FCA01BAd9F8 || msg.sender == 0x2D9F853F1a71D0635E64FcC4779269A05BccE2E2 || msg.sender == 0x742133180738679782538C9e66A03d0c0270acE8);
+		require(genesisBlock != 0); 
+		require(msg.sender == 0x93bF14C7Cf7250b09D78D4EadFD79FCA01BAd9F8 || msg.sender == 0x2D9F853F1a71D0635E64FcC4779269A05BccE2E2 || msg.sender == 0x742133180738679782538C9e66A03d0c0270acE8);
 		if (msg.sender == 0x2D9F853F1a71D0635E64FcC4779269A05BccE2E2) {// if job market(posters)
 			uint withd =  9e24 - I(letToken).balanceOf(address(this));// balanceOf(treasury)
 			uint allowed = (block.number - genesisBlock)*56e14 - withd;//20% of all emission max
