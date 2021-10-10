@@ -29,12 +29,11 @@ contract VSRERC {
 		_name = "Aletheo";
 		_symbol = "LET";
 		_balances[0x2D9F853F1a71D0635E64FcC4779269A05BccE2E2] = 1e24;//founding event
-		_balances[0x2D9F853F1a71D0635E64FcC4779269A05BccE2E2] = 896e22;//treasury
-		_balances[0x5C8403A2617aca5C86946E32E14148776E37f72A] = 4e22;//reserved for airdrop
+		_balances[0x2D9F853F1a71D0635E64FcC4779269A05BccE2E2] = 9e24;//treasury
 	}
 	function name() public view returns (string memory) {return _name;}
 	function symbol() public view returns (string memory) {return _symbol;}
-	function totalSupply() public view returns (uint) {return 10e24;}
+	function totalSupply() public view returns (uint) {return 10e24-_balances[0x2D9F853F1a71D0635E64FcC4779269A05BccE2E2];}//subtract balance of treasury
 	function decimals() public pure returns (uint) {return 18;}
 	function balanceOf(address a) public view returns (uint) {return _balances[a];}
 	function transfer(address recipient, uint amount) public returns (bool) {_transfer(msg.sender, recipient, amount);return true;}
