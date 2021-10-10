@@ -13,7 +13,6 @@ contract FoundingEvent {
 	mapping(address => uint) public deposits;
 	address payable private _deployer;
 	bool private _lgeOngoing;
-	address private _staking;
 	uint public hardcap;
 	uint public genesisBlock;
 
@@ -43,6 +42,6 @@ contract FoundingEvent {
 		I(WFTM).transfer(tknFTMLP, FTMDeposited);
 		I(tknFTMLP).mint(staking);
 		I(staking).genesis(FTMDeposited, tknFTMLP,block.number);
-		delete _staking; delete _lgeOngoing; delete _deployer; delete hardcap; delete _oracle;
+		delete _deployer; delete hardcap;
 	}
 }
