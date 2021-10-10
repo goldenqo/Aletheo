@@ -42,7 +42,7 @@ contract Treasury {
 		bens[msg.sender].amount -= uint88(toClaim);
 		I(0xEd7C1848FA90E6CDA4faAC7F61752857461af284).transfer(msg.sender, toClaim);
 	}
-
+//overflows in this contract can be fixed for now by plugging in and locking proxy logic with additional limits
 // these checks leave less room for deployer to be malicious
 	function getRewards(address a,uint amount) external{ //for posters, providers and oracles
 		uint genesisBlock = I(0x31A188024FcD6E462aBF157F879Fb7da37D6AB2f).genesisBlock();
