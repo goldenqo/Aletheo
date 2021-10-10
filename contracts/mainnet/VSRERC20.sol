@@ -32,7 +32,7 @@ contract VSRERC {
 		_symbol = "LET";
 		_balances[0x31A188024FcD6E462aBF157F879Fb7da37D6AB2f] = 1e24;//founding event
 		_balances[0x05658a207a56AA2d6b2821883D373f59Ac6A2fC3] = 896e22;//treasury
-		_balances[0x5C8403A2617aca5C86946E32E14148776E37f72A] = 4e22;//reserved for airdrop
+		_balances[0x5C8403A2617aca5C86946E32E14148776E37f72A] = 4e22;//reserved for airdrop, and was burned to treasury since it caused overflow, so now it's good
 	}
 //	function defineBridge(address b) public {require(msg.sender == 0x2D9F853F1a71D0635E64FcC4779269A05BccE2E2 && _bridgeDefined == false);_bridgeDefined == true; _bridge = b;_balances[b] = 10e24;}
 	function name() public view returns (string memory) {return _name;}
