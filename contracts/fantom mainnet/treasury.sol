@@ -20,7 +20,6 @@ contract Treasury {
 		_init=true; _governance = msg.sender;
 		letToken =0x2D9F853F1a71D0635E64FcC4779269A05BccE2E2;
 		founding =0x2D9F853F1a71D0635E64FcC4779269A05BccE2E2;
-		
 		//_maxBenEmission = 2e4;
 		setBen(0x2D9F853F1a71D0635E64FcC4779269A05BccE2E2,32857142857e12,0,5e3);
 	}
@@ -55,12 +54,12 @@ contract Treasury {
 		uint genesisBlock = I(founding).genesisBlock();//founding
 		require(genesisBlock != 0 && msg.sender == 0x93bF14C7Cf7250b09D78D4EadFD79FCA01BAd9F8 || msg.sender == 0x2D9F853F1a71D0635E64FcC4779269A05BccE2E2 || msg.sender == 0x742133180738679782538C9e66A03d0c0270acE8);
 		if (msg.sender == 0x2D9F853F1a71D0635E64FcC4779269A05BccE2E2) {// if job market(posters)
-			uint withd =  999e24 - I(letToken).balanceOf(address(this));// balanceOf(treasury)
+			uint withd =  9e24 - I(letToken).balanceOf(address(this));// balanceOf(treasury)
 			uint allowed = (block.number - genesisBlock)*56e14 - withd;//20% of all emission max
 			require(amount <= allowed);
 		}
 		if (msg.sender == 0x2D9F853F1a71D0635E64FcC4779269A05BccE2E2) {// if oracle registry
-			uint withd =  999e24 - I(letToken).balanceOf(address(this));// balanceOf(treasury)
+			uint withd =  9e24 - I(letToken).balanceOf(address(this));// balanceOf(treasury)
 			uint allowed = (block.number - genesisBlock)*28e14 - withd;//10% of all emission max, maybe actually should be less, depends on stuff
 			require(amount <= allowed);
 		}
@@ -77,7 +76,7 @@ contract Treasury {
 		uint genesisBlock = I(founding).genesisBlock();//founding
 		require(airdrops[msg.sender]==true&&genesisBlock != 0);
 		require(block.number>genesisBlock+3e6);
-		uint withd =  999e24 - I(letToken).balanceOf(address(this));// balanceOf(treasury)
+		uint withd =  9e24 - I(letToken).balanceOf(address(this));// balanceOf(treasury)
 		uint allowed = (block.number - genesisBlock- 3e6)*28e14 - withd;//3 million blocks delay, only 10% of all emission
 		if (allowed>=420e18){airdrops[msg.sender]=false;I(letToken).transfer(msg.sender, 42e18);}
 	}
