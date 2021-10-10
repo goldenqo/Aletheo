@@ -14,6 +14,7 @@ contract Treasury {
 	mapping (address => Beneficiary) public bens;
 	mapping (address => bool) public airdrops;
 	address public letToken;
+	address public founding;
 
 	function init() public {
 		require(_init == false && msg.sender == 0x5C8403A2617aca5C86946E32E14148776E37f72A);
