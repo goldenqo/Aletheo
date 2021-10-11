@@ -1,5 +1,3 @@
-Contract addresses will be changed on deployment
-
 Changes were kept minimal, so it's easy to review the difference if you are already familiar with eth mainnet contracts
 
 Founding Event https://ftmscan.com/address/0xe74930ff5d32DB0FF6F2Bd2b7d8c30E4F877d9bb#code
