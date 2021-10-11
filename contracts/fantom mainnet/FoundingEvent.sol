@@ -17,7 +17,7 @@ contract FoundingEvent {
 	uint public genesisBlock;
 
 	constructor() {_deployer = msg.sender;}
-	function startLGE(uint hc) external {require(msg.sender == _deployer && hc < 2e23 && hc > 1e23);if(hardcap != 0){require(hc<hardcap);}_lgeOngoing = true; hardcap = hc;}//hc between 200k and 100k
+	function startLGE(uint hc) external {require(msg.sender == _deployer && hc <= 2e23 && hc >= 1e23);if(hardcap != 0){require(hc<hardcap);}_lgeOngoing = true; hardcap = hc;}//hc between 200k and 100k
 	function triggerLaunch() public {require(msg.sender == _deployer);_createLiquidity();}
 
 	function depositFtm() external payable {
@@ -31,8 +31,8 @@ contract FoundingEvent {
 	function _createLiquidity() internal {
 		genesisBlock = block.number;
 		address WFTM = 0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83;
-		address token = 0x2D9F853F1a71D0635E64FcC4779269A05BccE2E2;//to change on deployment
-		address staking = 0x2D9F853F1a71D0635E64FcC4779269A05BccE2E2;//to change on deployment
+		address token = 0xDeCF46A5c6DdA9a2506a9eb1269138631c2A9EFC;
+		address staking = 0x117258bE971488976113f4055D2841c9E6A9D77f;
 		address factory = 0x152eE697f2E276fA89E96742e9bB9aB1F2E61bE3;
 		address tknFTMLP = I(factory).getPair(token,WFTM);
 		if (tknFTMLP == address(0)) {tknFTMLP=I(factory).createPair(token, WFTM);}
