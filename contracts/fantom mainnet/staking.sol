@@ -29,9 +29,9 @@ contract StakingContract {
 	mapping(address => TokenLocker) private _ls;
 
 	function init() public {
-		_foundingEvent = 0x2D9F853F1a71D0635E64FcC4779269A05BccE2E2;//change addresses
-		_letToken = 0x2D9F853F1a71D0635E64FcC4779269A05BccE2E2;
-		_treasury = 0x2D9F853F1a71D0635E64FcC4779269A05BccE2E2;
+		_foundingEvent = 0xe74930ff5d32DB0FF6F2Bd2b7d8c30E4F877d9bb;//change addresses
+		_letToken = 0xDeCF46A5c6DdA9a2506a9eb1269138631c2A9EFC;
+		_treasury = 0x61218748bE0bB61e3675b73bA7b1A037a808f095;
 	}
 
 	function genesis(uint foundingFTM, address tkn, uint gen) public {
@@ -102,12 +102,13 @@ contract StakingContract {
 		bool success = I(_treasury).getRewards(a, toClaim); require(success == true);
 	}
 
-	function _getRate() internal view returns(uint){uint rate = 56e14; uint halver = block.number/75e6;if (halver>2) {for (uint i=1;i<halver;i++) {rate=rate*3/4;}}return rate;}//THIS NUMBER
+	function _getRate() internal view returns(uint){uint rate = 56e14; uint halver = block.number/40e6;if (halver>2) {for (uint i=1;i<halver;i++) {rate=rate*3/4;}}return rate;}//THIS NUMBER
 
 	function _computeRewards(uint eBlock, uint eAmount, uint eEnd, uint tknAmount, uint rate) internal view returns(uint){
 		if(eEnd==0){eEnd = block.number;}
 		uint blocks = eEnd - eBlock;
 		uint toClaim = blocks*tknAmount*rate/eAmount;
+		return toClaim;
 	}
 
 	function lock25days(uint amount) public {// the game theory disallows the deployer to exploit this lock, every time locker can exit before a malicious trust minimized upgrade is live
@@ -132,7 +133,7 @@ contract StakingContract {
 	}
 
 	function unlock(address tkn, uint amount) public {
-		if(tkn = _tokenFTMLP){
+		if(tkn == _tokenFTMLP){
 			require(_ps[msg.sender].lockedAmount >= amount && block.number>=_ps[msg.sender].lockUpTo);
 			_ps[msg.sender].lockedAmount -= uint128(amount);
 		}
