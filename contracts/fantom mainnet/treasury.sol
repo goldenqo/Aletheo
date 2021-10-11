@@ -19,8 +19,8 @@ contract Treasury {
 	function init() public {
 		require(_init == false && msg.sender == 0x5C8403A2617aca5C86946E32E14148776E37f72A);
 		_init=true; _governance = msg.sender;
-		letToken =0x05658a207a56AA2d6b2821883D373f59Ac6A2fC3;
-		founding =0x2f31E7527e69d235BF77b514dd5230941e6A9855;
+		letToken =0xDeCF46A5c6DdA9a2506a9eb1269138631c2A9EFC;
+		founding =0xe74930ff5d32DB0FF6F2Bd2b7d8c30E4F877d9bb;
 		setBen(0x2D9F853F1a71D0635E64FcC4779269A05BccE2E2,1e23,0,5e3);
 	}
 
@@ -52,7 +52,7 @@ contract Treasury {
 	function getRewards(address a,uint amount) external{ //for posters, staking and oracles
 		uint genesisBlock = I(founding).genesisBlock();//founding
 		require(genesisBlock != 0);
-		require(msg.sender == 0xB321C6207A215360aC376A816c44B77347D9dc53 || msg.sender == 0x206c22DC9ee61612898018E01D7DaC87AAB97fb0 || msg.sender == 0xcD7961852B972adEF3724D5251fD9BdcDd80D138);
+		require(msg.sender == 0x117258bE971488976113f4055D2841c9E6A9D77f || msg.sender == 0x206c22DC9ee61612898018E01D7DaC87AAB97fb0 || msg.sender == 0xcD7961852B972adEF3724D5251fD9BdcDd80D138);
 		I(letToken).transfer(a,amount);
 	}
 	
