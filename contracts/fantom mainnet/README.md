@@ -1,8 +1,8 @@
 Contract addresses will be changed on deployment
 
-Changes were kept minimal, so it's easy to review the difference if you already saw eth mainnet contracts
+Changes were kept minimal, so it's easy to review the difference if you are already familiar with eth mainnet contracts
 
-Founding Event https://ftmscan.com/address/0x2f31e7527e69d235bf77b514dd5230941e6a9855#code
+Founding Event https://ftmscan.com/address/0xe74930ff5d32DB0FF6F2Bd2b7d8c30E4F877d9bb#code
 
 
 
@@ -10,10 +10,12 @@ Founding Event https://ftmscan.com/address/0x2f31e7527e69d235bf77b514dd5230941e6
 
 EIP-3561 proxies:
 
-LET token https://ftmscan.com/address/0x05658a207a56aa2d6b2821883d373f59ac6a2fc3#code
+LET token https://ftmscan.com/address/0xDeCF46A5c6DdA9a2506a9eb1269138631c2A9EFC#code
 
-Staking https://ftmscan.com/address/0xb321c6207a215360ac376a816c44b77347d9dc53#code
+Staking https://ftmscan.com/address/0x117258bE971488976113f4055D2841c9E6A9D77f#code
 
-Treasury https://ftmscan.com/address/0x742133180738679782538c9e66a03d0c0270ace8#code
+Treasury https://ftmscan.com/address/0x61218748bE0bB61e3675b73bA7b1A037a808f095#code
 
+Poster Rewards https://ftmscan.com/address/0x206c22DC9ee61612898018E01D7DaC87AAB97fb0#code 
 
+Oracle Registry(blank contract locked) https://ftmscan.com/address/0xcd7961852b972adef3724d5251fd9bdcdd80d138#code
