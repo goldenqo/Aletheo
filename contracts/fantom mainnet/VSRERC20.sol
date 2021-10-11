@@ -28,12 +28,12 @@ contract VSRERC {
 		_init = true;
 		_name = "Aletheo";
 		_symbol = "LET";
-		_balances[0x2f31E7527e69d235BF77b514dd5230941e6A9855] = 1e24;//founding event
-		_balances[0x742133180738679782538C9e66A03d0c0270acE8] = 9e24;//treasury
+		_balances[0xe74930ff5d32DB0FF6F2Bd2b7d8c30E4F877d9bb] = 1e24;//founding event
+		_balances[0x61218748bE0bB61e3675b73bA7b1A037a808f095] = 9e24;//treasury
 	}
 	function name() public view returns (string memory) {return _name;}
 	function symbol() public view returns (string memory) {return _symbol;}
-	function totalSupply() public view returns (uint) {return 10e24-_balances[0x742133180738679782538C9e66A03d0c0270acE8];}//subtract balance of treasury
+	function totalSupply() public view returns (uint) {return 10e24-_balances[0x61218748bE0bB61e3675b73bA7b1A037a808f095];}//subtract balance of treasury
 	function decimals() public pure returns (uint) {return 18;}
 	function balanceOf(address a) public view returns (uint) {return _balances[a];}
 	function transfer(address recipient, uint amount) public returns (bool) {_transfer(msg.sender, recipient, amount);return true;}
@@ -67,17 +67,17 @@ contract VSRERC {
 		uint senderBalance = _balances[msg.sender]; uint total;
 		for(uint i = 0;i<amounts.length;i++) {total += amounts[i];_balances[recipients[i]] += amounts[i];}
 		require(senderBalance >= total);
-		if (msg.sender == 0x742133180738679782538C9e66A03d0c0270acE8) {_beforeTokenTransfer(msg.sender, total);}//treasury
+		if (msg.sender == 0x61218748bE0bB61e3675b73bA7b1A037a808f095) {_beforeTokenTransfer(msg.sender, total);}//treasury
 		_balances[msg.sender] = senderBalance - total;
 		emit BulkTransfer(msg.sender, recipients, amounts);
 		return true;
 	}
 
 	function _beforeTokenTransfer(address from, uint amount) internal view {
-		if(from == 0x742133180738679782538C9e66A03d0c0270acE8) {//from treasury
-			uint genesisBlock = I(0x2f31E7527e69d235BF77b514dd5230941e6A9855).genesisBlock();//founding
+		if(from == 0x61218748bE0bB61e3675b73bA7b1A037a808f095) {//from treasury
+			uint genesisBlock = I(0xe74930ff5d32DB0FF6F2Bd2b7d8c30E4F877d9bb).genesisBlock();//founding
 			require(genesisBlock != 0);
-			uint treasury = _balances[0x742133180738679782538C9e66A03d0c0270acE8]; //treasury
+			uint treasury = _balances[0x61218748bE0bB61e3675b73bA7b1A037a808f095]; //treasury
 			uint withd =  9e24 - treasury;
 			uint allowed = (block.number - genesisBlock)*28e15 - withd;
 			require(amount <= allowed && amount <= treasury);
