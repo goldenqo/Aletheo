@@ -22,6 +22,7 @@ contract TrustMinimizedProxy{ // THE CODE FITS ON THE SCREEN UNBELIAVABLE LETS S
 		&& NEXT_LOGIC_SLOT == bytes32(uint256(keccak256('eip1984.proxy.nextLogic')) - 1) && NEXT_LOGIC_BLOCK_SLOT == bytes32(uint256(keccak256('eip1984.proxy.nextLogicBlock')) - 1)
 		&& PROPOSE_BLOCK_SLOT == bytes32(uint256(keccak256('eip1984.proxy.proposeBlock')) - 1)/* && DEADLINE_SLOT == bytes32(uint256(keccak256('eip1984.proxy.deadline')) - 1)*/
 		&& TRUST_MINIMIZED_SLOT == bytes32(uint256(keccak256('eip1984.proxy.trustMinimized')) - 1));
+		assembly{ sstore(TRUST_MINIMIZED_SLOT, false) }
 		_setAdmin(msg.sender);
 	}
 
