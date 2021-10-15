@@ -31,7 +31,7 @@ contract PosterRewards {
 		if(amount>1000e18){amount=1000e18;}
 		require(posters[msg.sender].amount>=amount&&posters[msg.sender].lastClaim+1e5<block.number&&genesisBlock != 0);
 		uint withd = 9e24 - I(0xEd7C1848FA90E6CDA4faAC7F61752857461af284).balanceOf(0x05658a207a56AA2d6b2821883D373f59Ac6A2fC3);// balanceOf(treasury)
-		uint allowed = (block.number - genesisBlock)*84e15 - withd;//only 20% of all emission max. with this additional limit, overflow in treasury is not an issue even before the upgrade
+		uint allowed = (block.number - genesisBlock)*84e15 - withd;//this math won't allow posters to claim almost anything before the upgrade, liquidity stakers and founders will claim more than that
 		if (allowed>=amount){
 			posters[msg.sender].amount-=uint128(amount);
 			posters[msg.sender].lastClaim=uint128(block.number);
