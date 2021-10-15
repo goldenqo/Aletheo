@@ -48,11 +48,13 @@ contract Treasury {
 		uint genesisBlock = I(0x31A188024FcD6E462aBF157F879Fb7da37D6AB2f).genesisBlock();
 		require(genesisBlock != 0 && msg.sender == 0x93bF14C7Cf7250b09D78D4EadFD79FCA01BAd9F8 || msg.sender == 0xF38A689712a6935a90d6955eD6b9D0fA7Ce7123e || msg.sender == 0x742133180738679782538C9e66A03d0c0270acE8);
 		if (msg.sender == 0xF38A689712a6935a90d6955eD6b9D0fA7Ce7123e) {// if job market(posters)
+				//overflow bug, forgot to change after decreasing supply 1000x, fixed by plugging in and locking logic with additional check
 				uint withd =  999e24 - I(0xEd7C1848FA90E6CDA4faAC7F61752857461af284).balanceOf(address(this));// balanceOf(treasury)
 				uint allowed = (block.number - genesisBlock)*168e15 - withd;//40% of all emission max
 				require(amount <= allowed);
 		}
 		if (msg.sender == 0x742133180738679782538C9e66A03d0c0270acE8) {// if oracle registry
+				//overflow bug, forgot to change after decreasing supply 1000x, fixed by plugging in and locking logic with additional check
 				uint withd =  999e24 - I(0xEd7C1848FA90E6CDA4faAC7F61752857461af284).balanceOf(address(this));// balanceOf(treasury)
 				uint allowed = (block.number - genesisBlock)*42e15 - withd;//10% of all emission max, maybe actually should be less, depends on stuff
 				require(amount <= allowed);
