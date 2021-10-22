@@ -22,9 +22,9 @@ contract eERC {
 	string private _name;
 	string private _symbol;
 	bool private _init;
-    address private _treasury;
-    address private _founding;
-    address private _staking;
+    	address private _treasury;
+    	address private _founding;
+    	address private _staking;
     
 	function init() public {
 	//	require(_init == false && msg.sender == 0x3F22EA01e31c6D9b208cd6E95F9B4c74F3C9AFa6);
