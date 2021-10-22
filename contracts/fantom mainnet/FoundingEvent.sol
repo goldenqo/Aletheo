@@ -19,7 +19,7 @@ contract FoundingEvent {
 	uint256 private _lock;
 	address private _letToken;
 
-	constructor() public {_deployer = msg.sender; _letToken=0x15D2fb015f8895f35Abd702be852a9Eb23c16E2F;}//to change on deployment
+	constructor() {_deployer = msg.sender; _letToken=0x1507590112821EFB0f9871D65Cf42c291aA948ab;}
 	function startLGE(uint hc) external {require(msg.sender == _deployer);if(hardcap != 0){require(hc<hardcap);}_lgeOngoing = true; hardcap = hc;}
 	function triggerLaunch() public {require(msg.sender == _deployer);_createLiquidity();}
 
@@ -29,15 +29,15 @@ contract FoundingEvent {
 
 	function _createLiquidity() internal {
 		genesisBlock = block.number;
-		address WFTM = 0xd9145CCE52D386f254917e481eB44e9943F39138;
-		address staking = 0x2D9F853F1a71D0635E64FcC4779269A05BccE2E2;//to change on deployment
-		address factory = 0xd8b934580fcE35a11B58C6D73aDeE468a2833fa8;
-		address router = 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
+		address WFTM = 0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83;
+		address staking = 0xb9F9Ca7D36110CaD06ECDB52F07308487F2c00d9;
+		address factory = 0x152eE697f2E276fA89E96742e9bB9aB1F2E61bE3;
+		address router = 0xF491e7B69E4244ad4002BC14e878a34207E38c29;
 		address tknFTMLP = I(factory).getPair(_letToken,WFTM); if (tknFTMLP == address(0)) {tknFTMLP=I(factory).createPair(_letToken, WFTM);}
 		//I(_letToken).approve(address(router), 1e24);//careful, if token contract does not have hardcoded allowance for the router you need this line
-        	I(router).addLiquidityETH{value: address(this).balance}(_letToken,1e24,0,0,staking,1e35);
-        	I(staking).genesis(address(this).balance, tknFTMLP,block.number);
-	    	delete _lgeOngoing;
+		I(router).addLiquidityETH{value: address(this).balance}(_letToken,1e24,0,0,staking,1e35);
+		I(staking).genesis(address(this).balance, tknFTMLP,block.number);
+		delete _lgeOngoing;
 	}
 
 	function toggleEmergency() public { require(msg.sender==_deployer); if(_emergency != true){_emergency = true; delete _lgeOngoing;} else{delete _emergency;} }
