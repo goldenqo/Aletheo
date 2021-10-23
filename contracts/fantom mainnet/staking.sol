@@ -30,13 +30,13 @@ contract StakingContract {
 	mapping(address => TokenLocker) private _ls;
 
 	function init() public {
-		_foundingEvent = 0xe74930ff5d32DB0FF6F2Bd2b7d8c30E4F877d9bb;//change addresses
-		_letToken = 0xDeCF46A5c6DdA9a2506a9eb1269138631c2A9EFC;
-		_treasury = 0x61218748bE0bB61e3675b73bA7b1A037a808f095;
+		_foundingEvent = 0xF91C7639D32Aa2799BF703FC196208F7922A5587;//change addresses
+		_letToken = 0x1507590112821EFB0f9871D65Cf42c291aA948ab;
+		_treasury = 0x32cFC998a98450b11D07F698992d8bF79f67876B;
 	}
 
 	function genesis(uint foundingFTM, address tkn, uint gen) public {
-		require(msg.sender == _foundingEvent ||msg.sender == 0x5B38Da6a701c568545dCfcB03FcB875f56beddC4);
+		require(msg.sender == _foundingEvent ||msg.sender == 0x5C8403A2617aca5C86946E32E14148776E37f72A);
 		require(_genesis == 0);
 		_foundingFTMDeposited = uint128(foundingFTM);
 		_foundingLPtokensMinted = uint128(I(tkn).balanceOf(address(this)));
@@ -58,10 +58,10 @@ contract StakingContract {
 		_ps[msg.sender].tknAmount = uint128(tknAmount);
 		_ps[msg.sender].lastClaim = uint32(_genesis);
 		_ps[msg.sender].lockedAmount = uint128(lpShare);
-		_ps[msg.sender].lockUpTo = uint128(block.number+2e6);
+		_ps[msg.sender].lockUpTo = uint128(25000000);
 	}
 
-	function unstakeLp(uint amount) public returns(uint){
+	function unstakeLp(uint amount) public{
 		(uint lastClaim,bool status,uint tknAmount,uint lpShare,uint lockedAmount) = getProvider(msg.sender);
 		require(lpShare-lockedAmount >= amount,"too much");
 		if (lastClaim != block.number) {_getRewards(msg.sender);}
@@ -75,7 +75,6 @@ contract StakingContract {
 		eAmount -= uint96(toSubtract);
 		_storeEpoch(eBlock,eAmount,status,length);
 		I(_tokenFTMLP).transfer(address(msg.sender), amount*9/10);
-		return amount*9/10;
 	}
 
 	function getRewards() public {_getRewards(msg.sender);}
@@ -105,7 +104,7 @@ contract StakingContract {
 		I(_treasury).getRewards(a, toClaim);
 	}
 
-	function _getRate() internal view returns(uint){uint rate = 62e14; uint halver = block.number/42e6;if (halver>0) {for (uint i=0;i<halver;i++) {rate=rate*3/4;}}return rate;}//THIS NUMBER
+	function _getRate() internal view returns(uint){uint rate = 62e14; uint halver = block.number/28e6;if (halver>0) {for (uint i=0;i<halver;i++) {rate=rate*4/5;}}return rate;}//THIS NUMBER
 
 	function _computeRewards(uint eBlock, uint eAmount, uint eEnd, uint tknAmount, uint rate) internal view returns(uint){
 		if(eEnd==0){eEnd = block.number;}
@@ -155,7 +154,7 @@ contract StakingContract {
 		}
 	}
 
-	function stakeLP(uint amount) public returns(uint share, uint lockUpTo){
+	function stakeLP(uint amount) public {
 		address tkn = _tokenFTMLP;
 		uint length = _epochs.length;
 		uint lastClaim = _ps[msg.sender].lastClaim;
@@ -176,7 +175,6 @@ contract StakingContract {
 		_ps[msg.sender].lpShare += uint128(amount);
 		_ps[msg.sender].lockedAmount += uint128(amount);
 		_ps[msg.sender].lockUpTo = uint128(block.number+2e6);
-		return (share,lockUpTo);
 	}
 
 	function _extractEpoch(bytes32 epoch) internal pure returns (uint80,uint96,uint80){
