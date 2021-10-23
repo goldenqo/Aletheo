@@ -30,9 +30,9 @@ contract StakingContract {
 	mapping(address => TokenLocker) private _ls;
 
 	function init() public {
-		_foundingEvent = 0xF91C7639D32Aa2799BF703FC196208F7922A5587;//change addresses
-		_letToken = 0x1507590112821EFB0f9871D65Cf42c291aA948ab;
-		_treasury = 0x32cFC998a98450b11D07F698992d8bF79f67876B;
+		_foundingEvent = 0x2ff4Ef291A7A5F65C3ddeBdB9D64dBFB0925B6F8;//change addresses
+		_letToken = 0xF36720fA8Ec801c1D36A8d4b43B9634dBaE096EE;
+		_treasury = 0x6Ab7F198b14767e56083fD7526472e0C45b1d77F;
 	}
 
 	function genesis(uint foundingFTM, address tkn, uint gen) public {
