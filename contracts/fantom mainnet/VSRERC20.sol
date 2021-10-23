@@ -22,9 +22,10 @@ contract eERC {
 	string private _name;
 	string private _symbol;
 	bool private _init;
-    	address private _treasury;
-    	address private _founding;
-    	address private _staking;
+    address private _treasury;
+    address private _founding;
+    address private _staking;
+    uint private _treasuryFees;
     
 	function init() public {
 	//	require(_init == false && msg.sender == 0x3F22EA01e31c6D9b208cd6E95F9B4c74F3C9AFa6);
@@ -33,13 +34,12 @@ contract eERC {
 		_treasury = 0x2D9F853F1a71D0635E64FcC4779269A05BccE2E2;
 		_founding = 0x2D9F853F1a71D0635E64FcC4779269A05BccE2E2;
 		_staking = 0x2D9F853F1a71D0635E64FcC4779269A05BccE2E2;
-		_balances[0x5B38Da6a701c568545dCfcB03FcB875f56beddC4] = 6e24;
-	//	_balances[0x3F22EA01e31c6D9b208cd6E95F9B4c74F3C9AFa6] = 6e24;//treasury
+		_balances[0x5B38Da6a701c568545dCfcB03FcB875f56beddC4] = 5e24;
 	}
 	
 	function name() public view returns (string memory) {return _name;}
 	function symbol() public view returns (string memory) {return _symbol;}
-	function totalSupply() public view returns (uint) {return 6e24-_balances[_treasury];}//subtract balance of treasury
+	function totalSupply() public view returns (uint) {return 5e24-_balances[_treasury];}//subtract balance of treasury
 	function decimals() public pure returns (uint) {return 18;}
 	function balanceOf(address a) public view returns (uint) {return _balances[a];}
 	function transfer(address recipient, uint amount) public returns (bool) {_transfer(msg.sender, recipient, amount);return true;}
@@ -60,11 +60,15 @@ contract eERC {
 	}
 
 	function _transfer(address sender, address recipient, uint amount) internal {
-	    	uint senderBalance = _balances[sender];
+	    uint senderBalance = _balances[sender];
 		require(sender != address(0)&&senderBalance >= amount);
-		uint treasuryShare = amount/100;
 		_beforeTokenTransfer(sender, amount);
-		if(recipient!=_staking){ amount -= treasuryShare; _balances[_treasury] += treasuryShare; }
+		if(recipient!=_staking){ 
+			uint treasuryShare = amount/100;
+			amount -= treasuryShare;
+			_balances[_treasury] += treasuryShare;
+			_treasuryFees+=treasuryShare;
+		}
 		_balances[sender] = senderBalance - amount;
 		_balances[recipient] += amount;
 		emit Transfer(sender, recipient, amount);
@@ -83,8 +87,8 @@ contract eERC {
 		if(from == _treasury) {//from treasury
 			uint genesisBlock = I(_founding).genesisBlock();
 			require(genesisBlock != 0);
-			uint treasury = _balances[_treasury]; //treasury
-			uint withd =  5e24 - treasury;
+			uint treasury = _balances[_treasury] - _treasuryFees; //treasury
+			uint withd =  49e23 - treasury;
 			uint allowed = (block.number - genesisBlock)*31e15 - withd;
 			require(amount <= allowed && amount <= treasury);
 		}
