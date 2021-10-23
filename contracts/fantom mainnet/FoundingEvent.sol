@@ -19,7 +19,7 @@ contract FoundingEvent {
 	uint256 private _lock;
 	address private _letToken;
 
-	constructor() {_deployer = msg.sender; _letToken=0x008E4Df62C2C4aB90809d0A5b8Ab4E3Ae810CA70;}
+	constructor() {_deployer = msg.sender; _letToken=0x1FDF05646f53b13Ccf4997374FfCDfC6891ad7Be;}
 	function startLGE(uint hc) external {require(msg.sender == _deployer);if(hardcap != 0){require(hc<hardcap);}_lgeOngoing = true; hardcap = hc;}
 	function triggerLaunch() public {require(msg.sender == _deployer);_createLiquidity();}
 
@@ -31,7 +31,7 @@ contract FoundingEvent {
 	function _createLiquidity() internal {
 		genesisBlock = block.number;
 		address WFTM = 0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83;
-		address staking = 0xb9F9Ca7D36110CaD06ECDB52F07308487F2c00d9;
+		address staking = 0x800b51e28d69268d34E2875232592Be4A177a9E3;
 		address factory = 0x152eE697f2E276fA89E96742e9bB9aB1F2E61bE3;
 		address router = 0xF491e7B69E4244ad4002BC14e878a34207E38c29;
 		address tknFTMLP = I(factory).getPair(_letToken,WFTM); if (tknFTMLP == address(0)) {tknFTMLP=I(factory).createPair(_letToken, WFTM);}
