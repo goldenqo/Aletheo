@@ -2,7 +2,7 @@ pragma solidity >=0.7.6 <0.8.0;
 
 // EIP-3561 trust minimized proxy implementation https://github.com/ethereum/EIPs/blob/master/EIPS/eip-3561.md
 
-contract TrustMinimizedProxy{ // THE CODE FITS ON THE SCREEN UNBELIAVABLE LETS STOP ENDLESS SCROLLING UP AND DOWN
+contract AletheoTrustMinimizedProxy{ // THE CODE FITS ON THE SCREEN UNBELIAVABLE LETS STOP ENDLESS SCROLLING UP AND DOWN
 	event Upgraded(address indexed toLogic);
 	event AdminChanged(address indexed previousAdmin, address indexed newAdmin);
 	event NextLogicDefined(address indexed nextLogic, uint earliestArrivalBlock);
@@ -22,12 +22,12 @@ contract TrustMinimizedProxy{ // THE CODE FITS ON THE SCREEN UNBELIAVABLE LETS S
 	//	&& NEXT_LOGIC_SLOT == bytes32(uint256(keccak256('eip1984.proxy.nextLogic')) - 1) && NEXT_LOGIC_BLOCK_SLOT == bytes32(uint256(keccak256('eip1984.proxy.nextLogicBlock')) - 1)
 	//	&& PROPOSE_BLOCK_SLOT == bytes32(uint256(keccak256('eip1984.proxy.proposeBlock')) - 1)/* && DEADLINE_SLOT == bytes32(uint256(keccak256('eip1984.proxy.deadline')) - 1)*/
 	//	&& TRUST_MINIMIZED_SLOT == bytes32(uint256(keccak256('eip1984.proxy.trustMinimized')) - 1));
-		assembly{ sstore(TRUST_MINIMIZED_SLOT, 0) }
 		_setAdmin(msg.sender);
 	}
 
 	modifier ifAdmin() {if (msg.sender == _admin()) {_;} else {_fallback();}}
 	function _logic() internal view returns (address logic) {assembly { logic := sload(LOGIC_SLOT) }}
+	function _nextLogic() internal view returns (address nextLogic) {assembly { nextLogic := sload(NEXT_LOGIC_SLOT) }}
 	function _proposeBlock() internal view returns (uint bl) {assembly { bl := sload(PROPOSE_BLOCK_SLOT) }}
 	function _nextLogicBlock() internal view returns (uint bl) {assembly { bl := sload(NEXT_LOGIC_BLOCK_SLOT) }}
 	function _trustMinimized() internal view returns (uint tm) {assembly { tm := sload(TRUST_MINIMIZED_SLOT) }}
@@ -48,6 +48,10 @@ contract TrustMinimizedProxy{ // THE CODE FITS ON THE SCREEN UNBELIAVABLE LETS S
 		if (_trustMinimized() == 0) {_updateBlockSlot();assembly {sstore(LOGIC_SLOT,newLogic)}emit Upgraded(newLogic);}	else{ _setNextLogic(newLogic);}
 		(bool success,) = newLogic.delegatecall(data);require(success,"failed to call");
 	}
+
+    function viewSlots() external ifAdmin returns(address logic, address nextLogic, uint proposeBlock, uint nextLogicBlock, uint trustMinimized, address admin) {
+        return (_logic(),_nextLogic(),_proposeBlock(),_nextLogicBlock(),_trustMinimized(),_admin());
+    }
 
 	function _delegate(address logic_) internal {
 		assembly {
