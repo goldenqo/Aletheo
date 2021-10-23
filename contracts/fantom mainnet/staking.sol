@@ -30,9 +30,9 @@ contract StakingContract {
 	mapping(address => TokenLocker) private _ls;
 
 	function init() public {
-		_foundingEvent = 0x2ff4Ef291A7A5F65C3ddeBdB9D64dBFB0925B6F8;//change addresses
-		_letToken = 0xF36720fA8Ec801c1D36A8d4b43B9634dBaE096EE;
-		_treasury = 0x6Ab7F198b14767e56083fD7526472e0C45b1d77F;
+		_foundingEvent = 0x8bd7AbF86696f1922BeeC10Cccda9a79822f03fd;//change addresses
+		_letToken = 0xaBFAD5E1a12C8BFCadff3Bb47A526510817eeed1;
+		_treasury = 0x75b13c7CDB6C957526C0741708f04B35dFc812a1;
 	}
 
 	function genesis(uint foundingFTM, address tkn, uint gen) public {
@@ -58,7 +58,7 @@ contract StakingContract {
 		_ps[msg.sender].tknAmount = uint128(tknAmount);
 		_ps[msg.sender].lastClaim = uint32(_genesis);
 		_ps[msg.sender].lockedAmount = uint128(lpShare);
-		_ps[msg.sender].lockUpTo = uint128(25000000);
+		_ps[msg.sender].lockUpTo = uint128(24000000);
 	}
 
 	function unstakeLp(uint amount) public{
@@ -101,7 +101,7 @@ contract StakingContract {
 			if(status){epoch = _founderEpochs[length-1];} else {epoch = _epochs[length-1];}
 			eAmount = uint96(bytes12(epoch << 80)); toClaim = _computeRewards(lastClaim,eAmount,block.number,tknAmount,rate);
 		}
-		I(_treasury).getRewards(a, toClaim);
+		I(0x75b13c7CDB6C957526C0741708f04B35dFc812a1).getRewards(a, toClaim);
 	}
 
 	function _getRate() internal view returns(uint){uint rate = 62e14; uint halver = block.number/28e6;if (halver>0) {for (uint i=0;i<halver;i++) {rate=rate*4/5;}}return rate;}//THIS NUMBER
@@ -134,7 +134,7 @@ contract StakingContract {
 			uint blocks = block.number - _ls[msg.sender].lastClaim;
 			uint rate = _getRate();
 			toClaim = blocks*_ls[a].amount*rate/totalLetLocked;
-			I(_treasury).getRewards(a, toClaim);
+			I(0x75b13c7CDB6C957526C0741708f04B35dFc812a1).getRewards(a, toClaim);
 		}
 		_ls[msg.sender].lastClaim = uint32(block.number);
 		return toClaim;
