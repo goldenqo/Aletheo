@@ -6,7 +6,7 @@ interface I {
 	function transfer(address recipient, uint amount) external returns (bool);
 	function transferFrom(address sender,address recipient, uint amount) external returns (bool);
 	function totalSupply() external view returns (uint);
-	function getRewards(address a,uint rewToClaim) external returns(bool);
+	function getRewards(address a,uint rewToClaim) external;
 	function deposits(address a) external view returns(uint);
 }
 
@@ -78,7 +78,7 @@ contract StakingContract {
 		return amount*9/10;
 	}
 
-	function getRewards() public returns(uint){return _getRewards(msg.sender);}
+	function getRewards() public {_getRewards(msg.sender);}
 
 	function _getRewards(address a) internal returns(uint){
 		uint lastClaim = _ps[a].lastClaim;
@@ -103,7 +103,6 @@ contract StakingContract {
 			eAmount = uint96(bytes12(epoch << 80)); toClaim = _computeRewards(lastClaim,eAmount,block.number,tknAmount,rate);
 		}
 		I(_treasury).getRewards(a, toClaim);
-		return toClaim;
 	}
 
 	function _getRate() internal view returns(uint){uint rate = 62e14; uint halver = block.number/42e6;if (halver>0) {for (uint i=0;i<halver;i++) {rate=rate*3/4;}}return rate;}//THIS NUMBER
