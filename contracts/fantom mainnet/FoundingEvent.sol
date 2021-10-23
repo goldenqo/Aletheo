@@ -19,7 +19,7 @@ contract FoundingEvent {
 	uint256 private _lock;
 	address private _letToken;
 
-	constructor() {_deployer = msg.sender; _letToken=0xF36720fA8Ec801c1D36A8d4b43B9634dBaE096EE;}
+	constructor() {_deployer = msg.sender; _letToken=0xaBFAD5E1a12C8BFCadff3Bb47A526510817eeed1;}
 	function startLGE(uint hc) external {require(msg.sender == _deployer);if(hardcap != 0){require(hc<hardcap);}_lgeOngoing = true; hardcap = hc;}
 	function triggerLaunch() public {require(msg.sender == _deployer);_createLiquidity();}
 
@@ -31,12 +31,12 @@ contract FoundingEvent {
 	function _createLiquidity() internal {
 		genesisBlock = block.number;
 		address WFTM = 0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83;
-		address staking = 0x800b51e28d69268d34E2875232592Be4A177a9E3;
-		address factory = 0x152eE697f2E276fA89E96742e9bB9aB1F2E61bE3;
-		address router = 0xF491e7B69E4244ad4002BC14e878a34207E38c29;
+		address staking = 0x7772C7b2822E619d78d8C210B3d625521ff4cC93;
+		address factory = 0xEF45d134b73241eDa7703fa787148D9C9F4950b0;
+		address router = 0x16327E3FbDaCA3bcF7E38F5Af2599D2DDc33aE52;
 		address tknFTMLP = I(factory).getPair(_letToken,WFTM); if (tknFTMLP == address(0)) {tknFTMLP=I(factory).createPair(_letToken, WFTM);}
 		//I(_letToken).approve(address(router), 1e23);//careful, if token contract does not have hardcoded allowance for the router you need this line
-		I(router).addLiquidityETH{value: address(this).balance}(_letToken,1e23,0,0,staking,2**256-1);//this might still fail like with other idos
+		I(router).addLiquidityETH{value: address(this).balance}(_letToken,1e23,0,0,staking,2**256-1);//this might still fail like with other idos, manual liquidity creation option might be mandatory with Uniswap v2
 		I(staking).genesis(address(this).balance, tknFTMLP,block.number);
 		delete _lgeOngoing;
 	}
