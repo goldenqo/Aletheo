@@ -18,11 +18,11 @@ contract TrustMinimizedProxy{ // THE CODE FITS ON THE SCREEN UNBELIAVABLE LETS S
 	bytes32 internal constant TRUST_MINIMIZED_SLOT = 0xa0ea182b754772c4f5848349cff27d3431643ba25790e0c61a8e4bdf4cec9201;
 
 	constructor() payable {
-		require(ADMIN_SLOT == bytes32(uint256(keccak256('eip1967.proxy.admin')) - 1) && LOGIC_SLOT==bytes32(uint256(keccak256('eip1967.proxy.implementation')) - 1) // this require is simply against human error, can be removed if you know what you are doing
-		&& NEXT_LOGIC_SLOT == bytes32(uint256(keccak256('eip1984.proxy.nextLogic')) - 1) && NEXT_LOGIC_BLOCK_SLOT == bytes32(uint256(keccak256('eip1984.proxy.nextLogicBlock')) - 1)
-		&& PROPOSE_BLOCK_SLOT == bytes32(uint256(keccak256('eip1984.proxy.proposeBlock')) - 1)/* && DEADLINE_SLOT == bytes32(uint256(keccak256('eip1984.proxy.deadline')) - 1)*/
-		&& TRUST_MINIMIZED_SLOT == bytes32(uint256(keccak256('eip1984.proxy.trustMinimized')) - 1));
-		assembly{ sstore(TRUST_MINIMIZED_SLOT, false) }
+	//	require(ADMIN_SLOT == bytes32(uint256(keccak256('eip1967.proxy.admin')) - 1) && LOGIC_SLOT==bytes32(uint256(keccak256('eip1967.proxy.implementation')) - 1) // this require is simply against human error, can be removed if you know what you are doing
+	//	&& NEXT_LOGIC_SLOT == bytes32(uint256(keccak256('eip1984.proxy.nextLogic')) - 1) && NEXT_LOGIC_BLOCK_SLOT == bytes32(uint256(keccak256('eip1984.proxy.nextLogicBlock')) - 1)
+	//	&& PROPOSE_BLOCK_SLOT == bytes32(uint256(keccak256('eip1984.proxy.proposeBlock')) - 1)/* && DEADLINE_SLOT == bytes32(uint256(keccak256('eip1984.proxy.deadline')) - 1)*/
+	//	&& TRUST_MINIMIZED_SLOT == bytes32(uint256(keccak256('eip1984.proxy.trustMinimized')) - 1));
+		assembly{ sstore(TRUST_MINIMIZED_SLOT, 0) }
 		_setAdmin(msg.sender);
 	}
 
@@ -30,23 +30,23 @@ contract TrustMinimizedProxy{ // THE CODE FITS ON THE SCREEN UNBELIAVABLE LETS S
 	function _logic() internal view returns (address logic) {assembly { logic := sload(LOGIC_SLOT) }}
 	function _proposeBlock() internal view returns (uint bl) {assembly { bl := sload(PROPOSE_BLOCK_SLOT) }}
 	function _nextLogicBlock() internal view returns (uint bl) {assembly { bl := sload(NEXT_LOGIC_BLOCK_SLOT) }}
-	function _trustMinimized() internal view returns (bool tm) {assembly { tm := sload(TRUST_MINIMIZED_SLOT) }}
+	function _trustMinimized() internal view returns (uint tm) {assembly { tm := sload(TRUST_MINIMIZED_SLOT) }}
 	function _admin() internal view returns (address adm) {assembly { adm := sload(ADMIN_SLOT) }}
 	function _setAdmin(address newAdm) internal {assembly {sstore(ADMIN_SLOT, newAdm)}}
 	function changeAdmin(address newAdm) external ifAdmin {emit AdminChanged(_admin(), newAdm);_setAdmin(newAdm);}
-	function upgrade() external ifAdmin {require(block.number>=_nextLogicBlock());address logic;assembly {logic := sload(NEXT_LOGIC_SLOT) sstore(LOGIC_SLOT,logic)}emit Upgraded(logic);}
+	function upgrade() external ifAdmin {require(block.number>=_nextLogicBlock(),"too soon");address logic;assembly {logic := sload(NEXT_LOGIC_SLOT) sstore(LOGIC_SLOT,logic)}emit Upgraded(logic);}
 	fallback () external payable {_fallback();}
 	receive () external payable {_fallback();}
 	function _fallback() internal {require(msg.sender != _admin());_delegate(_logic());}
 	function cancelUpgrade() external ifAdmin {address logic; assembly {logic := sload(LOGIC_SLOT)sstore(NEXT_LOGIC_SLOT, logic)}emit NextLogicCanceled();}
-	function prolongLock(uint b) external ifAdmin {require(b > _proposeBlock()); assembly {sstore(PROPOSE_BLOCK_SLOT,b)} emit ProposingUpgradesRestrictedUntil(b,b+2592000);}
-	function removeTrust() external ifAdmin {assembly{ sstore(TRUST_MINIMIZED_SLOT, true) }emit TrustRemoved();} // before this called acts like a normal eip 1967 transparent proxy. after the deployer confirms everything is deployed correctly must be called
+	function prolongLock(uint b) external ifAdmin {require(b > _proposeBlock(),"get maxxed"); assembly {sstore(PROPOSE_BLOCK_SLOT,b)} emit ProposingUpgradesRestrictedUntil(b,b+2592000);}
+	function removeTrust() external ifAdmin {assembly{ sstore(TRUST_MINIMIZED_SLOT, 1) }emit TrustRemoved();} // before this called acts like a normal eip 1967 transparent proxy. after the deployer confirms everything is deployed correctly must be called
 	function _updateBlockSlot() internal {uint nlb = block.number + 2592000; assembly {sstore(NEXT_LOGIC_BLOCK_SLOT,nlb)}}
-	function _setNextLogic(address nl) internal {require(block.number >= _proposeBlock());_updateBlockSlot();assembly { sstore(NEXT_LOGIC_SLOT, nl)}emit NextLogicDefined(nl,block.number + 2592000);}
+	function _setNextLogic(address nl) internal {require(block.number >= _proposeBlock(),"too soon");_updateBlockSlot();assembly { sstore(NEXT_LOGIC_SLOT, nl)}emit NextLogicDefined(nl,block.number + 2592000);}
 
 	function proposeToAndCall(address newLogic, bytes calldata data) payable external ifAdmin {
-		if (_logic() == address(0) || _trustMinimized() == false) {_updateBlockSlot();assembly {sstore(LOGIC_SLOT,newLogic)}emit Upgraded(newLogic);}else{_setNextLogic(newLogic);}
-		(bool success,) = newLogic.delegatecall(data);//require(success);
+		if (_trustMinimized() == 0) {_updateBlockSlot();assembly {sstore(LOGIC_SLOT,newLogic)}emit Upgraded(newLogic);}	else{ _setNextLogic(newLogic);}
+		(bool success,) = newLogic.delegatecall(data);require(success,"failed to call");
 	}
 
 	function _delegate(address logic_) internal {
