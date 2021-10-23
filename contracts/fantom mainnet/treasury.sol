@@ -25,16 +25,16 @@ contract Treasury {
 	uint public totalRefundsEmission;
 
 	function init() public {
-		require(_init == false && msg.sender == 0x5B38Da6a701c568545dCfcB03FcB875f56beddC4);
+		require(_init == false && msg.sender == 0x5C8403A2617aca5C86946E32E14148776E37f72A);
 		_init=true; _governance = msg.sender;
-		_letToken =0x05658a207a56AA2d6b2821883D373f59Ac6A2fC3;
-		_founding =0x2f31E7527e69d235BF77b514dd5230941e6A9855;
-		addBen(0x2D9F853F1a71D0635E64FcC4779269A05BccE2E2,1e23,0,5e22);
+		_letToken =0x1507590112821EFB0f9871D65Cf42c291aA948ab;
+		_founding =0xF91C7639D32Aa2799BF703FC196208F7922A5587;
+		addBen(0x5C8403A2617aca5C86946E32E14148776E37f72A,1e23,0,5e22);
 	}
 
 	function setGov(address a)external{ require(msg.sender==_governance); _governance=a; }
 	function setOracle(address a)external{ require(msg.sender==_governance); _oracle=a; }
-	function _getRate() internal view returns(uint){uint rate = 31e14; uint quarter = block.number/42e6;if (quarter>0) {for (uint i=0;i<quarter;i++) {rate=rate*3/4;}}return rate;}
+	function _getRate() internal view returns(uint){uint rate = 31e14; uint quarter = block.number/28e6;if (quarter>0) {for (uint i=0;i<quarter;i++) {rate=rate*4/5;}}return rate;}
 
 // ADD
 	function addBen(address a, uint amount, uint lastClaim, uint emission) public {
@@ -86,7 +86,7 @@ contract Treasury {
 	function getRewards(address a,uint amount) external{ //for staking
 		uint genesisBlock = I(_founding).genesisBlock();
 		require(genesisBlock != 0);
-		require(msg.sender == 0xB321C6207A215360aC376A816c44B77347D9dc53);
+		require(msg.sender == 0xb9F9Ca7D36110CaD06ECDB52F07308487F2c00d9);//staking
 		I(_letToken).transfer(a,amount);
 	}
 
@@ -138,8 +138,8 @@ contract Treasury {
 	}
 
 // IN CASE OF ANY ISSUE
-	function removeRefunds(address[] memory r) external{ require(msg.sender == _oracle); for(uint i = 0;i<r.length;i++) { delete refunds[r[i]]; } }
-	function removeAirdrops(address[] memory r) external{ require(msg.sender == _oracle); for(uint i = 0;i<r.length;i++) { delete airdrops[r[i]]; } }
+	//function removeRefunds(address[] memory r) external{ require(msg.sender == _oracle); for(uint i = 0;i<r.length;i++) { delete refunds[r[i]]; } }
+	//function removeAirdrops(address[] memory r) external{ require(msg.sender == _oracle); for(uint i = 0;i<r.length;i++) { delete airdrops[r[i]]; } }
 	function removePosters(address[] memory r) external{ require(msg.sender == _oracle); for(uint i = 0;i<r.length;i++) { delete posters[r[i]]; } }
-	function removeBen(address a) public { require(msg.sender == _governance); totBenEmission-=bens[a].emission; delete bens[a]; }
+	//function removeBen(address a) public { require(msg.sender == _governance); totBenEmission-=bens[a].emission; delete bens[a]; }
 }
