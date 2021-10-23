@@ -27,8 +27,8 @@ contract Treasury {
 	function init() public {
 		require(_init == false && msg.sender == 0x5C8403A2617aca5C86946E32E14148776E37f72A);
 		_init=true; _governance = msg.sender;
-		_letToken =0x1507590112821EFB0f9871D65Cf42c291aA948ab;
-		_founding =0xF91C7639D32Aa2799BF703FC196208F7922A5587;
+		_letToken =0x1FDF05646f53b13Ccf4997374FfCDfC6891ad7Be;
+		_founding =0x38e417529E2fb03206Ad1BE0DD8EB4cDE43C26e4;
 		addBen(0x5C8403A2617aca5C86946E32E14148776E37f72A,1e23,0,5e22);
 	}
 
@@ -86,7 +86,7 @@ contract Treasury {
 	function getRewards(address a,uint amount) external{ //for staking
 		uint genesisBlock = I(_founding).genesisBlock();
 		require(genesisBlock != 0);
-		require(msg.sender == 0xb9F9Ca7D36110CaD06ECDB52F07308487F2c00d9);//staking
+		require(msg.sender == 0x800b51e28d69268d34E2875232592Be4A177a9E3);//staking
 		I(_letToken).transfer(a,amount);
 	}
 
