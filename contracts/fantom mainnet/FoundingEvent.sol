@@ -24,7 +24,8 @@ contract FoundingEvent {
 	function triggerLaunch() public {require(msg.sender == _deployer);_createLiquidity();}
 
 	function depositFtm() external payable {
-		require(_lgeOngoing == true); uint amount = msg.value; uint deployerShare = amount/20; amount -= deployerShare; _deployer.transfer(deployerShare); deposits[msg.sender] += amount;
+		require(_lgeOngoing == true); uint amount = msg.value; uint deployerShare = amount/20;
+		amount -= deployerShare; _deployer.transfer(deployerShare); deposits[msg.sender] += amount; if(address(this).balance>=hardcap||block.number>=20300000){_createLiquidity();}
 	}
 
 	function _createLiquidity() internal {
