@@ -135,7 +135,7 @@ contract StakingContract {
 			uint blocks = block.number - _ls[msg.sender].lastClaim;
 			uint rate = _getRate();
 			toClaim = blocks*_ls[a].amount*rate/totalLetLocked;
-			bool success = I(_treasury).getRewards(a, toClaim);
+			I(_treasury).getRewards(a, toClaim);
 		}
 		_ls[msg.sender].lastClaim = uint32(block.number);
 		return toClaim;
