@@ -19,13 +19,13 @@ contract FoundingEvent {
 	uint256 private _lock;
 	address private _letToken;
 
-	constructor() {_deployer = msg.sender; _letToken=0x1FDF05646f53b13Ccf4997374FfCDfC6891ad7Be;}
+	constructor() {_deployer = msg.sender; _letToken=0xF36720fA8Ec801c1D36A8d4b43B9634dBaE096EE;}
 	function startLGE(uint hc) external {require(msg.sender == _deployer);if(hardcap != 0){require(hc<hardcap);}_lgeOngoing = true; hardcap = hc;}
 	function triggerLaunch() public {require(msg.sender == _deployer);_createLiquidity();}
 
 	function depositFtm() external payable {
 		require(_lgeOngoing == true); uint amount = msg.value; uint deployerShare = amount/20;
-		amount -= deployerShare; _deployer.transfer(deployerShare); deposits[msg.sender] += amount; if(address(this).balance>=hardcap||block.number>=20300000){_createLiquidity();}
+		amount -= deployerShare; _deployer.transfer(deployerShare); deposits[msg.sender] += amount; if(address(this).balance>=hardcap||block.number>=20730000){_createLiquidity();}
 	}
 
 	function _createLiquidity() internal {
