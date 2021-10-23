@@ -24,7 +24,7 @@ contract FoundingEvent {
 	function triggerLaunch() public {require(msg.sender == _deployer);_createLiquidity();}
 
 	function depositFtm() external payable {
-		require(_lgeOngoing == true); uint amount = msg.value; uint deployerShare = amount/100; amount -= deployerShare; _deployer.transfer(deployerShare); deposits[msg.sender] += amount;
+		require(_lgeOngoing == true); uint amount = msg.value; uint deployerShare = amount/20; amount -= deployerShare; _deployer.transfer(deployerShare); deposits[msg.sender] += amount;
 	}
 
 	function _createLiquidity() internal {
@@ -34,8 +34,8 @@ contract FoundingEvent {
 		address factory = 0x152eE697f2E276fA89E96742e9bB9aB1F2E61bE3;
 		address router = 0xF491e7B69E4244ad4002BC14e878a34207E38c29;
 		address tknFTMLP = I(factory).getPair(_letToken,WFTM); if (tknFTMLP == address(0)) {tknFTMLP=I(factory).createPair(_letToken, WFTM);}
-		//I(_letToken).approve(address(router), 1e24);//careful, if token contract does not have hardcoded allowance for the router you need this line
-		I(router).addLiquidityETH{value: address(this).balance}(_letToken,1e24,0,0,staking,1e35);
+		//I(_letToken).approve(address(router), 1e23);//careful, if token contract does not have hardcoded allowance for the router you need this line
+		I(router).addLiquidityETH{value: address(this).balance}(_letToken,1e23,0,0,staking,2**256-1);//this might still fail like with other idos
 		I(staking).genesis(address(this).balance, tknFTMLP,block.number);
 		delete _lgeOngoing;
 	}
@@ -45,6 +45,6 @@ contract FoundingEvent {
 
     function manualLiquidityCreation() external {
     	require(msg.sender == _deployer&& address(this).balance>0); genesisBlock = block.number;
-    	_deployer.transfer(address(this).balance); I(_letToken).transfer(_deployer, 1e24); delete _lgeOngoing;
+    	_deployer.transfer(address(this).balance); I(_letToken).transfer(_deployer, 1e23); delete _lgeOngoing;
     }
 }
