@@ -6,7 +6,6 @@ interface I{ function transfer(address to, uint value) external returns(bool); f
 
 contract Treasury {
 	address private _governance;
-	bool private _init;
 	uint public totBenEmission; // this limit is not really required because if deployer creates a lot of beneficiaries, it still would be a slow rug, which would just kill the project, but let's have it
 	struct Beneficiary {uint128 amount; uint64 lastClaim; uint64 emission;}
 	mapping (address => Beneficiary) public bens;
@@ -16,7 +15,7 @@ contract Treasury {
 	mapping (address => AirdropRecepient) public airdrops;
 	struct Refund {uint128 amount; uint64 lastClaim; uint64 emission;}
 	mapping (address => Refund) public refunds;
-    	address private _oracle;
+	address private _oracle;
 	address private _letToken;
 	address private _founding;
 	uint public totalPosters;
@@ -25,10 +24,10 @@ contract Treasury {
 	uint public totalRefundsEmission;
 
 	function init() public {
-		require(_init == true && msg.sender == 0x5C8403A2617aca5C86946E32E14148776E37f72A);
-		_init=false; _governance = msg.sender;
-		_letToken =0xF36720fA8Ec801c1D36A8d4b43B9634dBaE096EE;
-		_founding =0x2ff4Ef291A7A5F65C3ddeBdB9D64dBFB0925B6F8;
+		require(msg.sender == 0x5C8403A2617aca5C86946E32E14148776E37f72A);
+		_governance = msg.sender;
+		_letToken =0xaBFAD5E1a12C8BFCadff3Bb47A526510817eeed1;
+		_founding =0x8bd7AbF86696f1922BeeC10Cccda9a79822f03fd;
 		addBen(0x5C8403A2617aca5C86946E32E14148776E37f72A,1e23,0,5e22);
 	}
 
@@ -86,7 +85,7 @@ contract Treasury {
 	function getRewards(address a,uint amount) external{ //for staking
 		uint genesisBlock = I(_founding).genesisBlock();
 		require(genesisBlock != 0);
-		require(msg.sender == 0x800b51e28d69268d34E2875232592Be4A177a9E3);//staking
+		require(msg.sender == 0x7772C7b2822E619d78d8C210B3d625521ff4cC93);//staking
 		I(_letToken).transfer(a,amount);
 	}
 
