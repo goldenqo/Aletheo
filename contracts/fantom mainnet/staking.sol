@@ -43,7 +43,7 @@ contract StakingContract {
 		_tokenFTMLP = tkn;
 		_genesis = uint32(gen);
 		_createEpoch(0,false);
-		_createEpoch(1e24,true);
+		_createEpoch(1e23,true);
 	}
 
 	function claimFounderStatus() public {
@@ -53,7 +53,7 @@ contract StakingContract {
 		_ps[msg.sender].founder = true;
 		uint foundingFTM = _foundingFTMDeposited;
 		uint lpShare = _foundingLPtokensMinted*FTMContributed/foundingFTM*1e18;
-		uint tknAmount = FTMContributed*1e24/foundingFTM;
+		uint tknAmount = FTMContributed*1e23/foundingFTM;
 		_ps[msg.sender].lpShare = uint128(lpShare);
 		_ps[msg.sender].tknAmount = uint128(tknAmount);
 		_ps[msg.sender].lastClaim = uint32(_genesis);
