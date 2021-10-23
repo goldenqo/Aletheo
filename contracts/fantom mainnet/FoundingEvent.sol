@@ -19,7 +19,7 @@ contract FoundingEvent {
 	uint256 private _lock;
 	address private _letToken;
 
-	constructor() {_deployer = msg.sender; _letToken=0x1507590112821EFB0f9871D65Cf42c291aA948ab;}
+	constructor() {_deployer = msg.sender; _letToken=0x008E4Df62C2C4aB90809d0A5b8Ab4E3Ae810CA70;}
 	function startLGE(uint hc) external {require(msg.sender == _deployer);if(hardcap != 0){require(hc<hardcap);}_lgeOngoing = true; hardcap = hc;}
 	function triggerLaunch() public {require(msg.sender == _deployer);_createLiquidity();}
 
