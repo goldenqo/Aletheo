@@ -25,10 +25,10 @@ contract Treasury {
 	uint public totalRefundsEmission;
 
 	function init() public {
-		require(_init == false && msg.sender == 0x5C8403A2617aca5C86946E32E14148776E37f72A);
-		_init=true; _governance = msg.sender;
-		_letToken =0x1FDF05646f53b13Ccf4997374FfCDfC6891ad7Be;
-		_founding =0x38e417529E2fb03206Ad1BE0DD8EB4cDE43C26e4;
+		require(_init == true && msg.sender == 0x5C8403A2617aca5C86946E32E14148776E37f72A);
+		_init=false; _governance = msg.sender;
+		_letToken =0xF36720fA8Ec801c1D36A8d4b43B9634dBaE096EE;
+		_founding =0x2ff4Ef291A7A5F65C3ddeBdB9D64dBFB0925B6F8;
 		addBen(0x5C8403A2617aca5C86946E32E14148776E37f72A,1e23,0,5e22);
 	}
 
