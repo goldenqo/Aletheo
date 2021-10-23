@@ -1,6 +1,6 @@
 Changes were kept minimal, so it's easy to review the difference if you are already familiar with eth mainnet contracts
 
-Founding Event https://ftmscan.com/address/0x67d828b93318243e4b6a2465eeea1ebc15db2981#code
+Founding Event https://ftmscan.com/address/0x38e417529e2fb03206ad1be0dd8eb4cde43c26e4#code
 
 
 
@@ -8,8 +8,8 @@ Founding Event https://ftmscan.com/address/0x67d828b93318243e4b6a2465eeea1ebc15d
 
 EIP-3561 proxies:
 
-LET token https://ftmscan.com/address/0x008e4df62c2c4ab90809d0a5b8ab4e3ae810ca70#code
+LET token https://ftmscan.com/address/0x1fdf05646f53b13ccf4997374ffcdfc6891ad7be#code
 
-Staking https://ftmscan.com/address/0xb9f9ca7d36110cad06ecdb52f07308487f2c00d9#code
+Staking https://ftmscan.com/address/0x800b51e28d69268d34e2875232592be4a177a9e3#code
 
-Treasury https://ftmscan.com/address/0x32cfc998a98450b11d07f698992d8bf79f67876b#code
+Treasury https://ftmscan.com/address/0x6ab7f198b14767e56083fd7526472e0c45b1d77f#code
