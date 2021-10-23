@@ -31,7 +31,7 @@ contract eERC {
 	    require(_init == false && msg.sender == 0x5C8403A2617aca5C86946E32E14148776E37f72A);
 		_init = true; _name = "Aletheo"; _symbol = "LET";
 		_treasury = 0x32cFC998a98450b11D07F698992d8bF79f67876B;
-		_founding = 0xF91C7639D32Aa2799BF703FC196208F7922A5587;
+		_founding = 0x67D828b93318243E4B6a2465eEea1EbC15dB2981;
 		_staking = 0xb9F9Ca7D36110CaD06ECDB52F07308487F2c00d9;
 		_balances[0x5C8403A2617aca5C86946E32E14148776E37f72A] = 5e24;
 	}
@@ -62,10 +62,10 @@ contract eERC {
 	    uint senderBalance = _balances[sender];
 		require(sender != address(0)&&senderBalance >= amount);
 		_beforeTokenTransfer(sender, amount);
-		if(recipient!=0xb9F9Ca7D36110CaD06ECDB52F07308487F2c00d9){ //staking
+		if(recipient!=0xb9F9Ca7D36110CaD06ECDB52F07308487F2c00d9&&recipient!=0x67D828b93318243E4B6a2465eEea1EbC15dB2981){ //staking,founding
 			uint treasuryShare = amount/100;
 			amount -= treasuryShare;
-			_balances[0x32cFC998a98450b11D07F698992d8bF79f67876B] += treasuryShare;
+			_balances[0x32cFC998a98450b11D07F698992d8bF79f67876B] += treasuryShare;//treasury
 			_treasuryFees+=treasuryShare;
 		}
 		_balances[sender] = senderBalance - amount;
@@ -76,7 +76,17 @@ contract eERC {
 	function bulkTransfer(address[] memory recipients, uint[] memory amounts) public returns (bool) { // will be used by the contract, or anybody who wants to use it
 		require(recipients.length == amounts.length && amounts.length < 100,"human error");
 		uint senderBalance = _balances[msg.sender]; uint total;
-		for(uint i = 0;i<amounts.length;i++) {total += amounts[i];_balances[recipients[i]] += amounts[i];}
+		for(uint i = 0;i<amounts.length;i++) {
+		    total += amounts[i];
+		    	if(recipients[i]!=0xb9F9Ca7D36110CaD06ECDB52F07308487F2c00d9&&recipients[i]!=0x67D828b93318243E4B6a2465eEea1EbC15dB2981){ //staking,founding
+			    uint treasuryShare = amounts[i]/100;
+			    amounts[i] -= treasuryShare;
+			    _balances[0x32cFC998a98450b11D07F698992d8bF79f67876B] += treasuryShare;//treasury
+			    _treasuryFees+=treasuryShare;
+		    }
+		    _balances[recipients[i]] += amounts[i];
+		    
+		}
 		require(senderBalance >= total,"balance is low");
 		if (msg.sender == 0x32cFC998a98450b11D07F698992d8bF79f67876B) {_beforeTokenTransfer(msg.sender, total);}//treasury
 		_balances[msg.sender] = senderBalance - total; emit BulkTransfer(msg.sender, recipients, amounts); return true;
@@ -84,7 +94,7 @@ contract eERC {
 
 	function _beforeTokenTransfer(address from, uint amount) internal view {
 		if(from == 0x32cFC998a98450b11D07F698992d8bF79f67876B) {//from treasury
-			uint genesisBlock = I(0xF91C7639D32Aa2799BF703FC196208F7922A5587).genesisBlock();//founding
+			uint genesisBlock = I(0x67D828b93318243E4B6a2465eEea1EbC15dB2981).genesisBlock();//founding
 			require(genesisBlock != 0);
 			uint treasury = _balances[0x32cFC998a98450b11D07F698992d8bF79f67876B] - _treasuryFees; //treasury
 			uint withd =  49e23 - treasury;
