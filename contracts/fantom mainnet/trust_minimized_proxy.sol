@@ -46,7 +46,7 @@ contract TrustMinimizedProxy{ // THE CODE FITS ON THE SCREEN UNBELIAVABLE LETS S
 
 	function proposeToAndCall(address newLogic, bytes calldata data) payable external ifAdmin {
 		if (_logic() == address(0) || _trustMinimized() == false) {_updateBlockSlot();assembly {sstore(LOGIC_SLOT,newLogic)}emit Upgraded(newLogic);}else{_setNextLogic(newLogic);}
-		(bool success,) = newLogic.delegatecall(data);require(success);
+		(bool success,) = newLogic.delegatecall(data);//require(success);
 	}
 
 	function _delegate(address logic_) internal {
