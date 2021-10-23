@@ -30,15 +30,15 @@ contract eERC {
 	function init() public {
 	    require(_init == false && msg.sender == 0x5C8403A2617aca5C86946E32E14148776E37f72A);
 		_init = true; _name = "Aletheo"; _symbol = "LET";
-		_treasury = 0x32cFC998a98450b11D07F698992d8bF79f67876B;
-		_founding = 0x67D828b93318243E4B6a2465eEea1EbC15dB2981;
-		_staking = 0xb9F9Ca7D36110CaD06ECDB52F07308487F2c00d9;
+		_treasury = 0x6Ab7F198b14767e56083fD7526472e0C45b1d77F;
+		_founding = 0x38e417529E2fb03206Ad1BE0DD8EB4cDE43C26e4;
+		_staking = 0x800b51e28d69268d34E2875232592Be4A177a9E3;
 		_balances[0x5C8403A2617aca5C86946E32E14148776E37f72A] = 5e24;
 	}
 	
 	function name() public view returns (string memory) {return _name;}
 	function symbol() public view returns (string memory) {return _symbol;}
-	function totalSupply() public view returns (uint) {return 5e24-_balances[0x32cFC998a98450b11D07F698992d8bF79f67876B];}//subtract balance of treasury
+	function totalSupply() public view returns (uint) {return 5e24-_balances[0x6Ab7F198b14767e56083fD7526472e0C45b1d77F];}//subtract balance of treasury
 	function decimals() public pure returns (uint) {return 18;}
 	function balanceOf(address a) public view returns (uint) {return _balances[a];}
 	function transfer(address recipient, uint amount) public returns (bool) {_transfer(msg.sender, recipient, amount);return true;}
@@ -62,10 +62,10 @@ contract eERC {
 	    uint senderBalance = _balances[sender];
 		require(sender != address(0)&&senderBalance >= amount);
 		_beforeTokenTransfer(sender, amount);
-		if(recipient!=0xb9F9Ca7D36110CaD06ECDB52F07308487F2c00d9&&recipient!=0x67D828b93318243E4B6a2465eEea1EbC15dB2981){ //staking,founding
+		if(recipient!=0x800b51e28d69268d34E2875232592Be4A177a9E3&&recipient!=0x38e417529E2fb03206Ad1BE0DD8EB4cDE43C26e4){ //staking,founding
 			uint treasuryShare = amount/100;
 			amount -= treasuryShare;
-			_balances[0x32cFC998a98450b11D07F698992d8bF79f67876B] += treasuryShare;//treasury
+			_balances[0x6Ab7F198b14767e56083fD7526472e0C45b1d77F] += treasuryShare;//treasury
 			_treasuryFees+=treasuryShare;
 		}
 		_balances[sender] = senderBalance - amount;
@@ -78,10 +78,10 @@ contract eERC {
 		uint senderBalance = _balances[msg.sender]; uint total;
 		for(uint i = 0;i<amounts.length;i++) {
 		    total += amounts[i];
-		    	if(recipients[i]!=0xb9F9Ca7D36110CaD06ECDB52F07308487F2c00d9&&recipients[i]!=0x67D828b93318243E4B6a2465eEea1EbC15dB2981){ //staking,founding
+		    	if(recipients[i]!=0x800b51e28d69268d34E2875232592Be4A177a9E3&&recipients[i]!=0x38e417529E2fb03206Ad1BE0DD8EB4cDE43C26e4){ //staking,founding
 			    uint treasuryShare = amounts[i]/100;
 			    amounts[i] -= treasuryShare;
-			    _balances[0x32cFC998a98450b11D07F698992d8bF79f67876B] += treasuryShare;//treasury
+			    _balances[0x6Ab7F198b14767e56083fD7526472e0C45b1d77F] += treasuryShare;//treasury
 			    _treasuryFees+=treasuryShare;
 		    }
 		    _balances[recipients[i]] += amounts[i];
@@ -93,10 +93,10 @@ contract eERC {
 	}
 
 	function _beforeTokenTransfer(address from, uint amount) internal view {
-		if(from == 0x32cFC998a98450b11D07F698992d8bF79f67876B) {//from treasury
-			uint genesisBlock = I(0x67D828b93318243E4B6a2465eEea1EbC15dB2981).genesisBlock();//founding
+		if(from == 0x6Ab7F198b14767e56083fD7526472e0C45b1d77F) {//from treasury
+			uint genesisBlock = I(0x38e417529E2fb03206Ad1BE0DD8EB4cDE43C26e4).genesisBlock();//founding
 			require(genesisBlock != 0);
-			uint treasury = _balances[0x32cFC998a98450b11D07F698992d8bF79f67876B] - _treasuryFees; //treasury
+			uint treasury = _balances[0x6Ab7F198b14767e56083fD7526472e0C45b1d77F] - _treasuryFees; //treasury
 			uint withd =  49e23 - treasury;
 			uint allowed = (block.number - genesisBlock)*31e15 - withd;
 			require(amount <= allowed && amount <= treasury);
