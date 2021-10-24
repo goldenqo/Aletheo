@@ -1,4 +1,5 @@
 //CHANGE ADDRESSES
+//changes are very conservative and repetitive. security over efficiency until there will be time to perfect the contract to the level of staking contract
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
 
