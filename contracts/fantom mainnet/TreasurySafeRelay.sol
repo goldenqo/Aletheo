@@ -205,7 +205,7 @@ contract TreasurySafeRelay {
 		}
 	}
 
-	function claimPosterRewards()external { // THIS NUMBER EMISSION
+	function claimPosterRewards()external {
 		uint genesisBlock = I(0x8bd7AbF86696f1922BeeC10Cccda9a79822f03fd).genesisBlock();
 		I(0x75b13c7CDB6C957526C0741708f04B35dFc812a1).claimPosterRewards();
 		uint lastClaim = posters[msg.sender].lastClaim;
