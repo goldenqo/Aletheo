@@ -1,3 +1,7 @@
+/**
+ *Submitted for verification at FtmScan.com on 2021-10-28
+*/
+
 pragma solidity ^0.7.6;
 // author: SamPorter1984
 interface I{
@@ -19,7 +23,7 @@ contract FoundingEvent {
 	uint256 private _lock;
 	address private _letToken;
 
-	constructor() {_deployer = msg.sender; _letToken=0xaBFAD5E1a12C8BFCadff3Bb47A526510817eeed1;}
+	constructor() {_deployer = msg.sender; _letToken=0x944B79AD758c86Df6d004A14F2f79B25B40a4229;}
 	function startLGE(uint hc) external {require(msg.sender == _deployer);if(hardcap != 0){require(hc<hardcap);}_lgeOngoing = true; hardcap = hc;}
 	function triggerLaunch() public {require(msg.sender == _deployer);_createLiquidity();}
 
@@ -31,7 +35,7 @@ contract FoundingEvent {
 	function _createLiquidity() internal {
 		genesisBlock = block.number;
 		address WFTM = 0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83;
-		address staking = 0x7772C7b2822E619d78d8C210B3d625521ff4cC93;
+		address staking = 0x844D4992375368Ce4Bd03D19307258216D0dd147;
 		address factory = 0xEF45d134b73241eDa7703fa787148D9C9F4950b0;
 		address router = 0x16327E3FbDaCA3bcF7E38F5Af2599D2DDc33aE52;
 		address tknFTMLP = I(factory).getPair(_letToken,WFTM); if (tknFTMLP == address(0)) {tknFTMLP=I(factory).createPair(_letToken, WFTM);}
@@ -47,5 +51,11 @@ contract FoundingEvent {
     function manualLiquidityCreation() external {
     	require(msg.sender == _deployer&& address(this).balance>0); genesisBlock = block.number;
     	_deployer.transfer(address(this).balance); I(_letToken).transfer(_deployer, 1e23); delete _lgeOngoing;
+    }
+
+    function addFounderManually(address a) external payable{//in case of migration
+    	require(msg.sender == _deployer);
+    	uint amount = msg.value; uint deployerShare = amount/20;amount -= deployerShare; _deployer.transfer(deployerShare);
+    	deposits[a]+=amount;
     }
 }
