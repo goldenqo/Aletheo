@@ -1,3 +1,7 @@
+/**
+ *Submitted for verification at FtmScan.com on 2021-10-28
+*/
+
 //CHANGE ADDRESSES
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
@@ -14,7 +18,7 @@ interface I{function genesisBlock() external view returns(uint);}
 contract eERC {
 	event Transfer(address indexed from, address indexed to, uint value);
 	event Approval(address indexed owner, address indexed spender, uint value);
-	event BulkTransfer(address indexed from, address[] indexed recipients, uint[] amounts);
+//	event BulkTransfer(address indexed from, address[] indexed recipients, uint[] amounts);
 
 	mapping (address => mapping (address => bool)) private _allowances;
 	mapping (address => uint) private _balances;
@@ -30,15 +34,15 @@ contract eERC {
 	function init() public {
 	    require(_init == false && msg.sender == 0x5C8403A2617aca5C86946E32E14148776E37f72A);
 		_init = true; _name = "Aletheo"; _symbol = "LET";
-		//_treasury = 0x75b13c7CDB6C957526C0741708f04B35dFc812a1;
-		//_founding = 0x8bd7AbF86696f1922BeeC10Cccda9a79822f03fd;
-		//_staking = 0x7772C7b2822E619d78d8C210B3d625521ff4cC93;
+		//_treasury = 0x0C59578d5492669Fb3B71D92abd74ff7092367C6;
+		//_founding = 0xC15F932b03e0BFdaFd13d419BeFE5450b532e692;
+		//_staking = 0x844D4992375368Ce4Bd03D19307258216D0dd147;
 		_balances[0x5C8403A2617aca5C86946E32E14148776E37f72A] = 3e24;
 	}
 	
 	function name() public view returns (string memory) {return _name;}
 	function symbol() public view returns (string memory) {return _symbol;}
-	function totalSupply() public view returns (uint) {return 3e24-_balances[0x75b13c7CDB6C957526C0741708f04B35dFc812a1];}//subtract balance of treasury
+	function totalSupply() public view returns (uint) {return 3e24-_balances[0x0C59578d5492669Fb3B71D92abd74ff7092367C6];}//subtract balance of treasury
 	function decimals() public pure returns (uint) {return 18;}
 	function balanceOf(address a) public view returns (uint) {return _balances[a];}
 	function transfer(address recipient, uint amount) public returns (bool) {_transfer(msg.sender, recipient, amount);return true;}
@@ -63,17 +67,17 @@ contract eERC {
 		require(sender != address(0)&&senderBalance >= amount);
 		_beforeTokenTransfer(sender, amount);
 		_balances[sender] = senderBalance - amount;
-		if(recipient!=0x7772C7b2822E619d78d8C210B3d625521ff4cC93&&recipient!=0x8bd7AbF86696f1922BeeC10Cccda9a79822f03fd){ //staking,founding
+		if(recipient!=0x844D4992375368Ce4Bd03D19307258216D0dd147&&recipient!=0xC15F932b03e0BFdaFd13d419BeFE5450b532e692){ //staking,founding
 			uint treasuryShare = amount/100;
 			amount -= treasuryShare;
-			_balances[0x75b13c7CDB6C957526C0741708f04B35dFc812a1] += treasuryShare;//treasury
+			_balances[0x0C59578d5492669Fb3B71D92abd74ff7092367C6] += treasuryShare;//treasury
 			_treasuryFees+=treasuryShare;
 		}
 		_balances[recipient] += amount;
 		emit Transfer(sender, recipient, amount);
 	}
 
-	function bulkTransfer(address[] memory recipients, uint[] memory amounts) public returns (bool) { // will be used by the contract, or anybody who wants to use it
+/*	function bulkTransfer(address[] memory recipients, uint[] memory amounts) public returns (bool) { // will be used by the contract, or anybody who wants to use it
 		require(recipients.length == amounts.length && amounts.length < 100,"human error");
 		uint senderBalance = _balances[msg.sender]; uint total; uint treasuryShare; uint temp;
 		for(uint i = 0;i<amounts.length;i++) {
@@ -84,16 +88,16 @@ contract eERC {
 		    _balances[recipients[i]] += amounts[i];
 		}
 		require(senderBalance >= total,"balance is low");
-		if (msg.sender == 0x75b13c7CDB6C957526C0741708f04B35dFc812a1) {_beforeTokenTransfer(msg.sender, total);}//treasury
-		else {_balances[0x75b13c7CDB6C957526C0741708f04B35dFc812a1] += treasuryShare;_treasuryFees+=treasuryShare;}//treasury
+		if (msg.sender == 0x0C59578d5492669Fb3B71D92abd74ff7092367C6) {_beforeTokenTransfer(msg.sender, total);}//treasury
+		else {_balances[0x0C59578d5492669Fb3B71D92abd74ff7092367C6] += treasuryShare;_treasuryFees+=treasuryShare;}//treasury
 		_balances[msg.sender] = senderBalance - total; emit BulkTransfer(msg.sender, recipients, amounts); return true;
-	}
+	}*/
 
 	function _beforeTokenTransfer(address from, uint amount) internal view {
-		if(from == 0x75b13c7CDB6C957526C0741708f04B35dFc812a1) {//from treasury
-			uint genesisBlock = I(0x8bd7AbF86696f1922BeeC10Cccda9a79822f03fd).genesisBlock();//founding
+		if(from == 0x0C59578d5492669Fb3B71D92abd74ff7092367C6) {//from treasury
+			uint genesisBlock = I(0xC15F932b03e0BFdaFd13d419BeFE5450b532e692).genesisBlock();//founding
 			require(genesisBlock != 0);
-			uint treasury = _balances[0x75b13c7CDB6C957526C0741708f04B35dFc812a1] - _treasuryFees; //treasury
+			uint treasury = _balances[0x0C59578d5492669Fb3B71D92abd74ff7092367C6] - _treasuryFees; //treasury
 			uint withd =  29e23 - treasury;
 			uint allowed = (block.number - genesisBlock)*31e15 - withd;
 			require(amount <= allowed && amount <= treasury);
