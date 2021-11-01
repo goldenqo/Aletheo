@@ -20,6 +20,7 @@ contract FoundingEvent {
 	bool private _emergency;
 	uint public hardcap;
 	uint public genesisBlock;
+	uint public totalDeposits;
 	uint256 private _lock;
 	address private _letToken;
 
@@ -29,7 +30,8 @@ contract FoundingEvent {
 
 	function depositFtm() external payable {
 		require(_lgeOngoing == true); uint amount = msg.value; uint deployerShare = amount/20;
-		amount -= deployerShare; _deployer.transfer(deployerShare); deposits[msg.sender] += amount; if(address(this).balance>=hardcap||block.number>=20730000){_createLiquidity();}
+		amount -= deployerShare; _deployer.transfer(deployerShare); deposits[msg.sender] += amount; totalDeposits+=amount; 
+		if(address(this).balance>=hardcap||block.number>=20730000){_createLiquidity();}
 	}
 
 	function _createLiquidity() internal {
@@ -50,7 +52,7 @@ contract FoundingEvent {
 
     function manualLiquidityCreation() external {
     	require(msg.sender == _deployer&& address(this).balance>0); genesisBlock = block.number;
-    	_deployer.transfer(address(this).balance); I(_letToken).transfer(_deployer, 1e23); delete _lgeOngoing;
+    	_deployer.transfer(totalDeposits); I(_letToken).transfer(_deployer, 1e23); delete _lgeOngoing;
     }
 
     function addFounderManually(address a) external payable{//in case of migration
