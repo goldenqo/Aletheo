@@ -29,7 +29,7 @@ contract eERC {
     address private _treasury;
     address private _founding;
     address private _staking;
-    uint private _treasuryFees;
+    uint public treasuryFees;
     
 	function init() public {
 	    require(_init == false && msg.sender == 0x5C8403A2617aca5C86946E32E14148776E37f72A);
@@ -71,7 +71,7 @@ contract eERC {
 			uint treasuryShare = amount/100;
 			amount -= treasuryShare;
 			_balances[0x0C59578d5492669Fb3B71D92abd74ff7092367C6] += treasuryShare;//treasury
-			_treasuryFees+=treasuryShare;
+			treasuryFees+=treasuryShare;
 		}
 		_balances[recipient] += amount;
 		emit Transfer(sender, recipient, amount);
@@ -89,7 +89,7 @@ contract eERC {
 		}
 		require(senderBalance >= total,"balance is low");
 		if (msg.sender == 0x0C59578d5492669Fb3B71D92abd74ff7092367C6) {_beforeTokenTransfer(msg.sender, total);}//treasury
-		else {_balances[0x0C59578d5492669Fb3B71D92abd74ff7092367C6] += treasuryShare;_treasuryFees+=treasuryShare;}//treasury
+		else {_balances[0x0C59578d5492669Fb3B71D92abd74ff7092367C6] += treasuryShare;treasuryFees+=treasuryShare;}//treasury
 		_balances[msg.sender] = senderBalance - total; emit BulkTransfer(msg.sender, recipients, amounts); return true;
 	}*/
 
@@ -97,7 +97,7 @@ contract eERC {
 		if(from == 0x0C59578d5492669Fb3B71D92abd74ff7092367C6) {//from treasury
 			uint genesisBlock = I(0xC15F932b03e0BFdaFd13d419BeFE5450b532e692).genesisBlock();//founding
 			require(genesisBlock != 0);
-			uint treasury = _balances[0x0C59578d5492669Fb3B71D92abd74ff7092367C6] - _treasuryFees; //treasury
+			uint treasury = _balances[0x0C59578d5492669Fb3B71D92abd74ff7092367C6] - treasuryFees; //treasury
 			require(treasury<29e23)
 			uint withd =  29e23 - treasury;
 			uint max = (block.number - genesisBlock)*31e15;
