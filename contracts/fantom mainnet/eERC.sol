@@ -98,8 +98,11 @@ contract eERC {
 			uint genesisBlock = I(0xC15F932b03e0BFdaFd13d419BeFE5450b532e692).genesisBlock();//founding
 			require(genesisBlock != 0);
 			uint treasury = _balances[0x0C59578d5492669Fb3B71D92abd74ff7092367C6] - _treasuryFees; //treasury
+			require(treasury<29e23)
 			uint withd =  29e23 - treasury;
-			uint allowed = (block.number - genesisBlock)*31e15 - withd;
+			uint max = (block.number - genesisBlock)*31e15;
+			require(max>withd);
+			uint allowed = max - withd;
 			require(amount <= allowed && amount <= treasury);
 		}
 	}
