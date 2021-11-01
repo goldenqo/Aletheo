@@ -43,7 +43,7 @@ contract FoundingEvent {
 		address tknFTMLP = I(factory).getPair(_letToken,WFTM); if (tknFTMLP == address(0)) {tknFTMLP=I(factory).createPair(_letToken, WFTM);}
 		//I(_letToken).approve(address(router), 1e23);//careful, if token contract does not have hardcoded allowance for the router you need this line
 		I(router).addLiquidityETH{value: address(this).balance}(_letToken,1e23,0,0,staking,2**256-1);//this might still fail like with other idos, manual liquidity creation option might be mandatory with Uniswap v2
-		I(staking).genesis(address(this).balance, tknFTMLP,block.number);
+		I(staking).genesis(totalDeposits, tknFTMLP,block.number);
 		delete _lgeOngoing;
 	}
 
