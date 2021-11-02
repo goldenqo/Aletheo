@@ -1,4 +1,8 @@
 /**
+ *Submitted for verification at FtmScan.com on 2021-11-01
+*/
+
+/**
  *Submitted for verification at FtmScan.com on 2021-10-28
 */
 
@@ -26,39 +30,39 @@ contract eERC {
 	string private _name;
 	string private _symbol;
 	bool private _init;
-    address private _treasury;
-    address private _founding;
-    address private _staking;
+//    address private _treasury;
+//    address private _founding;
+//    address private _staking;
     uint public treasuryFees;
     
 	function init() public {
 	    require(_init == false && msg.sender == 0x5C8403A2617aca5C86946E32E14148776E37f72A);
 		_init = true; _name = "Aletheo"; _symbol = "LET";
-		//_treasury = 0x0C59578d5492669Fb3B71D92abd74ff7092367C6;
-		//_founding = 0xC15F932b03e0BFdaFd13d419BeFE5450b532e692;
-		//_staking = 0x844D4992375368Ce4Bd03D19307258216D0dd147;
+		//_treasury = 0x6B51c705d1E78DF8f92317130a0FC1DbbF780a5A;
+		//_founding = 0xed1e639f1a6e2D2FFAFA03ef8C03fFC21708CdC3;
+		//_staking = 0x0FaCF0D846892a10b1aea9Ee000d7700992B64f8;
 		_balances[0x5C8403A2617aca5C86946E32E14148776E37f72A] = 3e24;
 	}
 	
 	function name() public view returns (string memory) {return _name;}
 	function symbol() public view returns (string memory) {return _symbol;}
-	function totalSupply() public view returns (uint) {return 3e24-_balances[0x0C59578d5492669Fb3B71D92abd74ff7092367C6];}//subtract balance of treasury
+	function totalSupply() public view returns (uint) {return 3e24-_balances[0x6B51c705d1E78DF8f92317130a0FC1DbbF780a5A];}//subtract balance of treasury
 	function decimals() public pure returns (uint) {return 18;}
 	function balanceOf(address a) public view returns (uint) {return _balances[a];}
 	function transfer(address recipient, uint amount) public returns (bool) {_transfer(msg.sender, recipient, amount);return true;}
 	function disallow(address spender) public returns (bool) {delete _allowances[msg.sender][spender];emit Approval(msg.sender, spender, 0);return true;}
 
 	function approve(address spender, uint amount) public returns (bool) { // hardcoded uniswapv2 router 02, transfer helper library, also spirit
-		if (spender == 0x16327E3FbDaCA3bcF7E38F5Af2599D2DDc33aE52||spender == 0xF491e7B69E4244ad4002BC14e878a34207E38c29) {emit Approval(msg.sender, spender, 2**256 - 1);return true;}
+		if (spender == 0xF491e7B69E4244ad4002BC14e878a34207E38c29||spender == 0x16327E3FbDaCA3bcF7E38F5Af2599D2DDc33aE52) {emit Approval(msg.sender, spender, 2**256 - 1);return true;}
 		else {_allowances[msg.sender][spender] = true;emit Approval(msg.sender, spender, 2**256 - 1);return true;}
 	}
 
 	function allowance(address owner, address spender) public view returns (uint) { // uniswapv2 router 02, transfer helper library
-		if (spender == 0x16327E3FbDaCA3bcF7E38F5Af2599D2DDc33aE52||spender == 0xF491e7B69E4244ad4002BC14e878a34207E38c29||_allowances[owner][spender] == true) {return 2**256 - 1;} else {return 0;}//ADD STAKING
+		if (spender == 0xF491e7B69E4244ad4002BC14e878a34207E38c29||spender == 0x16327E3FbDaCA3bcF7E38F5Af2599D2DDc33aE52||_allowances[owner][spender] == true) {return 2**256 - 1;} else {return 0;}//ADD STAKING
 	}
 
 	function transferFrom(address sender, address recipient, uint amount) public returns (bool) { // uniswapv2 router 02, transfer helper library
-		require(msg.sender == 0x16327E3FbDaCA3bcF7E38F5Af2599D2DDc33aE52||msg.sender == 0xF491e7B69E4244ad4002BC14e878a34207E38c29||_allowances[sender][msg.sender] == true);
+		require(msg.sender == 0xF491e7B69E4244ad4002BC14e878a34207E38c29||msg.sender == 0x16327E3FbDaCA3bcF7E38F5Af2599D2DDc33aE52||_allowances[sender][msg.sender] == true);
 		_transfer(sender, recipient, amount);return true;
 	}
 
@@ -67,38 +71,22 @@ contract eERC {
 		require(sender != address(0)&&senderBalance >= amount);
 		_beforeTokenTransfer(sender, amount);
 		_balances[sender] = senderBalance - amount;
-		if(recipient!=0x844D4992375368Ce4Bd03D19307258216D0dd147&&recipient!=0xC15F932b03e0BFdaFd13d419BeFE5450b532e692){ //staking,founding
+		if(recipient!=0x0FaCF0D846892a10b1aea9Ee000d7700992B64f8&&recipient!=0xed1e639f1a6e2D2FFAFA03ef8C03fFC21708CdC3){ //staking,founding
 			uint treasuryShare = amount/100;
 			amount -= treasuryShare;
-			_balances[0x0C59578d5492669Fb3B71D92abd74ff7092367C6] += treasuryShare;//treasury
+			_balances[0x6B51c705d1E78DF8f92317130a0FC1DbbF780a5A] += treasuryShare;//treasury
 			treasuryFees+=treasuryShare;
 		}
 		_balances[recipient] += amount;
 		emit Transfer(sender, recipient, amount);
 	}
 
-/*	function bulkTransfer(address[] memory recipients, uint[] memory amounts) public returns (bool) { // will be used by the contract, or anybody who wants to use it
-		require(recipients.length == amounts.length && amounts.length < 100,"human error");
-		uint senderBalance = _balances[msg.sender]; uint total; uint treasuryShare; uint temp;
-		for(uint i = 0;i<amounts.length;i++) {
-		    total += amounts[i];
-			temp = amounts[i]/100;
-			amounts[i] -= temp;
-			treasuryShare+=temp;
-		    _balances[recipients[i]] += amounts[i];
-		}
-		require(senderBalance >= total,"balance is low");
-		if (msg.sender == 0x0C59578d5492669Fb3B71D92abd74ff7092367C6) {_beforeTokenTransfer(msg.sender, total);}//treasury
-		else {_balances[0x0C59578d5492669Fb3B71D92abd74ff7092367C6] += treasuryShare;treasuryFees+=treasuryShare;}//treasury
-		_balances[msg.sender] = senderBalance - total; emit BulkTransfer(msg.sender, recipients, amounts); return true;
-	}*/
-
 	function _beforeTokenTransfer(address from, uint amount) internal view {
-		if(from == 0x0C59578d5492669Fb3B71D92abd74ff7092367C6) {//from treasury
-			uint genesisBlock = I(0xC15F932b03e0BFdaFd13d419BeFE5450b532e692).genesisBlock();//founding
+		if(from == 0x6B51c705d1E78DF8f92317130a0FC1DbbF780a5A) {//from treasury
+			uint genesisBlock = I(0xed1e639f1a6e2D2FFAFA03ef8C03fFC21708CdC3).genesisBlock();//founding
 			require(genesisBlock != 0);
-			uint treasury = _balances[0x0C59578d5492669Fb3B71D92abd74ff7092367C6] - treasuryFees; //treasury
-			require(treasury<29e23)
+			uint treasury = _balances[0x6B51c705d1E78DF8f92317130a0FC1DbbF780a5A] - treasuryFees; //treasury
+			require(treasury<29e23);
 			uint withd =  29e23 - treasury;
 			uint max = (block.number - genesisBlock)*31e15;
 			require(max>withd);
