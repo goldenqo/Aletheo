@@ -1,4 +1,8 @@
 /**
+ *Submitted for verification at FtmScan.com on 2021-11-02
+*/
+
+/**
  *Submitted for verification at FtmScan.com on 2021-10-28
 */
 
@@ -7,7 +11,12 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
 
-interface I{ function transfer(address to, uint value) external returns(bool); function balanceOf(address) external view returns(uint); function genesisBlock() external view returns(uint);}
+interface I{ 
+    function transfer(address to, uint value) external returns(bool);
+    function balanceOf(address) external view returns(uint);
+    function genesisBlock() external view returns(uint);
+    function treasuryFees() external view returns(uint);
+}
 
 contract Treasury {
 	address private _governance;
@@ -26,14 +35,15 @@ contract Treasury {
 	uint public totalAirdrops;
 	uint public totalRefundsEmission;
 	uint public totBenEmission;
-
+	uint public withd;
+	
 	function init() public {
 		require(msg.sender == 0x5C8403A2617aca5C86946E32E14148776E37f72A);
 		_governance = msg.sender;
-		_letToken =0x944B79AD758c86Df6d004A14F2f79B25B40a4229;
-		_founding =0xC15F932b03e0BFdaFd13d419BeFE5450b532e692;
+		_letToken =0x7DA2331C522D4EDFAf545d2F5eF61406D9d637A9;
+		_founding =0xed1e639f1a6e2D2FFAFA03ef8C03fFC21708CdC3;
 		//added without arrays, so the code is representative
-//Fantom
+//Fantom(more fantom refunds will be added in due time)
 		addRefund(0x76b60dCf71dA2294f8aA034432D925D1eED8cf68,5);
 		addRefund(0x6718EB204A15601BCE38b6695816D6206F8207AB,52);
 		addRefund(0x4B254c5F0014487fB6DB637835a123667cc6e08b,500);
@@ -149,7 +159,7 @@ contract Treasury {
 
 	addBen(0x5C8403A2617aca5C86946E32E14148776E37f72A,1e23,0,5e22);
 	addBen(0xD6980B8f28d0b6Fa89b7476841E341c57508a3F6,1e23,0,1e22);//change addy
-	addBen(0x1Fd92A677e862fCcE9CFeF75ABAD79DF18B88d51,1e23,0,5e21);// change addy
+	//addBen(0x1Fd92A677e862fCcE9CFeF75ABAD79DF18B88d51,1e23,0,5e21);// change addy
 	}
 
 	function setGov(address a)external{ require(msg.sender==_governance); _governance=a; }
@@ -215,8 +225,14 @@ contract Treasury {
 	function getRewards(address a,uint amount) external{ //for staking
 		uint genesisBlock = I(_founding).genesisBlock();
 		require(genesisBlock != 0);
-		require(msg.sender == 0x844D4992375368Ce4Bd03D19307258216D0dd147);//staking
+		require(msg.sender == 0x0FaCF0D846892a10b1aea9Ee000d7700992B64f8);//staking
 		I(_letToken).transfer(a,amount);
+		uint treasury = I(_letToken).balanceOf(address(this)) - I(_letToken).treasuryFees(); //treasury
+		uint max = (block.number - genesisBlock)*93e14;
+		require(max>withd);
+		uint allowed = max - withd;
+		require(amount <= allowed && amount <= treasury);
+		withd+=amount;
 	}
 
 	function claimBenRewards() external returns(uint){
@@ -227,7 +243,7 @@ contract Treasury {
 		uint rate = _getRate();	rate = rate*bens[msg.sender].emission/1e23;
 		uint toClaim = (block.number - lastClaim)*rate;
 		if(toClaim>bens[msg.sender].amount){toClaim=bens[msg.sender].amount;}
-		if(toClaim>I(0x944B79AD758c86Df6d004A14F2f79B25B40a4229).balanceOf(address(this))){toClaim=I(0x944B79AD758c86Df6d004A14F2f79B25B40a4229).balanceOf(address(this));}//this check was supposed to be added on protocol upgrade, emission was so slow, that it could not possibly trigger overflow
+		if(toClaim>I(0x7DA2331C522D4EDFAf545d2F5eF61406D9d637A9).balanceOf(address(this))){toClaim=I(0x7DA2331C522D4EDFAf545d2F5eF61406D9d637A9).balanceOf(address(this));}//this check was supposed to be added on protocol upgrade, emission was so slow, that it could not possibly trigger overflow
 		bens[msg.sender].lastClaim = uint64(block.number);
 		bens[msg.sender].amount -= uint128(toClaim);
 		I(_letToken).transfer(msg.sender, toClaim);
@@ -235,45 +251,47 @@ contract Treasury {
 	}
 
 	function claimAirdrop()external {
-		uint genesisBlock = I(0xC15F932b03e0BFdaFd13d419BeFE5450b532e692).genesisBlock();
+		uint genesisBlock = I(0xed1e639f1a6e2D2FFAFA03ef8C03fFC21708CdC3).genesisBlock();
 		uint lastClaim = airdrops[msg.sender].lastClaim;
 		if(genesisBlock>lastClaim){lastClaim=genesisBlock;}
 		airdrops[msg.sender].lastClaim=uint128(block.number);
 		require(airdrops[msg.sender].amount>0&&genesisBlock!=0&&block.number>lastClaim&&block.number>genesisBlock);
-		uint rate = _getRate(); uint toClaim = (block.number-lastClaim)*rate/totalAirdrops;
+		uint rate=31e14; uint toClaim = (block.number-lastClaim)*rate/totalAirdrops;
 		if(toClaim>airdrops[msg.sender].amount){toClaim=airdrops[msg.sender].amount;}
-		if(toClaim>I(0x944B79AD758c86Df6d004A14F2f79B25B40a4229).balanceOf(address(this))){toClaim=I(0x944B79AD758c86Df6d004A14F2f79B25B40a4229).balanceOf(address(this));}
+		if(toClaim>I(0x7DA2331C522D4EDFAf545d2F5eF61406D9d637A9).balanceOf(address(this))){toClaim=I(0x7DA2331C522D4EDFAf545d2F5eF61406D9d637A9).balanceOf(address(this));}
 		airdrops[msg.sender].amount -= uint128(toClaim);
 		if(airdrops[msg.sender].amount==0){totalAirdrops-=1; airdrops[msg.sender].lastClaim==0;}
-		I(0x944B79AD758c86Df6d004A14F2f79B25B40a4229).transfer(msg.sender, toClaim);
+		I(0x7DA2331C522D4EDFAf545d2F5eF61406D9d637A9).transfer(msg.sender, toClaim);
     }
 
 	function claimPosterRewards()external { // THIS NUMBER EMISSION
-		uint genesisBlock = I(0xC15F932b03e0BFdaFd13d419BeFE5450b532e692).genesisBlock();
+		uint genesisBlock = I(0xed1e639f1a6e2D2FFAFA03ef8C03fFC21708CdC3).genesisBlock();
 		uint lastClaim = posters[msg.sender].lastClaim;
 		if(genesisBlock>lastClaim){lastClaim=genesisBlock;}
 		posters[msg.sender].lastClaim=uint128(block.number);
 		require(posters[msg.sender].amount>0&&genesisBlock!=0&&block.number>lastClaim&&block.number>genesisBlock);
 		uint rate=31e14;rate*=2; uint toClaim =(block.number-lastClaim)*rate/totalPosters; // THIS NUMBER
 		if(toClaim>posters[msg.sender].amount){toClaim=posters[msg.sender].amount;}
-		if(toClaim>I(0x944B79AD758c86Df6d004A14F2f79B25B40a4229).balanceOf(address(this))){toClaim=I(0x944B79AD758c86Df6d004A14F2f79B25B40a4229).balanceOf(address(this));}
+		if(toClaim>I(0x7DA2331C522D4EDFAf545d2F5eF61406D9d637A9).balanceOf(address(this))){toClaim=I(0x7DA2331C522D4EDFAf545d2F5eF61406D9d637A9).balanceOf(address(this));}
 		posters[msg.sender].amount-=uint128(toClaim);
-		I(0x944B79AD758c86Df6d004A14F2f79B25B40a4229).transfer(msg.sender, toClaim);
+		I(0x7DA2331C522D4EDFAf545d2F5eF61406D9d637A9).transfer(msg.sender, toClaim);
 		if(posters[msg.sender].amount==0){totalPosters-=1;posters[msg.sender].lastClaim==0;}
 	}
 
 	function claimRefundRewards()external {
-		uint genesisBlock = I(0xC15F932b03e0BFdaFd13d419BeFE5450b532e692).genesisBlock();
+		uint genesisBlock = I(0xed1e639f1a6e2D2FFAFA03ef8C03fFC21708CdC3).genesisBlock();
 		uint lastClaim = refunds[msg.sender].lastClaim;	if(genesisBlock>lastClaim){lastClaim=genesisBlock;}	refunds[msg.sender].lastClaim=uint128(block.number);
 		require(genesisBlock!=0&&block.number>lastClaim&&block.number>genesisBlock);
 		uint rate=_getRate(); uint toClaim = (block.number-lastClaim)*rate*refunds[msg.sender].emission/totalRefundsEmission;
-		if(toClaim>I(0x944B79AD758c86Df6d004A14F2f79B25B40a4229).balanceOf(address(this))){toClaim=I(0x944B79AD758c86Df6d004A14F2f79B25B40a4229).balanceOf(address(this));}
-		I(0x944B79AD758c86Df6d004A14F2f79B25B40a4229).transfer(msg.sender,toClaim);
+		if(toClaim>I(0x7DA2331C522D4EDFAf545d2F5eF61406D9d637A9).balanceOf(address(this))){toClaim=I(0x7DA2331C522D4EDFAf545d2F5eF61406D9d637A9).balanceOf(address(this));}
+		I(0x7DA2331C522D4EDFAf545d2F5eF61406D9d637A9).transfer(msg.sender,toClaim);
 	}
 
 // IN CASE OF ANY ISSUE
 	function removeRefunds(address[] memory r) external{ 
-		require(msg.sender == _governance); for(uint i = 0;i<r.length;i++) {totalRefundsEmission -= refunds[r[i]].emission; delete refunds[r[i]]; }
+		require(msg.sender == _governance); for(uint i = 0;i<r.length;i++) {
+			if(refunds[r[i]].emission>=totalRefundsEmission){refunds[r[i]].emission=totalRefundsEmission;}totalRefundsEmission -= refunds[r[i]].emission; delete refunds[r[i]];
+		}
 	}
 	function removeAirdrops(address[] memory r) external{ require(msg.sender == _governance); for(uint i = 0;i<r.length;i++) { totalAirdrops -=1; delete airdrops[r[i]]; } }
 	function removePosters(address[] memory r) external{ require(msg.sender == _oracle); for(uint i = 0;i<r.length;i++) { totalPosters -=1; delete posters[r[i]];} }
