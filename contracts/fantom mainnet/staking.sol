@@ -1,5 +1,5 @@
 /**
- *Submitted for verification at FtmScan.com on 2021-10-28
+ *Submitted for verification at FtmScan.com on 2021-11-02
 */
 
 // SPDX-License-Identifier: MIT
@@ -27,16 +27,16 @@ contract StakingContract {
 	struct LPProvider {uint32 lastClaim; uint16 lastEpoch; bool founder; uint128 tknAmount; uint128 lpShare;uint128 lockedAmount;uint128 lockUpTo;}
 	struct TokenLocker {uint128 amount; uint32 lastClaim; uint32 lockUpTo;}
 
-	bytes32[] private _epochs;
-	bytes32[] private _founderEpochs;
+	bytes32[] public _epochs;
+	bytes32[] public _founderEpochs;
 
 	mapping(address => LPProvider) private _ps;
 	mapping(address => TokenLocker) private _ls;
 
 	function init() public {
-		_foundingEvent = 0xC15F932b03e0BFdaFd13d419BeFE5450b532e692;//change addresses
-		_letToken = 0x944B79AD758c86Df6d004A14F2f79B25B40a4229;
-		_treasury = 0x0C59578d5492669Fb3B71D92abd74ff7092367C6;
+		_foundingEvent = 0xed1e639f1a6e2D2FFAFA03ef8C03fFC21708CdC3;//change addresses
+		_letToken = 0x7DA2331C522D4EDFAf545d2F5eF61406D9d637A9;
+		_treasury = 0x6B51c705d1E78DF8f92317130a0FC1DbbF780a5A;
 	}
 
 	function genesis(uint foundingFTM, address tkn, uint gen) public {
@@ -56,27 +56,30 @@ contract StakingContract {
 		require(_genesis != 0 && _ps[msg.sender].founder == false&&_ps[msg.sender].lpShare == 0);
 		_ps[msg.sender].founder = true;
 		uint foundingFTM = _foundingFTMDeposited;
-		uint lpShare = _foundingLPtokensMinted*FTMContributed/foundingFTM*1e18;
+		uint lpShare = _foundingLPtokensMinted*FTMContributed/foundingFTM;//this number
 		uint tknAmount = FTMContributed*1e23/foundingFTM;
 		_ps[msg.sender].lpShare = uint128(lpShare);
 		_ps[msg.sender].tknAmount = uint128(tknAmount);
 		_ps[msg.sender].lastClaim = uint32(_genesis);
 		_ps[msg.sender].lockedAmount = uint128(lpShare);
-		_ps[msg.sender].lockUpTo = uint128(24000000);
+		_ps[msg.sender].lockUpTo = uint128(25000000);
 	}
 
 	function unstakeLp(uint amount) public{
 		(uint lastClaim,bool status,uint tknAmount,uint lpShare,uint lockedAmount) = getProvider(msg.sender);
+		require(lpShare>=lockedAmount);
 		require(lpShare-lockedAmount >= amount,"too much");
 		if (lastClaim != block.number) {_getRewards(msg.sender);}
 		_ps[msg.sender].lpShare = uint128(lpShare - amount);
 		uint toSubtract = tknAmount*amount/lpShare; // not an array of deposits. if a provider stakes and then stakes again, and then unstakes - he loses share as if he staked only once at lowest price he had
+		require(tknAmount>=toSubtract);
 		_ps[msg.sender].tknAmount = uint128(tknAmount-toSubtract);
 		bytes32 epoch; uint length;
 		if (status == true) {length = _founderEpochs.length; epoch = _founderEpochs[length-1];}
-		else{length = _epochs.length; epoch = _epochs[length-1];_genLPtokens -= amount;}
+		else{length = _epochs.length; epoch = _epochs[length-1];_genLPtokens -= amount;require(_genLPtokens>=amount);}//this is alright, actually better to have it than not
 		(uint80 eBlock,uint96 eAmount,) = _extractEpoch(epoch);
 		eAmount -= uint96(toSubtract);
+		require(eAmount>=toSubtract);
 		_storeEpoch(eBlock,eAmount,status,length);
 		I(_tokenFTMLP).transfer(address(msg.sender), amount*9/10);
 	}
@@ -105,7 +108,7 @@ contract StakingContract {
 			if(status){epoch = _founderEpochs[length-1];} else {epoch = _epochs[length-1];}
 			eAmount = uint96(bytes12(epoch << 80)); toClaim = _computeRewards(lastClaim,eAmount,block.number,tknAmount,rate);
 		}
-		I(0x0C59578d5492669Fb3B71D92abd74ff7092367C6).getRewards(a, toClaim);
+		I(0x6B51c705d1E78DF8f92317130a0FC1DbbF780a5A).getRewards(a, toClaim);
 	}
 
 	function _getRate() internal view returns(uint){uint rate = 62e14; uint halver = block.number/28e6;if (halver>0) {for (uint i=0;i<halver;i++) {rate=rate*4/5;}}return rate;}//THIS NUMBER
@@ -138,7 +141,7 @@ contract StakingContract {
 			uint blocks = block.number - _ls[msg.sender].lastClaim;
 			uint rate = _getRate(); rate = rate/2;
 			toClaim = blocks*_ls[a].amount*rate/totalLetLocked;
-			I(0x0C59578d5492669Fb3B71D92abd74ff7092367C6).getRewards(a, toClaim);
+			I(0x6B51c705d1E78DF8f92317130a0FC1DbbF780a5A).getRewards(a, toClaim);
 		}
 		_ls[msg.sender].lastClaim = uint32(block.number);
 		return toClaim;
@@ -150,7 +153,7 @@ contract StakingContract {
 			_ps[msg.sender].lockedAmount -= uint128(amount);
 		}
 		if(tkn == _letToken){
-			require(_ls[msg.sender].amount>=amount);
+			require(_ls[msg.sender].amount>=amount && totalLetLocked>=amount);
 			_getLockRewards(msg.sender);
 			_ls[msg.sender].amount-=uint128(amount);
 			I(_letToken).transfer(msg.sender,amount);
@@ -168,13 +171,13 @@ contract StakingContract {
 		else if (lastClaim != block.number) {_getRewards(msg.sender);}
 		bytes32 epoch = _epochs[length-1];
 		(uint80 eBlock,uint96 eAmount,) = _extractEpoch(epoch);
-		eAmount += uint96(amount);
-		_storeEpoch(eBlock,eAmount,false,length);
 		_ps[msg.sender].lastEpoch = uint16(_epochs.length);
 		uint genLPtokens = _genLPtokens;
 		genLPtokens += amount;
 		_genLPtokens = genLPtokens;
 		uint share = amount*I(_letToken).balanceOf(tkn)/genLPtokens;
+		eAmount += uint96(share);
+		_storeEpoch(eBlock,eAmount,false,length);
 		_ps[msg.sender].tknAmount += uint128(share);
 		_ps[msg.sender].lpShare += uint128(amount);
 		_ps[msg.sender].lockedAmount += uint128(amount);
@@ -209,9 +212,4 @@ contract StakingContract {
 
 	function getProvider(address a)public view returns(uint,bool,uint,uint,uint){return(_ps[a].lastClaim,_ps[a].founder,_ps[a].tknAmount,_ps[a].lpShare,_ps[a].lockedAmount);}
 	function getAPYInfo()public view returns(uint,uint,uint,uint){return(_foundingFTMDeposited,_foundingLPtokensMinted,_genesis,_genLPtokens);}
-	function getEpoch(uint n,bool status) public view returns(uint eB, uint eA, uint eE){
-	    uint eBlock; uint eAmount; uint eEnd;
-	    if(status){ (eBlock,eAmount,eEnd) =_extractEpoch(_founderEpochs[n]); } else {(eBlock,eAmount,eEnd)=_extractEpoch(_epochs[n]);}
-	    return (eBlock,eAmount,eEnd);
-	}
 }
