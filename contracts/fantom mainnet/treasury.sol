@@ -44,8 +44,11 @@ contract Treasury {
 	uint public totalRefundsEmission;
 	uint public totBenEmission;
 	uint public epochBlock;
-
+	bool private _init;
+	
 	function init() public {
+	require(_init == false);
+	_init = true;
 		_governance = 0x5C8403A2617aca5C86946E32E14148776E37f72A;
 		_letToken =0x7DA2331C522D4EDFAf545d2F5eF61406D9d637A9;
 		_founding =0xAE6ba0D4c93E529e273c8eD48484EA39129AaEdc;
