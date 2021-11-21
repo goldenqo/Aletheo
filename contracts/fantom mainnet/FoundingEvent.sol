@@ -1,7 +1,3 @@
-/**
- *Submitted for verification at FtmScan.com on 2021-11-19
-*/
-
 pragma solidity ^0.7.6;
 // author: SamPorter1984
 interface I{
