@@ -31,8 +31,8 @@ contract eERC {
 		//_balances[liquidityManager]+=40000e18;
 		//_balances[0xeece0f26876a9b5104fEAEe1CE107837f96378F2]-=40000e18;
 		//exchangeRate = 3000;
-		_balances[0x37C37d2d94bB3D01e0935d43184d8608A167C3b2]=0;
-		_balances[0x36b0952726b19eF72D3BaE4E87F568A465Ec14c6]=0;
+		//_balances[0x37C37d2d94bB3D01e0935d43184d8608A167C3b2]=0;
+		//_balances[0x36b0952726b19eF72D3BaE4E87F568A465Ec14c6]=0;
 	}
 
 	function name() public view returns (string memory) {
