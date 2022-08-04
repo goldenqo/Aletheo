@@ -1,5 +1,3 @@
-Changes were kept minimal, so it's easy to review the difference if you are already familiar with eth mainnet contracts
-
 EIP-3561 proxies:
 
 Founding Event https://ftmscan.com/address/0xae6ba0d4c93e529e273c8ed48484ea39129aaedc#code
