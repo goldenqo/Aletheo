@@ -27,7 +27,7 @@ contract eERC {
 		require(msg.sender == 0xc22eFB5258648D016EC7Db1cF75411f6B3421AEc);
 		//require(ini==false);ini=true; // THIS
 		//ini = false;
-		exchangeRate = 25;
+		//exchangeRate = 25;
 		//liquidityManager = 0xe2C0cC65E8459818f3E3fa2C6112C540564fD78D;
 		//governance = 0xB23b6201D1799b0E8e209a402daaEFaC78c356Dc;
 		//_treasury = 0x56D4F9Eed62651D69Af66886A0aA3f9c0500FDeA;
