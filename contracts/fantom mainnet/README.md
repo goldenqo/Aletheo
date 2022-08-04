@@ -9,3 +9,5 @@ LET token https://ftmscan.com/address/0x7da2331c522d4edfaf545d2f5ef61406d9d637a9
 Staking https://ftmscan.com/address/0x0facf0d846892a10b1aea9ee000d7700992b64f8#code
 
 Treasury https://ftmscan.com/address/0xeece0f26876a9b5104feaee1ce107837f96378f2#code
+
+Liquidity Manager https://ftmscan.com/address/0x2Fe82aa8332Ba19F8bf194440f63A254A19d99F3
