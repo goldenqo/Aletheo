@@ -2,10 +2,10 @@ Changes were kept minimal, so it's easy to review the difference if you are alre
 
 EIP-3561 proxies:
 
-Founding Event https://ftmscan.com/address/0xae6ba0d4c93e529e273c8ed48484ea39129aaedc#code
+LET token https://snowtrace.io/address/0x017fe17065b6f973f1bad851ed8c9461c0169c31
 
-LET token https://ftmscan.com/address/0x7da2331c522d4edfaf545d2f5ef61406d9d637a9#code
+Staking https://snowtrace.io/address/0x5e31d498c820d6b4d358fceeeaca5de8cc2f0cbb
 
-Staking https://ftmscan.com/address/0x0facf0d846892a10b1aea9ee000d7700992b64f8#code
+Treasury https://snowtrace.io/address/0x56d4f9eed62651d69af66886a0aa3f9c0500fdea
 
-Treasury https://ftmscan.com/address/0xeece0f26876a9b5104feaee1ce107837f96378f2#code
+Liquidity manager https://snowtrace.io/address/0xe2c0cc65e8459818f3e3fa2c6112c540564fd78d
