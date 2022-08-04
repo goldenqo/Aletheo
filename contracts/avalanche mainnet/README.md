@@ -1,5 +1,3 @@
-Changes were kept minimal, so it's easy to review the difference if you are already familiar with eth mainnet contracts
-
 EIP-3561 proxies:
 
 LET token https://snowtrace.io/address/0x017fe17065b6f973f1bad851ed8c9461c0169c31
