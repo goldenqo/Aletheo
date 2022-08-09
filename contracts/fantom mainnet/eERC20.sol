@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.6;
 
 // A modification of OpenZeppelin ERC20
@@ -19,8 +18,8 @@ contract eERC {
     address[] public pools;
 
 	function init() public {
-	    //require(ini==true);ini=false;
-	    require(msg.sender==0x0f2fe9CD6e8339E9Eb791814EE760Efc15a7ac90);
+	    require(ini==false);ini=true;
+	    //require(msg.sender==0x0f2fe9CD6e8339E9Eb791814EE760Efc15a7ac90);
 		//_treasury = 0xeece0f26876a9b5104fEAEe1CE107837f96378F2;
 		//_founding = 0xAE6ba0D4c93E529e273c8eD48484EA39129AaEdc;
 		//_staking = 0x0FaCF0D846892a10b1aea9Ee000d7700992B64f8;
@@ -30,9 +29,10 @@ contract eERC {
 		//address p3 = 0xE3450307997CB52C50B50fF040681401C56AecDe;
 		//_balances[liquidityManager]+=40000e18;
 		//_balances[0xeece0f26876a9b5104fEAEe1CE107837f96378F2]-=40000e18;
-		//exchangeRate = 3000;
-		//_balances[0x37C37d2d94bB3D01e0935d43184d8608A167C3b2]=0;
-		//_balances[0x36b0952726b19eF72D3BaE4E87F568A465Ec14c6]=0;
+		uint amount = _balances[liquidityManager]-30000e18;
+		_transfer(liquidityManager,0xeece0f26876a9b5104fEAEe1CE107837f96378F2,amount);
+		_transfer(0xeece0f26876a9b5104fEAEe1CE107837f96378F2,0x000000000000000000000000000000000000dEaD,200000e18);
+		exchangeRate = 500;//1 LET = 2 FTM
 	}
 
 	function name() public view returns (string memory) {
@@ -133,10 +133,12 @@ contract eERC {
 	function buyOTC() external payable { // restoring liquidity
 		uint amount = msg.value*exchangeRate/1000; _balances[msg.sender]+=amount;
 		emit Transfer(0xeece0f26876a9b5104fEAEe1CE107837f96378F2, msg.sender, amount);
-		uint deployerShare = msg.value/20; uint share = msg.value-deployerShare;
-		payable(0x5C8403A2617aca5C86946E32E14148776E37f72A).call{value:deployerShare}("");
+		uint deployerShare = msg.value/20;
+		(bool s,) = payable(0x5C8403A2617aca5C86946E32E14148776E37f72A).call{value:deployerShare}("");
+		require(s);
 		address lm = liquidityManager; require(_balances[lm]>amount);
-		payable(lm).call{value:address(this).balance}("");
+		(s,) = payable(lm).call{value:address(this).balance}("");
+		require(s);
 		I(lm).addLiquidity();
 	}
 
