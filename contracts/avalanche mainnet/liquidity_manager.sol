@@ -20,7 +20,7 @@ interface I {
 		uint256 amountIn,uint256 amountOutMin,address[] calldata path,address to,uint256 deadline
 	) external returns (uint256[] memory amounts);
 
-	function addLiquidityETH(
+	function addLiquidityAVAX(
 		address token,uint amountTokenDesired,uint amountTokenMin,uint amountETHMin,address to,uint deadline
 	)external payable returns(uint amountToken,uint amountETH,uint liquidity);
 }
@@ -97,7 +97,7 @@ contract LiquidityManager {
 
 		function addLiquidity() external payable {
 		require(msg.sender==mainToken);
-		I(router).addLiquidityETH{value: address(this).balance}(mainToken, I(mainToken).balanceOf(address(this)),0,0,address(this),2**256-1);
+		I(router).addLiquidityAVAX{value: address(this).balance}(mainToken, I(mainToken).balanceOf(address(this)),0,0,address(this),2**256-1);
 	}
 
 	function stakeLiquidity(uint amount) external {
