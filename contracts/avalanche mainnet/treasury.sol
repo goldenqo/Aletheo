@@ -3,7 +3,6 @@ pragma solidity ^0.8.6;
 interface I{
 	function transfer(address to, uint value) external returns(bool);
 	function balanceOf(address) external view returns(uint);
-	function genesisBlock() external view returns(uint);
 	function invested(address a) external returns(uint);
 	function claimed(address a) external returns(bool);
 	function getNodeNumberOf(address a) external returns(uint);
@@ -49,7 +48,7 @@ contract Treasury {
 	mapping(address => Poster1) public posters1;
 
 	function init() public {
-		baseRate = 62e13;
+	//	baseRate = 62e13;
 	//	_governance=0xB23b6201D1799b0E8e209a402daaEFaC78c356Dc;
 	//	_letToken = 0x017fe17065B6F973F1bad851ED8c9461c0169c31;////
 	//	_snowPresale = 0x60BA9aAA57Aa638a60c524a3ac24Da91e04cFA5C;
@@ -67,7 +66,7 @@ contract Treasury {
 	}
 
 	function setRate(uint r) external {
-		require(msg.sender==_governance);
+		require(msg.sender==_governance&&r<=62e13);
 		baseRate = r;
 	}
 
@@ -297,8 +296,6 @@ contract Treasury {
 				if(toClaim+airdrop<=treasuryBalance){
 					toClaim+=airdrop; delete airdrops[msg.sender];
 				}
-			} else {
-				airdrops[msg.sender].amount-=uint128(treasuryBalance); toClaim+=treasuryBalance;
 			}
 		}
 		I(_letToken).transfer(msg.sender, toClaim);
