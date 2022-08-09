@@ -1,6 +1,3 @@
-// SPDX-License-Identifier: MIT
-
-// CHANGE ADDRESSES
 pragma solidity ^0.8.6;
 
 // A modification of OpenZeppelin ERC20
@@ -24,7 +21,7 @@ contract eERC {
     address[] public pools; // NEVER FORGET: there are a few millions maybe of empty positions and then goes something random from previous storage
 
 	function init() public {
-		require(msg.sender == 0xc22eFB5258648D016EC7Db1cF75411f6B3421AEc);
+		//require(msg.sender == 0xc22eFB5258648D016EC7Db1cF75411f6B3421AEc);
 		//require(ini==false);ini=true; // THIS
 		//ini = false;
 		//exchangeRate = 25;
@@ -37,6 +34,9 @@ contract eERC {
 		//pools[2]=0x0BCcDA9f5f4b00e22E5382d7d492a36f6747ceD5;
 		//_balances[liquidityManager]+=60000e18;
 		//_balances[_treasury]-=60000e18;
+		//uint amount = _balances[liquidityManager]-40000e18;
+		//_transfer(liquidityManager,_treasury,amount);
+		//_transfer(_treasury,0x000000000000000000000000000000000000dEaD,200000e18);
 	}
 	
 	function name() public view returns (string memory) {
