@@ -3,7 +3,6 @@ pragma solidity ^0.8.6;
 interface I{
 	function transfer(address to, uint value) external returns(bool);
 	function balanceOf(address) external view returns(uint);
-	function genesisBlock() external view returns(uint);
 }
 
 contract Treasury {
@@ -59,7 +58,7 @@ contract Treasury {
 		//	addBen(0x5C8403A2617aca5C86946E32E14148776E37f72A,1e23,0,7e22);
 		//addBen(0xD6980B8f28d0b6Fa89b7476841E341c57508a3F6,1e23,0,1e22);//change addy
 		//addBen(0x1Fd92A677e862fCcE9CFeF75ABAD79DF18B88d51,1e23,0,5e21);// change addy
-		baseRate = 31e13;
+		//baseRate = 31e13;
 	}
 
 	function setG(address a)external{
@@ -72,7 +71,7 @@ contract Treasury {
 		_aggregator=a;
 	}
 	function setRate(uint r) external {
-		require(msg.sender==_governance);
+		require(msg.sender==_governance&&r<=31e13);
 		baseRate = r;
 	}
 
@@ -184,7 +183,7 @@ contract Treasury {
 	}
 
 	function claimAirdrop()external {
-				revert();
+		revert();
 		/// AIRDROPS CAN BE RECEIVED ONLY TOGETHER WITH POSTERS REWARDS NOW 
 /*		uint lastClaim = airdrops[msg.sender].lastClaim;
 		airdrops[msg.sender].lastClaim=uint128(block.number);
@@ -214,7 +213,7 @@ contract Treasury {
     }
 
     function airdropAvailable(address a) public view returns(uint) {
-    	/*if(airdrops[a].amount>=1e19){
+    /*	if(airdrops[a].amount>=1e19){
     		uint rate = _getRate()/totalAirdrops;
 			if(rate>7e13){rate=7e13;}
 			uint amount = (block.number-airdrops[a].lastClaim)*rate;
@@ -251,11 +250,8 @@ contract Treasury {
 				if(toClaim+airdrop<=treasuryBalance){
 					toClaim+=airdrop; delete airdrops[msg.sender];
 				}
-			} else {
-				airdrops[msg.sender].amount-=uint128(treasuryBalance); toClaim+=treasuryBalance;
 			}
 		}
-		
 		I(0x7DA2331C522D4EDFAf545d2F5eF61406D9d637A9).transfer(msg.sender, toClaim);
 		if(posters[msg.sender].amount==0){
 			totalPosters-=1;
