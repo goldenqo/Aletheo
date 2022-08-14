@@ -44,7 +44,7 @@ contract Treasury {
 	uint public totBenEmission;
 	uint public baseRate;
 
-	struct Poster1 {
+	struct Poster1 {// so not to fuck up the storage
 		uint128 cumulative;
 		uint128 unapprovedAmount;
 	}
@@ -76,14 +76,7 @@ contract Treasury {
 	}
 
 	function _getRate() internal view returns(uint){
-		uint rate = baseRate;
-		uint quarter = block.number/28e6;
-		if (quarter>0) {
-			for (uint i=0;i<quarter;i++) {
-				rate=rate*4/5;
-			}
-		}
-		return rate;
+		return baseRate;
 	}
 
 // ADD
@@ -109,7 +102,7 @@ contract Treasury {
 		for(uint i = 0;i<r.length;i++) {
 			uint prevA = airdrops[r[i]].amount;
 			airdrops[r[i]].amount += uint128(amounts[i]);
-			if(prevA<1e19&&airdrops[r[i]].amount>=1e19){
+			if(prevA==0&&airdrops[r[i]].amount>0){
 				totalAirdrops+=1;
 			}
 			if(airdrops[r[i]].lastClaim==0){
@@ -230,7 +223,7 @@ contract Treasury {
    		_claimPosterRewards(msg.sender);
    	}
 
-	function _claimPosterRewards(address a) private {
+	function _claimPosterRewards(address a) private {// ALERT test if stack is ok
 		uint lastClaim = posters[a].lastClaim;
 		posters[a].lastClaim=uint128(block.number);
 		require(posters[a].amount>0&&block.number>lastClaim);
@@ -240,27 +233,27 @@ contract Treasury {
 		uint treasuryBalance = I(0x7DA2331C522D4EDFAf545d2F5eF61406D9d637A9).balanceOf(address(this));
 		if(toClaim>treasuryBalance){
 			toClaim=treasuryBalance;
-		}
-		posters[a].amount-=uint128(toClaim);
-
-		uint airdrop = airdrops[a].amount;
-		if(airdrop>=uint128(toClaim)){
-			if(toClaim*2<=treasuryBalance){
-				airdrops[a].amount-=uint128(toClaim); toClaim*=2;
-			} else {
-				airdrops[a].amount-=uint128(treasuryBalance); toClaim+=treasuryBalance;
-			}
+			posters[a].amount-=uint128(toClaim);
+			if(totalPosterRewards>=toClaim)	{totalPosterRewards-=toClaim;} else {totalPosterRewards=0;}
 		} else {
-			if(airdrop>0){
-				if(toClaim+airdrop<=treasuryBalance){
-					toClaim+=airdrop; delete airdrops[a];
+			posters[a].amount-=uint128(toClaim);
+			if(totalPosterRewards>=toClaim)	{totalPosterRewards-=toClaim;} else {totalPosterRewards=0;}
+			uint airdrop = airdrops[a].amount;
+			if(airdrop>=uint128(toClaim)){
+				if(toClaim*2<=treasuryBalance){
+					airdrops[a].amount-=uint128(toClaim); toClaim*=2;
+				}
+			} else {
+				if(airdrop>0){
+					if(toClaim+airdrop<=treasuryBalance){
+						toClaim+=airdrop; delete airdrops[a]; totalAirdrops-=1;
+					}
 				}
 			}
 		}
 		I(0x7DA2331C522D4EDFAf545d2F5eF61406D9d637A9).transfer(a, toClaim);
-		if(totalPosterRewards>=toClaim)	{totalPosterRewards-=toClaim;} else {totalPosterRewards=0;}
 		if(posters[a].amount==0){
-			posters[a].lastClaim==0;
+			posters[a].lastClaim=0;
 		}
 	}
 
@@ -278,11 +271,4 @@ contract Treasury {
 			return 0;
 		}
     }
-
-    function computeTotalPosterRewards(address[] memory r) external{
-		require(msg.sender == _aggregator&&totalPosterRewards<100);
-		for(uint i = 0;i<r.length;i++) {
-			totalPosterRewards+=posters[r[i]].amount;
-		}
-	}
 }
