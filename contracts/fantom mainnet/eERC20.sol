@@ -15,24 +15,17 @@ contract eERC {
     bool public ini;
     uint public exchangeRate;
     address public liquidityManager;
-    address[] public pools;
-
+    address public governance;
+    address public treasury;
+    uint public sellTax;
+    mapping(address => bool) public pools;
 	function init() public {
-	    require(ini==false);ini=true;
-	    //require(msg.sender==0x0f2fe9CD6e8339E9Eb791814EE760Efc15a7ac90);
-		//_treasury = 0xeece0f26876a9b5104fEAEe1CE107837f96378F2;
-		//_founding = 0xAE6ba0D4c93E529e273c8eD48484EA39129AaEdc;
-		//_staking = 0x0FaCF0D846892a10b1aea9Ee000d7700992B64f8;
-		//liquidityManager = 0x2Fe82aa8332Ba19F8bf194440f63A254A19d99F3;
-		//address p1 = 0xbf8fDdf052bEb8E61F1d9bBD736A88b2B57F0a94;
-		//address p2 = 0x3Bb6713E01B27a759d1A6f907bcd97D2B1f0F209;
-		//address p3 = 0xE3450307997CB52C50B50fF040681401C56AecDe;
-		//_balances[liquidityManager]+=40000e18;
-		//_balances[0xeece0f26876a9b5104fEAEe1CE107837f96378F2]-=40000e18;
-		uint amount = _balances[liquidityManager]-30000e18;
-		_transfer(liquidityManager,0xeece0f26876a9b5104fEAEe1CE107837f96378F2,amount);
-		_transfer(0xeece0f26876a9b5104fEAEe1CE107837f96378F2,0x000000000000000000000000000000000000dEaD,200000e18);
-		exchangeRate = 500;//1 LET = 2 FTM
+		governance = 0x5C8403A2617aca5C86946E32E14148776E37f72A;
+		treasury = 0xeece0f26876a9b5104fEAEe1CE107837f96378F2;
+		sellTax = 10;
+		pools[0xbf8fDdf052bEb8E61F1d9bBD736A88b2B57F0a94]=true;
+		pools[0x3Bb6713E01B27a759d1A6f907bcd97D2B1f0F209]=true;
+		pools[0xE3450307997CB52C50B50fF040681401C56AecDe]=true;
 	}
 
 	function name() public view returns (string memory) {
@@ -44,7 +37,7 @@ contract eERC {
 	}
 
 	function totalSupply() public view returns (uint) {//subtract balance of dead address
-		return 1e24-_balances[0x000000000000000000000000000000000000dEaD];
+		return 1e24-_balances[0x000000000000000000000000000000000000dEaD]-_balances[treasury];
 	}
 
 	function decimals() public pure returns (uint) {
@@ -98,17 +91,10 @@ contract eERC {
 		_beforeTokenTransfer(sender, recipient, amount);
 		_balances[sender] = senderBalance - amount;
 		//if it's a sell or liquidity add
-		if(sender!=liquidityManager){
-			for(uint n=0;n<pools.length; n++){
-				if(pools[n]==address(0)){ break; }
-				if(pools[n]==recipient){
-					uint k=10;
-					uint treasuryShare = amount/k;
-  					amount -= treasuryShare;
-					_balances[0xeece0f26876a9b5104fEAEe1CE107837f96378F2] += treasuryShare;//treasury
-					break;
-				}
-			}
+		if(sender!=liquidityManager&&pools[recipient]==true&&sellTax>0){
+			uint treasuryShare = amount/sellTax;
+			amount -= treasuryShare;
+			_balances[treasury] += treasuryShare;//treasury
 		}
 		_balances[recipient] += amount;
 		emit Transfer(sender, recipient, amount);
@@ -117,38 +103,32 @@ contract eERC {
 	function _beforeTokenTransfer(address from,address to, uint amount) internal { }
 
 	function setLiquidityManager(address a) external {
-		require(msg.sender == 0x5C8403A2617aca5C86946E32E14148776E37f72A);
+		require(msg.sender == governance);
 		liquidityManager = a;
 	}
 
 	function addPool(address a) external {
 		require(msg.sender == liquidityManager);
-		bool check;
-		for(uint n=0;n<pools.length;n++){ if(a==pools[n]){check==true;} if(pools[n]==address(0)){break;} }
-		if(!check){
-			pools.push(a);
+		if(pools[a]==false){
+			pools[a]=true;
 		}
 	}
 
 	function buyOTC() external payable { // restoring liquidity
-		uint amount = msg.value*exchangeRate/1000; _balances[msg.sender]+=amount;
-		emit Transfer(0xeece0f26876a9b5104fEAEe1CE107837f96378F2, msg.sender, amount);
+		uint amount = msg.value*exchangeRate/1000; _balances[msg.sender]+=amount; _balances[treasury]-=amount;
+		emit Transfer(treasury, msg.sender, amount); 
 		uint deployerShare = msg.value/20;
-		(bool s,) = payable(0x5C8403A2617aca5C86946E32E14148776E37f72A).call{value:deployerShare}("");
-		require(s);
+		payable(governance).call{value:deployerShare}("");
 		address lm = liquidityManager; require(_balances[lm]>amount);
-		(s,) = payable(lm).call{value:address(this).balance}("");
-		require(s);
+		payable(lm).call{value:address(this).balance}("");
 		I(lm).addLiquidity();
 	}
 
-	function changeExchangeRate(uint er) public { require(msg.sender==0x5C8403A2617aca5C86946E32E14148776E37f72A); exchangeRate = er; }
+	function changeExchangeRate(uint er) public { require(msg.sender==governance); exchangeRate = er; }
 
-	function burn(uint amount, uint p) external {
-		require(msg.sender==0x5C8403A2617aca5C86946E32E14148776E37f72A);
-		amount=amount*1e18;	_balances[pools[p]]-=amount; I(pools[p]).sync();
+	function setSellTaxModifier(uint m) public {
+		require(msg.sender == governance&&(m>=10||m==0));sellTax = m;
 	}
-
 }
 
 interface I{
