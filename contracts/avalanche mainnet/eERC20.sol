@@ -16,8 +16,8 @@ contract eERC {
     uint public exchangeRate;
     address public liquidityManager;
     address public governance;
-    address private _treasury;
-    address private _staking;
+    address public _treasury;
+    address public _staking;
 	mapping (address => bool) public pools; // a couple of addresses which are not pools might be recorded as such, array was here, but there is nothing to gain from it for hacka
  	uint public sellTax;
 
@@ -36,7 +36,7 @@ contract eERC {
 	}
 
 	function totalSupply() public view returns (uint) {//subtract balance of treasury
-		return 1e24-_balances[0x000000000000000000000000000000000000dEaD];
+		return 1e24-_balances[0x000000000000000000000000000000000000dEaD]-_balances[_treasury];
 	}
 
 	function decimals() public pure returns (uint) {
