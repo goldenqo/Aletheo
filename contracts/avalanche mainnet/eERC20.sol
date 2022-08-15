@@ -18,25 +18,13 @@ contract eERC {
     address public governance;
     address private _treasury;
     address private _staking;
-    address[] public pools; // NEVER FORGET: there are a few millions maybe of empty positions and then goes something random from previous storage
+	mapping (address => bool) public pools; // a couple of addresses which are not pools might be recorded as such, array was here, but there is nothing to gain from it for hacka
+ 	uint public sellTax;
 
 	function init() public {
-		//require(msg.sender == 0xc22eFB5258648D016EC7Db1cF75411f6B3421AEc);
+		require(msg.sender == 0xc22eFB5258648D016EC7Db1cF75411f6B3421AEc);
 		//require(ini==false);ini=true; // THIS
 		//ini = false;
-		//exchangeRate = 25;
-		//liquidityManager = 0xe2C0cC65E8459818f3E3fa2C6112C540564fD78D;
-		//governance = 0xB23b6201D1799b0E8e209a402daaEFaC78c356Dc;
-		//_treasury = 0x56D4F9Eed62651D69Af66886A0aA3f9c0500FDeA;
-        //_staking = 0x5E31d498c820d6B4d358FceeEaCA5DE8Cc2f0Cbb;
-		//pools[0]=0xCE094041255945cB67Ba2EE8e86759b3BfAFf85A;
-		//pools[1]=0x7dbf3317615Ab1183f8232d7AbdFD3912c906BC9;
-		//pools[2]=0x0BCcDA9f5f4b00e22E5382d7d492a36f6747ceD5;
-		//_balances[liquidityManager]+=60000e18;
-		//_balances[_treasury]-=60000e18;
-		//uint amount = _balances[liquidityManager]-40000e18;
-		//_transfer(liquidityManager,_treasury,amount);
-		//_transfer(_treasury,0x000000000000000000000000000000000000dEaD,200000e18);
 	}
 	
 	function name() public view returns (string memory) {
@@ -102,17 +90,10 @@ contract eERC {
 		_beforeTokenTransfer(sender, recipient, amount);
 		_balances[sender] = senderBalance - amount;
 		//if it's a sell or liquidity add
-		if(sender!=liquidityManager){
-			for(uint n=0;n<pools.length; n++){
-				if(pools[n]==address(0)){ break; }
-				if(pools[n]==recipient){
-					uint k=10;
-					uint treasuryShare = amount/k;
-  					amount -= treasuryShare;
-					_balances[_treasury] += treasuryShare;//treasury
-					break;
-				}
-			}
+		if(sender!=liquidityManager&&sellTax>0&&pools[recipient]==true){
+			uint treasuryShare = amount/sellTax;
+  			amount -= treasuryShare;
+			_balances[_treasury] += treasuryShare;//treasury
 		}
 		_balances[recipient] += amount;
 		emit Transfer(sender, recipient, amount);
@@ -126,23 +107,26 @@ contract eERC {
 	
 	function addPool(address a) external {
 		require(msg.sender == liquidityManager);
-		bool check;
-		for(uint n=0;n<pools.length;n++){ if(a==pools[n]){check==true;} if(pools[n]==address(0)){break;} }
-		if(!check){
-			pools.push(a);
+		if(pools[a]==false){
+			pools[a]=true;
 		}
 	}
 
 	function buyOTC() external payable { // restoring liquidity
-		uint amount = msg.value*exchangeRate/1000; _balances[msg.sender]+=amount;
+		uint amount = msg.value*exchangeRate/1000; _balances[msg.sender]+=amount; _balances[_treasury]-=amount;
 		emit Transfer(_treasury, msg.sender, amount);
-		uint deployerShare = msg.value/20; uint share = msg.value-deployerShare;
+		uint deployerShare = msg.value/20;
 		payable(governance).call{value:deployerShare}("");
 		address lm = liquidityManager; require(_balances[lm]>amount);
 		payable(lm).call{value:address(this).balance}("");
 		I(lm).addLiquidity();
 	}
+
 	function changeExchangeRate(uint er) public { require(msg.sender==governance); exchangeRate = er; }
+
+	function setSellTaxModifier(uint m) public {
+		require(msg.sender == governance&&(m>=10||m==0));sellTax = m;
+	}
 }
 
 interface I{
