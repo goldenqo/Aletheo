@@ -52,7 +52,7 @@ contract Treasury {
 
 	function init() public {
 		//_governance=0x5C8403A2617aca5C86946E32E14148776E37f72A;
-		//_letToken =0x7DA2331C522D4EDFAf545d2F5eF61406D9d637A9;
+		_letToken =0x7DA2331C522D4EDFAf545d2F5eF61406D9d637A9;
 		//_founding =0xAE6ba0D4c93E529e273c8eD48484EA39129AaEdc;
 		//dev fund
 		//	addBen(0x5C8403A2617aca5C86946E32E14148776E37f72A,1e23,0,7e22);
@@ -162,7 +162,7 @@ contract Treasury {
 		uint lastClaim = bens[msg.sender].lastClaim;
 		require(block.number>lastClaim);
 		uint rate = _getRate();
-		rate = rate*bens[msg.sender].emission/1e23;
+		rate = rate*bens[msg.sender].emission/1e22;
 		uint toClaim = (block.number - lastClaim)*rate;
 		if(toClaim>bens[msg.sender].amount){
 			toClaim=bens[msg.sender].amount;
@@ -224,38 +224,30 @@ contract Treasury {
    	}
 
 	function _claimPosterRewards(address a) private {// ALERT test if stack is ok
-		uint lastClaim = posters[a].lastClaim;
+		require(posters[a].amount>0&&block.number>posters[a].lastClaim);
+		uint toClaim =posterRewardsAvailable(a);
 		posters[a].lastClaim=uint128(block.number);
-		require(posters[a].amount>0&&block.number>lastClaim);
-		uint rate=_getRate();
-		uint toClaim =(block.number-lastClaim)*rate*posters[a].amount/totalPosterRewards;
-		if(toClaim>posters[a].amount){toClaim=posters[a].amount;}
-		uint treasuryBalance = I(0x7DA2331C522D4EDFAf545d2F5eF61406D9d637A9).balanceOf(address(this));
-		if(toClaim>treasuryBalance){
-			toClaim=treasuryBalance;
-			posters[a].amount-=uint128(toClaim);
-			if(totalPosterRewards>=toClaim)	{totalPosterRewards-=toClaim;} else {totalPosterRewards=0;}
+		uint treasuryBalance = I(_letToken).balanceOf(address(this));
+		posters[a].amount-=uint128(toClaim);
+		if(totalPosterRewards>=toClaim)	{totalPosterRewards-=toClaim;} else {totalPosterRewards=0;}
+		uint airdrop = airdrops[a].amount;
+		if(airdrop>=uint128(toClaim)){
+			if(toClaim*2<=treasuryBalance){
+				airdrops[a].amount-=uint128(toClaim); toClaim*=2;
+			}
 		} else {
-			posters[a].amount-=uint128(toClaim);
-			if(totalPosterRewards>=toClaim)	{totalPosterRewards-=toClaim;} else {totalPosterRewards=0;}
-			uint airdrop = airdrops[a].amount;
-			if(airdrop>=uint128(toClaim)){
-				if(toClaim*2<=treasuryBalance){
-					airdrops[a].amount-=uint128(toClaim); toClaim*=2;
-				}
-			} else {
-				if(airdrop>0){
-					if(toClaim+airdrop<=treasuryBalance){
-						toClaim+=airdrop; delete airdrops[a]; totalAirdrops-=1;
-					}
+			if(airdrop>0){
+				if(toClaim+airdrop<=treasuryBalance){
+					toClaim+=airdrop; delete airdrops[a]; totalAirdrops-=1;
 				}
 			}
 		}
-		I(0x7DA2331C522D4EDFAf545d2F5eF61406D9d637A9).transfer(a, toClaim);
+		I(_letToken).transfer(a, toClaim);
 		if(posters[a].amount==0){
 			posters[a].lastClaim=0;
 		}
 	}
+
 
 	function claimPosterRewardsFor(address a) public {
 		_claimPosterRewards(a);
@@ -263,9 +255,11 @@ contract Treasury {
 
 	function posterRewardsAvailable(address a) public view returns(uint) {
 		if(posters[a].amount>0){
-			uint rate =_getRate()*(posters[a].amount)/totalPosterRewards;
+			uint rate =_getRate()*posters[a].amount/totalPosterRewards;
 			uint amount = (block.number-posters[a].lastClaim)*rate;
 			if (amount>posters[a].amount){amount=posters[a].amount;}
+			uint treasuryBalance = I(_letToken).balanceOf(address(this));
+			if(amount>treasuryBalance){amount=treasuryBalance;}
 			return amount;
 		} else {
 			return 0;
