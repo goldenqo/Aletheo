@@ -39,25 +39,14 @@ contract LiquidityManager {
 
 	mapping(address => uint) public amounts;
 
-	function init() public {
-		//router=0xF491e7B69E4244ad4002BC14e878a34207E38c29;
-		//factory=0x152eE697f2E276fA89E96742e9bB9aB1F2E61bE3;
-		//mainToken=0x7DA2331C522D4EDFAf545d2F5eF61406D9d637A9;//let token
-		//defTokenFrom=0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83;//wftm
-		//defPoolFrom=0xbf8fDdf052bEb8E61F1d9bBD736A88b2B57F0a94;//wftm pool
-		//defTokenTo=0x04068DA6C83AFCFA0e13ba15A6696662335D5B75;//usdc
-		//defPoolTo=0x3Bb6713E01B27a759d1A6f907bcd97D2B1f0F209;//usdc pool
-		//liqMan=0x5C8403A2617aca5C86946E32E14148776E37f72A;// liquidity manager
-		//I(mainToken).approve(router,2**256-1); I(defTokenFrom).approve(router,2**256-1); I(defTokenTo).approve(router,2**256-1);
-		//I(defPoolFrom).approve(router,2**256-1); I(defPoolTo).approve(router,2**256-1);
-		//_treasury = 0xeece0f26876a9b5104fEAEe1CE107837f96378F2;
-	}
+	function init() public {}
 
 	modifier onlyLiqMan() {	require(msg.sender == liqMan);_; }
+	modifier onlyDao() { require(msg.sender == dao);_; }
 
 	function approve(address token) public onlyLiqMan { I(token).approve(router,2**256-1); }
 
-	function swapLiquidity(address tokenFrom, address tokenTo, uint percent) public onlyLiqMan {
+	function swapLiquidity(address tokenFrom, address tokenTo, uint percent) public onlyDao {
 		address pFrom = I(factory).getPair(mainToken,tokenFrom); address pTo = I(factory).getPair(mainToken,tokenTo); uint liquidity = I(pFrom).balanceOf(address(this))*percent/100;
 		if(I(mainToken).balanceOf(pTo)==0){I(mainToken).addPool(pTo);} _swapLiquidity(tokenFrom, tokenTo, liquidity);
 	}
@@ -84,16 +73,7 @@ contract LiquidityManager {
 		}
 	}
 
-	function changeRouter(address _router) public onlyLiqMan { router = _router; }
-
-	function changeMainToken(address token) public onlyLiqMan {	mainToken = token; }
-
-	function changeDefTokenFrom(address token, address pool) public onlyLiqMan {// allowance to router for old default token is alright, so no need to decrease
-		defTokenFrom = token; defPoolFrom = pool; I(defTokenFrom).approve(router,2**256-1); I(defPoolFrom).approve(router,2**256-1);
-		if(I(mainToken).balanceOf(pool)==0){ I(mainToken).addPool(pool); }
-	}
-
-	function changeDefTokenTo(address token, address pool) public onlyLiqMan {
+	function changeDefTokenTo(address token, address pool) public onlyDao {
 		defTokenTo = token; defPoolTo = pool; I(defTokenTo).approve(router,2**256-1); I(defPoolTo).approve(router,2**256-1);
 		if(I(mainToken).balanceOf(pool)==0){ I(mainToken).addPool(pool); }
 	}
@@ -126,4 +106,6 @@ contract LiquidityManager {
 			_swapLiquidity(defTokenFrom, defTokenTo, liquidity);
 		}
 	}
+
+	fallback() external payable {} receive() external payable {}//if uniswap sends back dust
 }
