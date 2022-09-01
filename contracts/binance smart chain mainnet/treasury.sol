@@ -288,7 +288,7 @@ contract Treasury {
 		if(founders[a].registered==false&&genesis!=0){
 			uint deposit = I(_foundingEvent).deposits(a);
 			if(deposit>0){
-				founders[a].amount=uint128(deposit*11e11);
+				founders[a].amount=uint128(deposit);
 				founders[a].lastClaim=uint128(genesis);
 				founders[a].registered=true;
 				if(totalFounderRewards==0){
@@ -321,7 +321,7 @@ contract Treasury {
 				return 0;
 			}
     	} else {
-			uint amount = I(_foundingEvent).deposits(a)*11e11;
+			uint amount = I(_foundingEvent).deposits(a);
     		return amount;
     	}
     }
