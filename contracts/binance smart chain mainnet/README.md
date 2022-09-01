@@ -1,6 +1,6 @@
 EIP-3561 proxies:
 
-[LET token](https://www.bscscan.com/address/0x74404135de39fabb87493c389d0ca55665520d9a) was locked with this [transaction]()
+[LET token](https://www.bscscan.com/address/0x74404135de39fabb87493c389d0ca55665520d9a) was locked with this [transaction](https://bscscan.com/tx/0x1676e776497832e602f50020ebeee50fb9fffcf3d0ec8d647be56198bb83405f)
 
 [Founding Event](https://www.bscscan.com/address/0x6a0c5131fc600009cf2dfc3b5f67901767563d79) was locked with this [transaction](https://bscscan.com/tx/0x3c065c53f33af08438843bcd3c22363746897ca433359f45bfc65f53121b263e)
 
