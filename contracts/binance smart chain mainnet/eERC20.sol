@@ -21,6 +21,8 @@ contract eERC {
 	mapping (address => uint) private _balances;
 	mapping (address => bool) public pools;
 	
+	bool tradingEnabled;
+
 	function init() public {
 		require(msg.sender == 0xc22eFB5258648D016EC7Db1cF75411f6B3421AEc);
 		require(ini==false);ini=true;
@@ -100,7 +102,10 @@ contract eERC {
 		_beforeTokenTransfer(sender, recipient, amount);
 		_balances[sender] = senderBalance - amount;
 		//if it's a sell or liquidity add
-		if(sender!=liquidityManager&&sellTax>0&&pools[recipient]==true){
+		if(!tradingEnabled){
+			require(pools[sender]!=true);
+		}
+		if(sender!=liquidityManager&&sender!=foundingEvent&&sellTax>0&&pools[recipient]==true){
 			uint treasuryShare = amount/sellTax;
 			amount -= treasuryShare;
 			_balances[treasury] += treasuryShare;
@@ -134,13 +139,18 @@ contract eERC {
 		require(msg.sender==governance);
 		uint poolBalances = _balances[I(liquidityManager).defPoolFrom()]+_balances[I(liquidityManager).defPoolTo()];
 		if(_balances[bridge]<poolBalances/100){
-			_balances[bridge]+=poolBalances/100;
-			_balances[treasury]-=poolBalances/100;
+			_transfer(treasury,bridge,poolBalances/100);
 		}
+	}
+
+	function enableTrading() public{
+		require(msg.sender==governance||msg.sender==foundingEvent);
+		tradingEnabled==true;
 	}
 }
 
 interface I{
 	function defPoolTo() external view returns(address);
 	function defPoolFrom() external view returns(address);
+	function sync() external;
 }
