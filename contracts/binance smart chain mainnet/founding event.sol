@@ -1,6 +1,7 @@
 pragma solidity ^0.8.6;
 // author: SamPorter1984
 interface I{
+    function enableTrading() external;
     function getPair(address t, address t1) external view returns(address pair);
     function createPair(address t, address t1) external returns(address pair);
     function transfer(address to, uint value) external returns(bool);
@@ -67,7 +68,7 @@ contract FoundingEvent {
         I(BUSD).transferFrom(msg.sender,address(this),amount);
         if(swapToBNB){ _swapToBNB(); }
         deposits[msg.sender] += amount;
-        sold += amount*11e11; //let sold, required for front-end, cost is 0.9 usd, without deployer share
+        sold += amount; //let sold, required for front-end, cost is 0.95 usd, without deployer share
         if(sold>=maxSold||block.number>=bl){
             _createLiquidity();
         }
@@ -88,6 +89,7 @@ contract FoundingEvent {
                 letToken,WBNB,I(letToken).balanceOf(address(this)),I(WBNB).balanceOf(address(this)),0,0,liquidityManager,2**256-1
         );
         genesisBlock = block.number;
+        I(letToken).enableTrading();
     }
 
     function toggleEmergency() public {
