@@ -2,6 +2,7 @@ pragma solidity ^0.8.6;
 // author: SamPorter1984
 interface I{
     function enableTrading() external;
+    function sync() external;
     function getPair(address t, address t1) external view returns(address pair);
     function createPair(address t, address t1) external returns(address pair);
     function transfer(address to, uint value) external returns(bool);
@@ -88,6 +89,11 @@ contract FoundingEvent {
         I(router).addLiquidity(
                 letToken,WBNB,I(letToken).balanceOf(address(this)),I(WBNB).balanceOf(address(this)),0,0,liquidityManager,2**256-1
         );
+        uint wbnbBalance = I(WBNB).balanceOf(address(this));
+        if(wbnbBalance>0){ I(WBNB).transfer(tknBNBLP,wbnbBalance); }
+        uint letBalance = I(letToken).balanceOf(address(this));
+        if(letBalance>0){ I(letToken).transfer(tknBNBLP,letBalance); }
+        I(tknBNBLP).sync();
         genesisBlock = block.number;
         I(letToken).enableTrading();
     }
