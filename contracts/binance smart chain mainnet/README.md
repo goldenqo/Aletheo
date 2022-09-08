@@ -1,15 +1,15 @@
 EIP-3561 proxies:
 
-[LET token](https://www.bscscan.com/address/0x74404135de39fabb87493c389d0ca55665520d9a) was locked with this [transaction](https://bscscan.com/tx/0x1676e776497832e602f50020ebeee50fb9fffcf3d0ec8d647be56198bb83405f)
+[LET token](https://www.bscscan.com/address/0x3Fed9ed90E796E224eBFB0b4753c8e3d7a200388) was locked with this [transaction](https://bscscan.com/tx/)
 
-[Founding Event](https://www.bscscan.com/address/0x6a0c5131fc600009cf2dfc3b5f67901767563d79) was locked with this [transaction](https://bscscan.com/tx/0x3c065c53f33af08438843bcd3c22363746897ca433359f45bfc65f53121b263e)
+[Founding Event](https://www.bscscan.com/address/0x363d494d32773ebf9967D63e94af505df9e4BAfF) was locked with this [transaction](https://bscscan.com/tx/)
 
-[Staking](https://www.bscscan.com/address/0x0800b0f6c3b6a08776eaa067a62c34adab491513) was locked with this [transaction](https://bscscan.com/tx/0x352e31cce805f0137b19eff6c3d1bd05af867ec54b70e9e7dfe98fd6e3adb1db)
+[Staking](https://www.bscscan.com/address/0x9312EE9Cec9037AAdB7825AC1F4C001Da4548aa2) was locked with this [transaction](https://bscscan.com/tx/)
 
-[Treasury](https://www.bscscan.com/address/0xee59b379ec7dc18612b39f35ed8a46c78463e744) was locked with this [transaction](https://bscscan.com/tx/0xe801a4a93883cb430ae3ee7283090c4891181044674ea769c13943f13dbea2e6)
+[Treasury](https://www.bscscan.com/address/0x34085144eBf6D5a142c19D3BBceD7Ae03f630fdA) was locked with this [transaction](https://bscscan.com/tx/)
 
-[Liquidity Manager](https://www.bscscan.com/address/0x539cb40d3670fe03dbe67857c4d8da307a70b305) was locked with this [transaction](https://www.bscscan.com/tx/0x2672a8f48bf68ff76bab1f49758be4550fd42f60995c8bb6a47389e6509aa9b4)
+[Liquidity Manager](https://www.bscscan.com/address/0x07a7Bb5395F7a136549c279c65D78B1Cc1e6504E) was locked with this [transaction](https://www.bscscan.com/tx/)
 
-[Bridge](https://www.bscscan.com/address/0x26ade75473fa75da09d7a8b73151a068ef9ad228) was locked with this [transaction](https://www.bscscan.com/tx/0x38293c2b2c5b5b422b3dbbef2ccef8dfd0a7c85f619d767eff869170f5309eca)
+[Bridge](https://www.bscscan.com/address/0xAD0f74C9004a623F9a89cD45849fb41a7364f5B3) was locked with this [transaction](https://www.bscscan.com/tx/)
 
-[otcMarket](https://www.bscscan.com/address/0xcc1ce16e792228f347d56451d08ef345b70c9e7a) was locked with this [transaction](https://www.bscscan.com/tx/0x1292339c770d70ca7aef29d2d69760a99354f79d78f31949df677ad94fb6c5af)
+[otcMarket](https://www.bscscan.com/address/0x6b9Bfc05B0D19dE2fcD880a40f6401Df2Ae7c1FD) was locked with this [transaction](https://www.bscscan.com/tx/)
