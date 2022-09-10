@@ -1,4 +1,4 @@
-EIP-3561 proxies:
+EIP-3561 proxies(not locked yet, since we are still looking for partnerships):
 
 [LET token](https://www.bscscan.com/address/0x3Fed9ed90E796E224eBFB0b4753c8e3d7a200388) was locked with this [transaction](https://bscscan.com/tx/)
 
