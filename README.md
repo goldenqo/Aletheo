@@ -10,4 +10,6 @@ Because of EIP-3561 specifically designed for Aletheo, refactoring and optimizat
 
 Next version of whitepaper soon, latest is [0.6](https://github.com/SamPorter1984/Aletheo/blob/main/papers/Aletheo%20Whitepaper%200.6.pdf) and has a couple of errors in design.
 
+The browser extension for anonymous imageboards was removed from here and will have a separate repo soon.
+
 You can find EIP-3561 tests in this [repo](https://github.com/SamPorter1984/EIP-3561-tests).
