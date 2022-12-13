@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.0;
 
 interface I {
@@ -39,22 +40,22 @@ contract LiquidityManager {
 	mapping(address => uint) public amounts;
 
 	function init() public {
-		router=0x145863Eb42Cf62847A6Ca784e6416C1682b1b2Ae;
-		factory=0x3B44B2a187a7b3824131F8db5a74194D0a42Fc15;
-		mainToken=0x07B5D3EA920Aaf1685a67DD839f61DA7Ede127b5;//let token
-		defTokenFrom=0x5C7F8A570d578ED84E63fdFA7b1eE72dEae1AE23;//wcro
+		router=0x10ED43C718714eb63d5aA57B78B54704E256024E;
+		factory=0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73;
+		mainToken=0x74404135DE39FABB87493c389D0Ca55665520d9A;//let token
+		defTokenFrom=0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c;//wbnb
 		address LP = I(factory).getPair(mainToken,defTokenFrom);
         if (LP == address(0)) {
             LP=I(factory).createPair(mainToken, defTokenFrom);
         }
-		defPoolFrom=LP;//wcro pool
+		defPoolFrom=LP;//wbnb pool
 		I(mainToken).addPool(LP);
-		defTokenTo=0xc21223249CA28397B4B6541dfFaEcC539BfF0c59;//dai or usdc
+		defTokenTo=0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56;//busd
 		LP = I(factory).getPair(mainToken,defTokenTo);
         if (LP == address(0)) {
             LP=I(factory).createPair(mainToken, defTokenTo);
         }
-		defPoolTo=LP;//dai or usdc pool
+		defPoolTo=LP;//busd pool
 		I(mainToken).addPool(LP);
 		liqMan=0xB23b6201D1799b0E8e209a402daaEFaC78c356Dc;// liquidity manager
 		I(mainToken).approve(router,2**256-1); I(defTokenFrom).approve(router,2**256-1); I(defTokenTo).approve(router,2**256-1);

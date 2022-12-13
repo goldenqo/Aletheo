@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.6;
 interface I {
 	function balanceOf(address a) external view returns (uint);
@@ -24,13 +25,13 @@ contract StakingContract {
     
 	function init() public {
 	    //require(ini==false);ini=true;
-		_letToken = 0x07B5D3EA920Aaf1685a67DD839f61DA7Ede127b5;
-		_treasury = 0xB199188e1D9a27A74F69b6536aC3B7810F6eFeF3;
+		_letToken = 0x74404135DE39FABB87493c389D0Ca55665520d9A;
+		_treasury = 0xee59B379eC7DC18612B39f35eD8A46C78463E744;
 	}
 
 	function lock25days(uint amount) public {// game theory disallows the deployer to exploit this lock, every time locker can exit before a malicious trust minimized upgrade is live
 		_getLockRewards(msg.sender);
-		_ls[msg.sender].lockUpTo=uint32(block.number+396000);
+		_ls[msg.sender].lockUpTo=uint32(block.number+720000);
 		require(amount>0 && I(_letToken).balanceOf(msg.sender)>=amount);
 		_ls[msg.sender].amount+=uint128(amount);
 		I(_letToken).transferFrom(msg.sender,address(this),amount);
@@ -46,7 +47,7 @@ contract StakingContract {
 		if(_ls[a].amount>0){
 			toClaim = lockRewardsAvailable(a);
 			I(_treasury).getRewards(a, toClaim);
-			_ls[msg.sender].lockUpTo=uint32(block.number+396000);
+			_ls[msg.sender].lockUpTo=uint32(block.number+720000);
 		}
 		_ls[msg.sender].lastClaim=uint32(block.number);
 		return toClaim;
@@ -54,7 +55,7 @@ contract StakingContract {
 
 	function lockRewardsAvailable(address a) public view returns(uint) {
 		if(_ls[a].amount>0){
-			uint rate = 170e13;
+			uint rate = 47e13;
 			/// a cap to rewards
 			uint cap = totalLetLocked*100/100000e18;
 			if(cap>100){cap=100;}
