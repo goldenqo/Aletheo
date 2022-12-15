@@ -1,0 +1,23 @@
+{
+  "name": "aletheo",
+  "version": "1.0.0",
+  "description": "From Greek it's the Bringer of truth from God, or simply God of Truth. Most of the development is now in private repo/background for a bit while",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SamPorter1984/Aletheo.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SamPorter1984/Aletheo/issues"
+  },
+  "homepage": "https://github.com/SamPorter1984/Aletheo#readme",
+  "devDependencies": {
+    "hardhat": "^2.12.4",
+    "prettier": "2.8.1"
+  }
+}
