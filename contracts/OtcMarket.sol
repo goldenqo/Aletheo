@@ -1,7 +1,11 @@
 pragma solidity ^0.8.6;
 
 // author: SamPorter1984
-
+// at first it was supposed to provide ability for holders of otherwise locked shares to be tradeable
+// now it's a limit order exchange which supports every token
+// but so far without listening to events it will be impossible to adequately interact with positions
+// full decentralization will be expensive for the user, but probably required, needs updates
+// to probably support both expensive decentralized and inexpensive interactions
 enum LockedShare {
     STAKE,
     FOUNDER,
@@ -31,8 +35,7 @@ interface I {
 
 contract OTCMarket {
     // pretty much the only reference point for front-end
-    // without listening to events it will be impossible to adequately interact with positions
-    // full decentralization will be expensive for the user
+
     event EditAsk(address indexed token, uint price, address indexed asker, uint amount);
     event EditBid(address indexed token, uint price, address indexed bidder, uint amount);
     event EditLockedShareAsk(LockedShare lockedShare, uint price, address indexed asker, uint amount);

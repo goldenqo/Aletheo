@@ -1,6 +1,4 @@
 require('@nomicfoundation/hardhat-toolbox')
-require('@openzeppelin/hardhat-upgrades')
-//require('@tovarishfin/hardhat-yul')
 
 module.exports = {
   solidity: {
@@ -10,7 +8,7 @@ module.exports = {
         settings: {
           optimizer: {
             enabled: true,
-            runs: 6284, //6284
+            runs: 628400, //6284
           },
         },
       },
@@ -19,7 +17,7 @@ module.exports = {
         settings: {
           optimizer: {
             enabled: true,
-            runs: 6284,
+            runs: 628400,
           },
         },
       },

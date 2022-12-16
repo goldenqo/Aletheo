@@ -16,15 +16,14 @@ contract EERC20 {
     address public governance;
     address public treasury;
     address public foundingEvent;
-    address public bridge;
     uint public sellTax;
 
     mapping(address => mapping(address => bool)) private _allowances;
     mapping(address => uint) private _balances;
     mapping(address => bool) public pools;
 
-    constructor(address _liquidityManager, address _treasury, address _foundingEvent) {
-        //require(msg.sender == 0xc22eFB5258648D016EC7Db1cF75411f6B3421AEc);
+    function init(address _liquidityManager, address _treasury, address _foundingEvent, address _governance) public {
+        require(msg.sender == 0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199);
         require(ini == false);
         ini = true;
         name = 'Aletheo';
@@ -32,26 +31,11 @@ contract EERC20 {
         liquidityManager = _liquidityManager;
         treasury = _treasury;
         foundingEvent = _foundingEvent;
-        governance = msg.sender;
-        _mint(msg.sender, 15000e18);
-        //_mint(treasury, 50000e18);
-        //_mint(foundingEvent, 90000e18);
+        governance = _governance;
+        _mint(_governance, 15000e18);
+        _mint(treasury, 50000e18);
+        _mint(foundingEvent, 90000e18);
     }
-
-    //function init(address _liquidityManager, address _treasury, address _foundingEvent) public {
-    //    require(msg.sender == 0xc22eFB5258648D016EC7Db1cF75411f6B3421AEc);
-    //    require(ini == false);
-    //    ini = true;
-    //    name = 'Aletheo';
-    //    symbol = 'LET';
-    //    liquidityManager = _liquidityManager;
-    //    treasury = _treasury;
-    //    foundingEvent = _foundingEvent;
-    //    governance = 0xB23b6201D1799b0E8e209a402daaEFaC78c356Dc;
-    //    _mint(0xB23b6201D1799b0E8e209a402daaEFaC78c356Dc, 15000e18);
-    //    _mint(treasury, 50000e18);
-    //    _mint(foundingEvent, 90000e18);
-    //}
 
     function totalSupply() public view returns (uint) {
         return _totalSupply - _balances[0x000000000000000000000000000000000000dEaD] - _balances[0x0000000000000000000000000000000000000000];
@@ -167,12 +151,4 @@ contract EERC20 {
         _balances[account] += amount;
         emit Transfer(address(0), account, amount);
     }
-}
-
-interface I {
-    function defPoolTo() external view returns (address);
-
-    function defPoolFrom() external view returns (address);
-
-    function sync() external;
 }
