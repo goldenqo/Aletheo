@@ -4,7 +4,7 @@ pragma solidity ^0.8.6;
 // A modification of OpenZeppelin ERC20
 // Original can be found here: https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/ERC20.sol
 
-contract eERC {
+contract EERC20 {
     event Transfer(address indexed from, address indexed to, uint value);
     event Approval(address indexed owner, address indexed spender, uint value);
 
@@ -23,21 +23,35 @@ contract eERC {
     mapping(address => uint) private _balances;
     mapping(address => bool) public pools;
 
-    function init() public {
-        require(msg.sender == 0xc22eFB5258648D016EC7Db1cF75411f6B3421AEc);
+    constructor(address _liquidityManager, address _treasury, address _foundingEvent) {
+        //require(msg.sender == 0xc22eFB5258648D016EC7Db1cF75411f6B3421AEc);
         require(ini == false);
         ini = true;
         name = 'Aletheo';
         symbol = 'LET';
-        liquidityManager = 0x539cB40D3670fE03Dbe67857C4d8da307a70B305;
-        governance = 0xB23b6201D1799b0E8e209a402daaEFaC78c356Dc;
-        treasury = 0xee59B379eC7DC18612B39f35eD8A46C78463E744;
-        foundingEvent = 0x6a0c5131fC600009cf2dfC3b5f67901767563d79;
-        bridge = 0x26aDe75473FA75da09d7A8B73151A068eF9AD228;
-        _mint(0xB23b6201D1799b0E8e209a402daaEFaC78c356Dc, 15000e18);
-        _mint(treasury, 50000e18);
-        _mint(foundingEvent, 90000e18);
+        liquidityManager = _liquidityManager;
+        treasury = _treasury;
+        foundingEvent = _foundingEvent;
+        governance = msg.sender;
+        _mint(msg.sender, 15000e18);
+        //_mint(treasury, 50000e18);
+        //_mint(foundingEvent, 90000e18);
     }
+
+    //function init(address _liquidityManager, address _treasury, address _foundingEvent) public {
+    //    require(msg.sender == 0xc22eFB5258648D016EC7Db1cF75411f6B3421AEc);
+    //    require(ini == false);
+    //    ini = true;
+    //    name = 'Aletheo';
+    //    symbol = 'LET';
+    //    liquidityManager = _liquidityManager;
+    //    treasury = _treasury;
+    //    foundingEvent = _foundingEvent;
+    //    governance = 0xB23b6201D1799b0E8e209a402daaEFaC78c356Dc;
+    //    _mint(0xB23b6201D1799b0E8e209a402daaEFaC78c356Dc, 15000e18);
+    //    _mint(treasury, 50000e18);
+    //    _mint(foundingEvent, 90000e18);
+    //}
 
     function totalSupply() public view returns (uint) {
         return _totalSupply - _balances[0x000000000000000000000000000000000000dEaD] - _balances[0x0000000000000000000000000000000000000000];
