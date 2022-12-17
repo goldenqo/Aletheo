@@ -1,4 +1,4 @@
-require('@nomicfoundation/hardhat-toolbox')
+require('@nomicfoundation/hardhat-toolbox');
 
 module.exports = {
   solidity: {
@@ -8,7 +8,7 @@ module.exports = {
         settings: {
           optimizer: {
             enabled: true,
-            runs: 628400, //6284
+            runs: 62840, //6284
           },
         },
       },
@@ -17,10 +17,37 @@ module.exports = {
         settings: {
           optimizer: {
             enabled: true,
-            runs: 628400,
+            runs: 62840,
+          },
+        },
+      },
+      {
+        version: '0.6.6',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 62840,
+          },
+        },
+      },
+      {
+        version: '0.4.18',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 62840, //6284
+          },
+        },
+      },
+      {
+        version: '0.5.16',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 62840, //6284
           },
         },
       },
     ],
   },
-}
+};

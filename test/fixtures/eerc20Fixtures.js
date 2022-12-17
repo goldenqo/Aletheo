@@ -1,10 +1,18 @@
-const EERC20ABI = require('../artifacts/contracts/EERC20.sol/EERC20.json');
+const EERC20ABI = require('../../artifacts/contracts/EERC20.sol/EERC20.json');
+const { loadFixture } = require('@nomicfoundation/hardhat-network-helpers');
 
 async function EERC20Fixture() {
   const accounts = await ethers.getSigners();
   const EERC20 = await ethers.getContractFactory('EERC20');
   const eerc20 = await EERC20.deploy();
   await eerc20.connect(accounts[19]).init(accounts[2].address, accounts[3].address, accounts[4].address, accounts[0].address);
+  return { eerc20, accounts };
+}
+
+async function EERC20FixtureNotInitialized() {
+  const accounts = await ethers.getSigners();
+  const EERC20 = await ethers.getContractFactory('EERC20');
+  const eerc20 = await EERC20.deploy();
   return { eerc20, accounts };
 }
 
@@ -32,4 +40,5 @@ module.exports = {
   EERC20Fixture,
   erc20Fixture,
   EERC20ProxiedFixture,
+  EERC20FixtureNotInitialized,
 };

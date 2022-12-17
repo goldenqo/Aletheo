@@ -55,11 +55,14 @@ interface I {
         address to,
         uint deadline
     ) external payable returns (uint[] memory amounts);
+
+    function deposit() external payable;
 }
+import 'hardhat/console.sol';
 
 contract FoundingEvent {
     mapping(address => uint) public deposits;
-    address payable private _deployer;
+    address payable public deployer;
     bool public emergency;
     bool public swapToBNB;
     uint public genesisBlock;
@@ -67,91 +70,96 @@ contract FoundingEvent {
     uint public sold;
     uint public presaleEndBlock;
     uint public maxSold;
-    address private _letToken;
+    address public letToken;
     address public WBNB;
     address public BUSD;
     address public router;
-    bool public ini;
+    address public factory;
 
-    function init() external {
-        require(msg.sender == 0xc22eFB5258648D016EC7Db1cF75411f6B3421AEc);
-        _deployer = payable(0xB23b6201D1799b0E8e209a402daaEFaC78c356Dc);
-        _letToken = 0x74404135DE39FABB87493c389D0Ca55665520d9A;
-        WBNB = 0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c;
-        BUSD = 0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56;
-        router = 0x10ED43C718714eb63d5aA57B78B54704E256024E;
+    function init(address _deployer, address letToken_, address _WBNB, address _WBUSD, address _router, address _factory) external {
+        require(msg.sender == 0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199);
+        deployer = payable(_deployer);
+        letToken = letToken_;
+        WBNB = _WBNB; //0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c;
+        BUSD = _WBUSD; //0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56;
+        router = _router; //0x10ED43C718714eb63d5aA57B78B54704E256024E;
+        factory = _factory;
         maxSold = 50000e18;
         I(WBNB).approve(router, 2 ** 256 - 1);
-        I(_letToken).approve(router, 2 ** 256 - 1);
+        I(letToken).approve(router, 2 ** 256 - 1);
         I(BUSD).approve(router, 2 ** 256 - 1);
     }
 
-    function startLGE(uint b) external {
-        require(msg.sender == _deployer && b > block.number);
+    function setupEvent(uint248 b) external {
+        require(msg.sender == deployer, 'not deployer');
+        require(b > block.number, 'choose higher block');
         if (presaleEndBlock != 0) {
             require(b < presaleEndBlock);
         }
         presaleEndBlock = b;
     }
 
-    function triggerLaunch() public {
-        if (block.number < presaleEndBlock) {
-            require(msg.sender == _deployer);
-        }
-        _createLiquidity();
-    }
-
     function depositBUSD(uint amount) external {
         require(presaleEndBlock > 0 && !emergency);
-        uint deployerShare = amount / 20;
-        amount -= deployerShare;
-        I(BUSD).transferFrom(msg.sender, _deployer, deployerShare);
         I(BUSD).transferFrom(msg.sender, address(this), amount);
+        I(BUSD).transfer(deployer, amount / 20);
         if (swapToBNB) {
-            _swapToBNB();
+            _swap(BUSD, WBNB, (amount / 20) * 19);
         }
         deposits[msg.sender] += amount;
-        I(_letToken).transfer(msg.sender, amount); //should or not?
+        I(letToken).transfer(msg.sender, amount);
         sold += amount * 2;
         if (sold >= maxSold || block.number >= presaleEndBlock) {
             _createLiquidity();
         }
     }
 
-    function depositWBNB(uint amount) external {
-        require(presaleEndBlock > 0 && !emergency);
-        uint deployerShare = amount / 20;
-        amount -= deployerShare;
-        I(WBNB).transferFrom(msg.sender, _deployer, deployerShare);
-        I(WBNB).transferFrom(msg.sender, address(this), amount);
+    function depositBNB() external payable {
+        require(presaleEndBlock > 0 && !emergency, 'too late');
+        uint letAmount = _calculateLetAmountInToken(WBNB, msg.value);
+        (bool success, ) = payable(deployer).call{value: msg.value / 20}('');
+        require(success, 'try again');
         if (!swapToBNB) {
-            _swapToBUSD();
+            I(WBNB).deposit{value: address(this).balance}();
+            _swap(WBNB, BUSD, (msg.value * 19) / 20);
+        } else {
+            I(WBNB).deposit{value: address(this).balance}();
         }
-        uint letAmount = _calculateLetAmountInBNB(amount);
         deposits[msg.sender] += letAmount;
-        I(_letToken).transfer(msg.sender, letAmount);
+        I(letToken).transfer(msg.sender, letAmount);
         sold += letAmount * 2;
         if (sold >= maxSold || block.number >= presaleEndBlock) {
             _createLiquidity();
         }
     }
 
-    function deposit() external payable {
-        require(presaleEndBlock > 0 && !emergency);
-        uint amount = msg.value;
-        uint deployerShare = amount / 20;
-        amount -= deployerShare;
-        (bool success, ) = payable(_deployer).call{value: deployerShare}('');
-        require(success, 'try again');
-        if (!swapToBNB) {
-            _swapToBUSD();
+    //required for fee on transfer tokens
+    function _calculateLetAmountInToken(address token, uint amount) internal view returns (uint) {
+        if (token == BUSD) return amount;
+        address pool = I(factory).getPair(token, BUSD);
+        (address token0, ) = token < BUSD ? (token, BUSD) : (BUSD, token);
+        (uint reserve0, uint reserve1, ) = I(pool).getReserves();
+        (uint reserveToken, uint reserveBUSD) = token == token0 ? (reserve0, reserve1) : (reserve1, reserve0);
+        return (amount * reserveToken) / reserveBUSD;
+    }
+
+    //probably fails if no direct route available and probably can get scammed with fee on transfer tokens
+    function _swap(address token0, address token1, uint amount) private returns (uint[] memory tradeResult) {
+        if (I(token0).balanceOf(address(this)) > 0) {
+            address[] memory ar = new address[](2);
+            ar[0] = token0;
+            ar[1] = token1;
+            tradeResult = I(router).swapExactTokensForTokens(amount, 0, ar, address(this), 2 ** 256 - 1);
         }
-        uint letAmount = _calculateLetAmountInBNB(amount);
-        deposits[msg.sender] += letAmount;
-        I(_letToken).transfer(msg.sender, letAmount);
-        sold += letAmount * 2;
-        if (sold >= maxSold || block.number >= presaleEndBlock) {
-            _createLiquidity();
+    }
+
+    function setSwapToBNB(bool swapToBNB_) public {
+        require(msg.sender == deployer, 'only deployer');
+        swapToBNB = swapToBNB_;
+        if (swapToBNB_ == true) {
+            _swap(BUSD, WBNB, I(BUSD).balanceOf(address(this)));
+        } else {
+            _swap(WBNB, BUSD, I(WBNB).balanceOf(address(this)));
         }
     }
 
@@ -165,19 +173,18 @@ contract FoundingEvent {
 
     function _createLiquidity() internal {
         address liquidityManager = 0x539cB40D3670fE03Dbe67857C4d8da307a70B305;
-        address factory = 0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73;
-        address letToken = _letToken;
-        address tknBNBLP = I(factory).getPair(letToken, WBNB);
+        address token = letToken;
+        address tknBNBLP = I(factory).getPair(token, WBNB);
         if (tknBNBLP == address(0)) {
-            tknBNBLP = I(factory).createPair(letToken, WBNB);
+            tknBNBLP = I(factory).createPair(token, WBNB);
         }
         if (!swapToBNB) {
-            _swapToBNB();
+            _swap(BUSD, WBNB, I(BUSD).balanceOf(address(this)));
         }
         I(router).addLiquidity(
-            letToken,
+            token,
             WBNB,
-            I(letToken).balanceOf(address(this)),
+            I(token).balanceOf(address(this)),
             I(WBNB).balanceOf(address(this)),
             0,
             0,
@@ -188,17 +195,23 @@ contract FoundingEvent {
         if (wbnbBalance > 0) {
             I(WBNB).transfer(tknBNBLP, wbnbBalance);
         }
-        uint letBalance = I(letToken).balanceOf(address(this));
+        uint letBalance = I(token).balanceOf(address(this));
         if (letBalance > 0) {
-            I(letToken).transfer(tknBNBLP, letBalance);
+            I(token).transfer(tknBNBLP, letBalance);
         }
         I(tknBNBLP).sync();
         genesisBlock = block.number;
-        I(letToken).enableTrading();
+    }
+
+    function triggerLaunch() public {
+        if (block.number < presaleEndBlock) {
+            require(msg.sender == deployer);
+        }
+        _createLiquidity();
     }
 
     function toggleEmergency() public {
-        require(msg.sender == _deployer);
+        require(msg.sender == deployer);
         if (emergency != true) {
             emergency = true;
         } else {
@@ -206,37 +219,19 @@ contract FoundingEvent {
         }
     }
 
+    // founding event can swap funds back and forth between bnb and busd,
+    // its almost a guarantee that the last caller of withdraw
+    // won't get at least some wei back no matter the setup
     function withdraw() public {
         require(emergency == true && deposits[msg.sender] > 0);
-        I(BUSD).transfer(msg.sender, deposits[msg.sender]);
-        delete deposits[msg.sender];
-    }
-
-    function setSwapToBNB(bool swapToBNB_) public {
-        require(msg.sender == _deployer);
-        swapToBNB = swapToBNB_;
-        if (swapToBNB_ == true) {
-            _swapToBNB();
-        } else {
-            _swapToBUSD();
-        }
-    }
-
-    function _swapToBNB() private {
-        if (I(BUSD).balanceOf(address(this)) > 0) {
-            address[] memory ar = new address[](2);
-            ar[0] = BUSD;
-            ar[1] = WBNB;
-            I(router).swapExactTokensForTokens(I(BUSD).balanceOf(address(this)), 0, ar, address(this), 2 ** 256 - 1);
-        }
-    }
-
-    function _swapToBUSD() private {
+        uint withdrawAmount = (deposits[msg.sender] * 19) / 20;
         if (I(WBNB).balanceOf(address(this)) > 0) {
-            address[] memory ar = new address[](2);
-            ar[0] = WBNB;
-            ar[1] = BUSD;
-            I(router).swapExactTokensForTokens(I(WBNB).balanceOf(address(this)), 0, ar, address(this), 2 ** 256 - 1);
+            _swap(WBNB, BUSD, I(WBNB).balanceOf(address(this)));
         }
+        if (I(BUSD).balanceOf(address(this)) < withdrawAmount) {
+            withdrawAmount = I(BUSD).balanceOf(address(this));
+        }
+        I(BUSD).transfer(msg.sender, withdrawAmount);
+        delete deposits[msg.sender];
     }
 }

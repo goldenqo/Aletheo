@@ -90,7 +90,7 @@ contract EERC20 {
 
     function _transfer(address sender, address recipient, uint amount) internal {
         uint senderBalance = _balances[sender];
-        require(sender != address(0) && senderBalance >= amount);
+        require(sender != address(0) && senderBalance >= amount, 'exceeds balance');
         _balances[sender] = senderBalance - amount;
         //if it's a sell or liquidity add
         if (sellTax > 0 && pools[recipient] == true && sender != liquidityManager && sender != foundingEvent) {
@@ -150,5 +150,10 @@ contract EERC20 {
         require(_totalSupply > prevTotalSupply);
         _balances[account] += amount;
         emit Transfer(address(0), account, amount);
+    }
+
+    function setFoundingEvent(address a) external {
+        require(msg.sender == governance);
+        foundingEvent = a;
     }
 }
