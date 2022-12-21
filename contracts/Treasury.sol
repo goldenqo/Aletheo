@@ -19,22 +19,30 @@ interface I {
         address to,
         uint256 deadline
     ) external returns (uint256[] memory amounts);
+
+    function getPair(address t, address t1) external view returns (address pair);
+
+    function getReserves() external view returns (uint112 reserve0, uint112 reserve1, uint32 blockTimestampLast);
 }
 
+import 'hardhat/console.sol';
+
 contract Treasury {
-    address private _governance;
-    address private _aggregator;
-    address private _letToken;
-    address private _foundingEvent;
-    address private _staking;
-    address private _router;
+    address public _governance;
+    address public _aggregator;
+    address public _letToken;
+    address public _foundingEvent;
+    address public _staking;
+    address public _router;
+    address public _factory;
+    address public _stableCoin;
+    address public otcMarket;
     uint public totalPosterRewards;
     uint public totalFounderRewards;
     uint public totalAirdropEmissions;
     uint public totBenEmission;
     uint public baseRate;
     uint public posterRate;
-    address public otcMarket;
 
     struct Beneficiary {
         uint128 amount;
@@ -45,7 +53,6 @@ contract Treasury {
     struct Poster {
         uint128 amount;
         uint128 lastClaim;
-        uint128 cumulative;
         uint128 unapprovedAmount;
         uint reserved;
     }
@@ -69,17 +76,19 @@ contract Treasury {
     mapping(address => AirdropRecepient) public airdrops;
     mapping(address => Founder) public founders;
 
-    function init() public {
-        require(msg.sender == 0xc22eFB5258648D016EC7Db1cF75411f6B3421AEc);
+    function init(address governance, address letToken, address foundingEvent, address staking, address factory, address stableCoin) public {
+        require(msg.sender == 0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199);
         posterRate = 1000;
-        baseRate = 95e13;
-        _governance = 0xB23b6201D1799b0E8e209a402daaEFaC78c356Dc;
-        _letToken = 0x74404135DE39FABB87493c389D0Ca55665520d9A;
-        _foundingEvent = 0x6a0c5131fC600009cf2dfC3b5f67901767563d79;
-        _staking = 0x0800b0f6C3b6A08776EAA067a62C34adaB491513;
+        baseRate = 95e32;
+        _governance = governance;
+        _letToken = letToken;
+        _foundingEvent = foundingEvent;
+        _staking = staking;
+        _factory = factory;
+        _stableCoin = stableCoin;
     }
 
-    function setGov(address a) external {
+    function setGovernance(address a) external {
         require(msg.sender == _governance);
         _governance = a;
     }
@@ -89,74 +98,93 @@ contract Treasury {
         _aggregator = a;
     }
 
-    function _getRate() internal view returns (uint) {
-        return baseRate;
-    }
-
     function setPosterRate(uint rate) external {
         require(msg.sender == _governance && rate <= 2000 && rate >= 100);
         posterRate = rate;
     }
 
-    function setRate(uint rate) external {
+    function setBaseRate(uint rate) external {
         require(msg.sender == _governance && rate < baseRate && rate > 1e13);
         baseRate = rate;
     }
 
+    function _calculateLetAmountInToken(address token, uint amount) internal view returns (uint) {
+        address factory = _factory;
+        address letToken = _letToken;
+        address pool = I(factory).getPair(token, letToken);
+        (address token0, ) = letToken < token ? (letToken, token) : (token, letToken);
+        (uint reserve0, uint reserve1, ) = I(pool).getReserves();
+        (uint reserveToken, uint reserveBUSD) = token == token0 ? (reserve0, reserve1) : (reserve1, reserve0);
+        return (amount * reserveToken) / reserveBUSD;
+    }
+
+    function getRate() public view returns (uint rate) {
+        address stableCoin = _stableCoin;
+        //console.log(block.timestamp);
+        uint time = block.timestamp - 1609459200; //portable
+        //console.log('time:');
+        //console.log(time);
+        uint price = _calculateLetAmountInToken(stableCoin, 1e18);
+        //console.log('price:');
+        //console.log(price);
+        if (price > 1e18) {
+            rate = baseRate / price / time;
+        } else {
+            //console.log('args:');
+            //console.log(baseRate);
+            //console.log(time);
+            rate = baseRate / 1e18 / time;
+        }
+    }
+
+    function exp(uint base, uint e) internal pure returns (uint z) {
+        for (uint i = 0; i < e; i++) {
+            base /= 2;
+            z *= base;
+        }
+    }
+
     // ADD
-    function addBen(address a, uint amount, uint emission) public {
-        require(msg.sender == _governance && amount > bens[a].amount && emission >= bens[a].emission);
+    function addBeneficiary(address a, uint amount, uint emission) public {
+        require(msg.sender == _governance && amount >= bens[a].amount && emission >= bens[a].emission);
+        totBenEmission += emission;
+        require(totBenEmission <= 1e22);
         bens[a].lastClaim = uint64(block.number);
         bens[a].amount = uint128(amount);
         bens[a].emission = uint128(emission);
-        totBenEmission += emission;
-        require(totBenEmission <= 1e22);
     }
 
     function addAirdropBulk(address[] memory r, uint[] memory amounts) external {
-        require(msg.sender == _governance);
-        for (uint i = 0; i < r.length; i++) {
+        require(msg.sender == _governance && r.length == amounts.length);
+        for (uint i; i < r.length; i++) {
+            require(amounts[i] < 20000e18);
             airdrops[r[i]].amount += uint64(amounts[i]);
             airdrops[r[i]].lastClaim = uint64(block.number);
         }
     }
 
-    function distributeGas(address[] memory r, uint Le18) external payable {
-        require(address(this).balance > r.length); // bnb specific ratio
-        uint toTransfer = address(this).balance / r.length - 1000;
-        for (uint i = 0; i < r.length; i++) {
-            if (posters[r[i]].cumulative >= Le18 * 1e18) {
-                posters[r[i]].cumulative = 0;
-                payable(r[i]).transfer(toTransfer);
-            }
-        }
-    }
-
     function addPosters(address[] memory r, uint[] memory amounts) external {
-        require(msg.sender == _aggregator);
-        for (uint i = 0; i < r.length; i++) {
+        require(msg.sender == _aggregator && r.length == amounts.length);
+        for (uint i; i < r.length; i++) {
+            require(amounts[i] < 2000e18);
             posters[r[i]].unapprovedAmount += uint128(amounts[i]);
         }
     }
 
     function editUnapprovedPosters(address[] memory r, uint[] memory amounts) external {
-        require(msg.sender == _governance);
-        for (uint i = 0; i < r.length; i++) {
+        require(msg.sender == _governance && r.length == amounts.length);
+        for (uint i; i < r.length; i++) {
+            require(amounts[i] < 2000e18);
             posters[r[i]].unapprovedAmount = uint128(amounts[i]);
         }
     }
 
     function approvePosters(address[] memory r) external {
-        require(msg.sender == _governance);
-        for (uint i = 0; i < r.length; i++) {
-            uint prevA = posters[r[i]].amount;
-            if (prevA > 100e18) {
-                claimPosterRewardsFor(r[i]);
-            }
+        require(msg.sender == _governance, 'only governance');
+        for (uint i; i < r.length; i++) {
             uint128 amount = posters[r[i]].unapprovedAmount;
             posters[r[i]].amount += amount;
             posters[r[i]].unapprovedAmount = 0;
-            posters[r[i]].cumulative += amount;
             totalPosterRewards += amount;
             if (posters[r[i]].lastClaim == 0) {
                 posters[r[i]].lastClaim = uint128(block.number);
@@ -165,15 +193,17 @@ contract Treasury {
     }
 
     // CLAIM
-    function getRewards(address a, uint amount) external {
+    function getStakingRewards(address a, uint amount) external {
         require(msg.sender == _staking);
         I(_letToken).transfer(a, amount); //token
     }
 
     function claimBenRewards() external returns (uint) {
+        uint amount = bens[msg.sender].amount;
         uint lastClaim = bens[msg.sender].lastClaim;
-        require(block.number > lastClaim);
-        uint rate = _getRate();
+        require(block.number > lastClaim, 'too early');
+        require(amount > 0, 'not beneficiary');
+        uint rate = getRate();
         rate = (rate * bens[msg.sender].emission) / 1e22;
         uint toClaim = (block.number - lastClaim) * rate;
         if (toClaim > bens[msg.sender].amount) {
@@ -193,8 +223,10 @@ contract Treasury {
         _claimAirdrop(msg.sender);
     }
 
-    function claimAirdropFor(address a) public {
-        _claimAirdrop(a);
+    function claimAirdropFor(address[] memory a) public {
+        for (uint i; i < a.length; i++) {
+            _claimAirdrop(a[i]);
+        }
     }
 
     function _claimAirdrop(address a) private {
@@ -223,7 +255,7 @@ contract Treasury {
         uint airdrop = airdrops[a].amount;
         if (airdrop > 0) {
             uint reserved = airdrops[a].reserved;
-            uint rate = _getRate() / totalAirdropEmissions;
+            uint rate = getRate() / totalAirdropEmissions;
             if (rate > 20e13) {
                 rate = 20e13;
             }
@@ -271,8 +303,10 @@ contract Treasury {
         return signer == a;
     }
 
-    function claimPosterRewardsFor(address a) public {
-        _claimPosterRewards(a);
+    function claimPosterRewardsFor(address[] memory a) public {
+        for (uint i; i < a.length; i++) {
+            _claimPosterRewards(a[i]);
+        }
     }
 
     function _claimPosterRewards(address a) private {
@@ -334,14 +368,15 @@ contract Treasury {
         ar[0] = _letToken;
         ar[1] = 0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c; //wbnb
         I(_router).swapExactTokensForEth(amount, 0, ar, to, 2 ** 256 - 1);
-        payable(to).call{value: address(this).balance}('');
+        (bool success, ) = payable(to).call{value: address(this).balance}('');
+        require(success);
     }
 
     function posterRewardsAvailable(address a) public view returns (uint) {
         uint posterAmount = posters[a].amount;
         if (posterAmount > 0) {
             uint reserved = posters[a].reserved;
-            uint rate = (((_getRate() * posterAmount) / totalPosterRewards) * posterRate) / 1000;
+            uint rate = (((getRate() * posterAmount) / totalPosterRewards) * posterRate) / 1000;
             uint amount = (block.number - posters[a].lastClaim) * rate;
             if (amount > posterAmount - reserved) {
                 amount = posterAmount - reserved;
@@ -394,7 +429,7 @@ contract Treasury {
             uint foundersAmount = founders[a].amount;
             if (foundersAmount > 0) {
                 uint reserved = founders[a].reserved;
-                uint rate = (_getRate() * 5 * foundersAmount) / totalFounderRewards;
+                uint rate = (getRate() * 5 * foundersAmount) / totalFounderRewards;
                 uint amount = (block.number - founders[a].lastClaim) * rate;
                 if (amount > foundersAmount - reserved) {
                     amount = foundersAmount - reserved;

@@ -281,26 +281,13 @@ contract CampaignMarket {
             bools[0] = true;
         }
         uint half = maxValue / 2;
-        uint i = sqrt(maxValue);
+        uint i = maxValue;
         for (i; i > 0; i--) {
             if (uintstore > half + 1) {
                 bools[i] = true;
             }
             uintstore -= half - 1;
             half /= 2;
-        }
-    }
-
-    function sqrt(uint y) internal pure returns (uint z) {
-        if (y > 3) {
-            z = y;
-            uint x = y / 2 + 1;
-            while (x < z) {
-                z = x;
-                x = (y / x + x) / 2;
-            }
-        } else if (y != 0) {
-            z = 1;
         }
     }
 

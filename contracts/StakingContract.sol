@@ -49,10 +49,10 @@ contract StakingContract {
 
     bool public ini; //reserved
 
-    function init() public {
+    function init(address letToken, address treasury) public {
         //require(ini==false);ini=true;
-        _letToken = 0x74404135DE39FABB87493c389D0Ca55665520d9A;
-        _treasury = 0xee59B379eC7DC18612B39f35eD8A46C78463E744;
+        _letToken = letToken;
+        _treasury = treasury;
     }
 
     function registerToken(TokenRewards memory token) public {

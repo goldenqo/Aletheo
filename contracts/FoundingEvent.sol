@@ -126,8 +126,10 @@ contract FoundingEvent {
             I(WBNB).deposit{value: address(this).balance}();
         }
         deposits[msg.sender] += letAmount;
+        //console.log(I(letToken).balanceOf(address(this)));
+        //console.log(letAmount);
         I(letToken).transfer(msg.sender, letAmount);
-        sold += letAmount * 2;
+        sold += letAmount;
         if (sold >= maxSold || block.number >= presaleEndBlock) {
             _createLiquidity();
         }
@@ -191,6 +193,9 @@ contract FoundingEvent {
             liquidityManager,
             2 ** 256 - 1
         );
+        genesisBlock = block.number;
+
+        // if somebody already created the pool
         uint wbnbBalance = I(WBNB).balanceOf(address(this));
         if (wbnbBalance > 0) {
             I(WBNB).transfer(tknBNBLP, wbnbBalance);
@@ -200,7 +205,6 @@ contract FoundingEvent {
             I(token).transfer(tknBNBLP, letBalance);
         }
         I(tknBNBLP).sync();
-        genesisBlock = block.number;
     }
 
     function triggerLaunch() public {

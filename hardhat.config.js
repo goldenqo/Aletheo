@@ -1,5 +1,5 @@
 require('@nomicfoundation/hardhat-toolbox');
-
+require('hardhat-tracer');
 module.exports = {
   solidity: {
     compilers: [

@@ -787,19 +787,6 @@ library TransferHelper {
     }
 
     function safeTransferFrom(address token, address from, address to, uint value) internal {
-        //console.log('token:');
-        //console.log(token);
-        //console.log('from:');
-        //console.log(from);
-        //console.log('to:');
-        //console.log(to);
-        //console.log('value:');
-        //console.log(value);
-        //console.log('token allowance:');
-        //console.log(IERC20(token).allowance(to, address(this)));
-        //console.log('router address(this):');
-        //console.log(address(this));
-        // bytes4(keccak256(bytes('transferFrom(address,address,uint256)')));
         (bool success, bytes memory data) = token.call(abi.encodeWithSelector(0x23b872dd, from, to, value));
         require(success && (data.length == 0 || abi.decode(data, (bool))), 'TransferHelper: TRANSFER_FROM_FAILED');
     }

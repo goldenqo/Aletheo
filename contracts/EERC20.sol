@@ -24,7 +24,7 @@ contract EERC20 {
 
     function init(address _liquidityManager, address _treasury, address _foundingEvent, address _governance) public {
         require(msg.sender == 0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199);
-        require(ini == false);
+        require(ini == false, 'already initialized');
         ini = true;
         name = 'Aletheo';
         symbol = 'LET';
@@ -34,7 +34,7 @@ contract EERC20 {
         governance = _governance;
         _mint(_governance, 15000e18);
         _mint(treasury, 50000e18);
-        _mint(foundingEvent, 90000e18);
+        _mint(foundingEvent, 100000e18);
     }
 
     function totalSupply() public view returns (uint) {
