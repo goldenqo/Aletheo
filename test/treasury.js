@@ -119,7 +119,7 @@ describe('TREASURY', function () {
     it('Adds airdrops bulk if called by governance', async function () {
       const arg = ethers.BigNumber.from('30000000000000');
       await expect(treasury.addAirdropBulk([accounts[0].address], [arg])).not.to.be.reverted;
-      expect((await treasury.airdrops(accounts[0].address), 'unexpected airdrops[address].amount').amount).to.equal(arg);
+      expect((await treasury.airdrops(accounts[0].address)).amount, 'unexpected airdrops[address].amount').to.equal(arg);
       expect((await treasury.airdrops(accounts[0].address)).lastClaim, 'unexpected airdrops[address].lastClaim').to.equal(await time.latestBlock());
     });
     it('Fails to addAirdropBulk if called by not governance', async function () {
@@ -189,19 +189,19 @@ describe('TREASURY', function () {
       const arg = 15;
       await treasury.connect(accounts[9]).addPosters([accounts[0].address], [arg]);
       await expect(treasury.connect(accounts[0]).approvePosters([accounts[0].address])).not.to.be.reverted;
-      expect((await treasury.posters(accounts[0].address)).amount).to.equal(arg);
-      expect((await treasury.posters(accounts[0].address)).unapprovedAmount).to.equal(0);
+      expect((await treasury.posters(accounts[0].address)).amount, 'unexpected posters[address].amount').to.equal(arg);
+      expect((await treasury.posters(accounts[0].address)).unapprovedAmount, 'unexpected unapprovedAmount').to.equal(0);
     });
     it('Sets lastClaim to block.number if it was zero and if called by governance', async function () {
       await treasury.connect(accounts[9]).addPosters([accounts[0].address], [15]);
       await expect(treasury.approvePosters([accounts[0].address])).not.to.be.reverted;
-      expect((await treasury.posters(accounts[0].address)).lastClaim).to.equal(await time.latestBlock());
+      expect((await treasury.posters(accounts[0].address)).lastClaim, 'unexpected lastClaim').to.equal(await time.latestBlock());
     });
     it('Adds to totalPosterRewards', async function () {
       const initial = await treasury.totalPosterRewards();
       await treasury.connect(accounts[9]).addPosters([accounts[0].address], [15]);
       await expect(treasury.approvePosters([accounts[0].address])).not.to.be.reverted;
-      expect(await treasury.totalPosterRewards()).to.equal(initial.add(15));
+      expect(await treasury.totalPosterRewards(), 'unexpected totalPosterRewards').to.equal(initial.add(15));
     });
     it('Fails if called by not governance', async function () {
       await treasury.connect(accounts[9]).addPosters([accounts[0].address], [15]);
@@ -213,7 +213,7 @@ describe('TREASURY', function () {
     it('Gets staking rewards if called by staking', async function () {
       const initial = await eerc20.balanceOf(accounts[0].address);
       await expect(treasury.connect(staking).getStakingRewards(accounts[0].address, 15)).not.to.be.reverted;
-      expect(await eerc20.balanceOf(accounts[0].address)).to.equal(initial.add(15));
+      expect(await eerc20.balanceOf(accounts[0].address), 'unexpected let balance').to.equal(initial.add(15));
     });
     it('Fails if called by not staking', async function () {
       await expect(treasury.getStakingRewards(accounts[0].address, 15)).to.be.reverted;
